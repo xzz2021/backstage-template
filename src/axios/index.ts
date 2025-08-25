@@ -1,12 +1,13 @@
 import service from './service'
 import { CONTENT_TYPE } from '@/constants'
 import { useUserStoreWithOut } from '@/store/modules/user'
+import { throttleWrap } from './throttle'
 
 const request = (option: AxiosConfig) => {
   const { url, method, params, data, headers, responseType } = option
 
   const userStore = useUserStoreWithOut()
-  return service.request({
+  const config = {
     url: url,
     method,
     params,
@@ -14,11 +15,18 @@ const request = (option: AxiosConfig) => {
     responseType: responseType,
     headers: {
       'Content-Type': CONTENT_TYPE,
-      [userStore.getTokenKey ?? 'Authorization']: userStore.getToken ?? '',
+      [userStore.getTokenKey ?? 'Authorization']: userStore.getToken
+        ? 'bearer ' + userStore.getToken
+        : '',
       ...headers
     }
-  })
+  }
+
+  // return service.request(config) //  返回原始请求   用于测试 后端限流
+  return throttleWrap(service.request)(config) //  前端节流请求
 }
+
+// const throttledRequest = throttleWrap(request)
 
 export default {
   get: <T = any>(option: AxiosConfig) => {

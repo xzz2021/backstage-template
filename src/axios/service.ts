@@ -5,6 +5,15 @@ import { AxiosInstance, InternalAxiosRequestConfig, RequestConfig, AxiosResponse
 import { ElMessage } from 'element-plus'
 import { REQUEST_TIMEOUT } from '@/constants'
 
+import { useUserStoreWithOut } from '@/store/modules/user'
+
+const errMsg = (msg: string) => {
+  ElMessage({
+    message: msg?.length > 150 ? msg.slice(0, 150) : msg,
+    grouping: true,
+    type: 'error'
+  })
+}
 export const PATH_URL = import.meta.env.VITE_API_BASE_PATH
 
 const abortControllerMap: Map<string, AbortController> = new Map()
@@ -25,6 +34,7 @@ axiosInstance.interceptors.request.use((res: InternalAxiosRequestConfig) => {
   return res
 })
 
+//  响应拦截器 一号    1. 优先过滤掉服务端 异常状态码
 axiosInstance.interceptors.response.use(
   (res: AxiosResponse) => {
     const url = res.config.url || ''
@@ -34,12 +44,28 @@ axiosInstance.interceptors.response.use(
   },
   (error: AxiosError) => {
     console.log('err： ' + error) // for debug
-    ElMessage.error(error.message)
+    // console.log('xzz2021: error', error)
+    if (error?.status === 500) {
+      errMsg('网络异常,或后端服务进程出错!')
+    }
+    if (error?.status == 404) {
+      errMsg('接口不存在,请联系后端管理员!')
+    }
+    if (error?.status == 403) {
+      errMsg('当前用户没有操作权限,请联系管理员!')
+    }
+    if (error?.status == 401) {
+      errMsg('登录过期, 鉴权失败, 请重新登录!')
+      const userStore = useUserStoreWithOut()
+      userStore.logout()
+    }
+    errMsg((error.response?.data as any)?.message || '网络异常,或后端服务进程出错!')
     return Promise.reject(error)
   }
 )
 
 axiosInstance.interceptors.request.use(defaultRequestInterceptors)
+//  响应拦截器 二号
 axiosInstance.interceptors.response.use(defaultResponseInterceptors)
 
 const service = {

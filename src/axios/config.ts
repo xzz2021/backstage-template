@@ -2,7 +2,6 @@ import { AxiosResponse, InternalAxiosRequestConfig } from './types'
 import { ElMessage } from 'element-plus'
 import qs from 'qs'
 import { SUCCESS_CODE, TRANSFORM_REQUEST_DATA } from '@/constants'
-import { useUserStoreWithOut } from '@/store/modules/user'
 import { objToFormData } from '@/utils'
 
 const defaultRequestInterceptors = (config: InternalAxiosRequestConfig) => {
@@ -15,7 +14,7 @@ const defaultRequestInterceptors = (config: InternalAxiosRequestConfig) => {
     TRANSFORM_REQUEST_DATA &&
     config.method === 'post' &&
     config.headers['Content-Type'] === 'multipart/form-data' &&
-    !(config.data instanceof FormData)
+    !(config.data instanceof FormData) // 不是formData 则进行转换
   ) {
     config.data = objToFormData(config.data)
   }
@@ -32,9 +31,11 @@ const defaultRequestInterceptors = (config: InternalAxiosRequestConfig) => {
     config.params = {}
     config.url = url
   }
+  // 如果data本身就是formData 则会直接走向这里  不会进行任何处理
   return config
 }
 
+// 只有响应拦截器 一号通过了, 才会走到这边的二号
 const defaultResponseInterceptors = (response: AxiosResponse) => {
   if (response?.config?.responseType === 'blob') {
     // 如果是文件流，直接过
@@ -42,11 +43,14 @@ const defaultResponseInterceptors = (response: AxiosResponse) => {
   } else if (response.data.code === SUCCESS_CODE) {
     return response.data
   } else {
-    ElMessage.error(response?.data?.message)
-    if (response?.data?.code === 401) {
-      const userStore = useUserStoreWithOut()
-      userStore.logout()
-    }
+    // console.log('xzz2021: defaultResponseInterceptors -> response.data', response.data)
+    const msg = response?.data?.message || response?.data || '请求失败'
+
+    ElMessage({
+      message: msg?.length > 150 ? msg.slice(0, 150) : msg,
+      grouping: true,
+      type: 'error'
+    })
   }
 }
 
