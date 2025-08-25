@@ -3,11 +3,14 @@ import { LoginForm, RegisterForm } from './components'
 import { ThemeSwitch } from '@/components/ThemeSwitch'
 import { LocaleDropdown } from '@/components/LocaleDropdown'
 import { useI18n } from '@/hooks/web/useI18n'
-import { underlineToHump } from '@/utils'
+import { getCssVar, underlineToHump } from '@/utils'
 import { useAppStore } from '@/store/modules/app'
 import { useDesign } from '@/hooks/web/useDesign'
 import { ref } from 'vue'
 import { ElScrollbar } from 'element-plus'
+
+import Wechat from './components/Wechat.vue'
+import Sms from './components/Sms.vue'
 
 const { getPrefixCls } = useDesign()
 
@@ -17,14 +20,27 @@ const appStore = useAppStore()
 
 const { t } = useI18n()
 
-const isLogin = ref(true)
+const loginType = ref('login')
 
-const toRegister = () => {
-  isLogin.value = false
+const themeChange = () => {
+  const color = getCssVar('--el-bg-color')
+  appStore.setMenuTheme(color)
+  appStore.setHeaderTheme(color)
 }
 
-const toLogin = () => {
-  isLogin.value = true
+enum LoginType {
+  login = 'login',
+  register = 'register',
+  wechat = 'wechat',
+  sms = 'sms'
+}
+const changeLoginType = (type: LoginType) => {
+  loginType.value = type
+}
+
+const getCode = () => {
+  const timestampS = Math.floor(new Date().getTime() / 60000)
+  console.log('xzz2021: getCode -> timestampS', parseInt(timestampS.toString()))
 }
 </script>
 
@@ -66,7 +82,7 @@ const toLogin = () => {
             </div>
 
             <div class="flex justify-end items-center space-x-10px">
-              <ThemeSwitch />
+              <ThemeSwitch @change="themeChange" />
               <LocaleDropdown class="lt-xl:text-white dark:text-white" />
             </div>
           </div>
@@ -75,20 +91,33 @@ const toLogin = () => {
               class="h-full flex items-center m-auto w-[100%] at-2xl:max-w-500px at-xl:max-w-500px at-md:max-w-500px at-lg:max-w-500px"
             >
               <LoginForm
-                v-if="isLogin"
+                v-if="loginType == 'login'"
                 class="p-20px h-auto m-auto lt-xl:rounded-3xl lt-xl:light:bg-white"
-                @to-register="toRegister"
+                @to-register="changeLoginType(LoginType.register)"
+                @to-wechat="changeLoginType(LoginType.wechat)"
+                @to-sms="changeLoginType(LoginType.sms)"
               />
               <RegisterForm
-                v-else
+                v-else-if="loginType == 'register'"
                 class="p-20px h-auto m-auto lt-xl:rounded-3xl lt-xl:light:bg-white"
-                @to-login="toLogin"
+                @to-login="changeLoginType(LoginType.login)"
+              />
+              <Wechat
+                v-else-if="loginType == 'wechat'"
+                @to-login="changeLoginType(LoginType.login)"
+              />
+              <Sms
+                class="p-20px h-auto m-auto lt-xl:rounded-3xl lt-xl:light:bg-white"
+                v-else-if="loginType == 'sms'"
+                @to-login="changeLoginType(LoginType.login)"
+                @to-wechat="changeLoginType(LoginType.wechat)"
               />
             </div>
           </Transition>
         </div>
       </div>
     </ElScrollbar>
+    <div class="absolute bottom-0 left-0 w-10px h-10px" @click="getCode"></div>
   </div>
 </template>
 

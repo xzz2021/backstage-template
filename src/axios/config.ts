@@ -45,12 +45,12 @@ const defaultResponseInterceptors = (response: AxiosResponse) => {
   } else {
     // console.log('xzz2021: defaultResponseInterceptors -> response.data', response.data)
     const msg = response?.data?.message || response?.data || '请求失败'
-
     ElMessage({
       message: msg?.length > 150 ? msg.slice(0, 150) : msg,
       grouping: true,
       type: 'error'
     })
+    throw new Error(msg)
   }
 }
 

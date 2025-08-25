@@ -3,13 +3,11 @@ import { Form, FormSchema } from '@/components/Form'
 import { reactive, ref, unref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useForm } from '@/hooks/web/useForm'
-import { ElInput, FormRules } from 'element-plus'
+import { ElInput, ElMessage, FormRules } from 'element-plus'
 import { useValidator } from '@/hooks/web/useValidator'
 import { BaseButton } from '@/components/Button'
-import { getSmsCode, registerApi } from '@/api/login'
-import { ElMessage } from 'element-plus'
-
-const emit = defineEmits(['to-login'])
+import { getSmsCode, wechatBind } from '@/api/login'
+import { useLogin } from './hooks'
 
 const { formRegister, formMethods } = useForm()
 const { getElFormExpose, getFormData } = formMethods
@@ -18,8 +16,33 @@ const { t } = useI18n()
 
 const { required, lengthRange, phone, numberLength } = useValidator()
 
+const props = defineProps<{
+  wechatInfo: any
+}>()
+
 const getCodeTime = ref(60)
 const getCodeLoading = ref(false)
+const getCode = async () => {
+  const formRef = await getElFormExpose()
+  const isPhone = await formRef?.validateField('phone')
+  if (!isPhone) {
+    return ElMessage.error('请输入手机号')
+  }
+  getCodeLoading.value = true
+  const timer = setInterval(() => {
+    getCodeTime.value--
+    if (getCodeTime.value <= 0) {
+      clearInterval(timer)
+      getCodeTime.value = 60
+      getCodeLoading.value = false
+    }
+  }, 1000)
+  // 向后端请求发送验证码
+  const formData = await getFormData()
+  const { phone } = formData
+  const res = await getSmsCode({ phone, type: 'bind' })
+  console.log('xzz2021: getCode -> res', res)
+}
 
 const schema = reactive<FormSchema[]>([
   {
@@ -30,7 +53,28 @@ const schema = reactive<FormSchema[]>([
     formItemProps: {
       slots: {
         default: () => {
-          return <h2 class="text-2xl font-bold text-center w-[100%]">{t('login.register')}</h2>
+          return <h2 class="text-2xl font-bold text-center w-[100%]">绑定信息</h2>
+        }
+      }
+    }
+  },
+  {
+    field: 'avatar',
+    colProps: {
+      span: 24
+    },
+    formItemProps: {
+      slots: {
+        default: () => {
+          return (
+            <div class="flex items-center w-full justify-center">
+              {props.wechatInfo.avatar ? (
+                <img src={props.wechatInfo.avatar} alt="" class="w-[60px] h-[60px] rounded-full" />
+              ) : (
+                <></>
+              )}
+            </div>
+          )
         }
       }
     }
@@ -38,7 +82,7 @@ const schema = reactive<FormSchema[]>([
   {
     field: 'username',
     label: t('login.username'),
-    value: 'xzz2021',
+    value: props.wechatInfo.username,
     component: 'Input',
     colProps: {
       span: 24
@@ -50,19 +94,19 @@ const schema = reactive<FormSchema[]>([
   {
     field: 'phone',
     label: t('login.phone'),
-    value: '13077908822',
+    value: '',
     component: 'Input',
     colProps: {
       span: 24
     },
     componentProps: {
-      placeholder: t('login.phone')
+      placeholder: t('login.phonePlaceholder')
     }
   },
   {
     field: 'password',
     label: t('login.password'),
-    value: '112233',
+    value: '',
     component: 'InputPassword',
     colProps: {
       span: 24
@@ -78,7 +122,7 @@ const schema = reactive<FormSchema[]>([
   {
     field: 'check_password',
     label: t('login.checkPassword'),
-    value: '112233',
+    value: '',
     component: 'InputPassword',
     colProps: {
       span: 24
@@ -94,8 +138,6 @@ const schema = reactive<FormSchema[]>([
   {
     field: 'code',
     label: t('login.code'),
-    value: '112233',
-
     colProps: {
       span: 24
     },
@@ -121,32 +163,6 @@ const schema = reactive<FormSchema[]>([
     }
   },
 
-  // {
-  //   field: 'iAgree',
-  //   colProps: {
-  //     span: 24
-  //   },
-  //   formItemProps: {
-  //     slots: {
-  //       default: (formData: any) => {
-  //         return (
-  //           <>
-  //             <IAgree
-  //               v-model={formData.iAgree}
-  //               text="我同意《用户协议》"
-  //               link={[
-  //                 {
-  //                   text: '《用户协议》',
-  //                   url: 'https://element-plus.org/'
-  //                 }
-  //               ]}
-  //             />
-  //           </>
-  //         )
-  //       }
-  //     }
-  //   }
-  // },
   {
     field: 'register',
     colProps: {
@@ -164,12 +180,7 @@ const schema = reactive<FormSchema[]>([
                   loading={loading.value}
                   onClick={loginRegister}
                 >
-                  {t('login.register')}
-                </BaseButton>
-              </div>
-              <div class="w-[100%] mt-15px">
-                <BaseButton class="w-[100%]" onClick={toLogin}>
-                  {t('login.hasUser')}
+                  确认绑定
                 </BaseButton>
               </div>
             </>
@@ -179,39 +190,6 @@ const schema = reactive<FormSchema[]>([
     }
   }
 ])
-
-const toLogin = () => {
-  emit('to-login')
-}
-
-const loading = ref(false)
-
-const getCode = async () => {
-  const formRef = await getElFormExpose()
-  const isPhone = await formRef?.validateField('phone')
-  if (!isPhone) {
-    return ElMessage.error('请输入手机号')
-  }
-  getCodeLoading.value = true
-  const timer = setInterval(() => {
-    getCodeTime.value--
-    if (getCodeTime.value <= 0) {
-      clearInterval(timer)
-      getCodeTime.value = 60
-      getCodeLoading.value = false
-    }
-  }, 1000)
-  // 向后端请求发送验证码
-  const formData = await getFormData()
-  const { phone } = formData
-  const res = await getSmsCode({ phone, type: 'register' })
-  console.log('xzz2021: getCode -> res', res)
-  if (res.code == 200) {
-    ElMessage.success('验证码发送成功')
-  } else {
-    ElMessage.error('验证码发送失败')
-  }
-}
 
 const validatecheckPwd = async (_rule: any, value: any, callback: any) => {
   const formData = await getFormData()
@@ -227,7 +205,12 @@ const rules: FormRules = {
   password: [required(), lengthRange({ min: 6, max: 16 })],
   check_password: [required(), { asyncValidator: validatecheckPwd, trigger: 'blur' }],
   code: [required(), numberLength(6)]
+  // iAgree: [required()]
 }
+
+const loading = ref(false)
+
+const { successLogin } = useLogin()
 
 const loginRegister = async () => {
   const formRef = await getElFormExpose()
@@ -235,13 +218,18 @@ const loginRegister = async () => {
     if (valid) {
       try {
         const formData = await getFormData()
-        loading.value = true
-        const { password, phone, username, code } = formData
-        await registerApi({ password, phone, username, code })
-        ElMessage.success('注册成功, 欢迎登陆!')
-        toLogin()
-      } finally {
-        loading.value = false
+        console.log('xzz2021: loginRegister -> formData', formData)
+        console.log('xzz2021: loginRegister -> props.wechatInfo', props.wechatInfo)
+        const res = await wechatBind({ ...formData, ...props.wechatInfo })
+        const { userinfo, access_token } = res.data
+        if (access_token) {
+          //  说明登录成功  设定token 路由跳转
+          successLogin(userinfo, access_token)
+        } else {
+          ElMessage.error('绑定失败')
+        }
+      } catch (error) {
+        console.error('xzz2021: onBeforeRouteUpdate -> error', error)
       }
     }
   })

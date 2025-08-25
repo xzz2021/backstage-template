@@ -122,7 +122,8 @@ export default {
     passwordPlaceholder: 'Please input password',
     code: 'Verification code',
     codePlaceholder: 'Please input verification code',
-    getCode: 'Get code'
+    getCode: 'Get code',
+    phone: 'Phone'
   },
   router: {
     login: 'Login',

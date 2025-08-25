@@ -205,3 +205,36 @@ export const eachTree = (treeDatas: any[], callBack: Fn, parentNode = {}) => {
     }
   })
 }
+
+//  list2tree 同时排序
+export const formatToTree = <
+  T extends { id: number; parentId: number | null; sort: number | null }
+>(
+  array2: T[],
+  parentId: number | null = null,
+  parentKey = 'parentId'
+): (T & { children: T[] })[] => {
+  const array = JSON.parse(JSON.stringify(array2))
+  // Check if parentId exists in array (except for null)
+  const parentExists = (pid: number | null) => pid === null || array.some((item) => item.id === pid)
+
+  return (
+    array
+      // Filter items that either match parentId or have non-existent parentId
+      .filter(
+        (item) =>
+          item[parentKey] === parentId || (parentId === null && !parentExists(item[parentKey]))
+      )
+      .map((item) => ({
+        ...item,
+        children: formatToTree(array, item.id, parentKey)
+      }))
+      // Sort by sort field, null values go to the end
+      .sort((a, b) => {
+        if (a.sort === null && b.sort === null) return 0
+        if (a.sort === null) return 1
+        if (b.sort === null) return -1
+        return a.sort - b.sort
+      })
+  )
+}

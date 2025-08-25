@@ -74,5 +74,12 @@ declare global {
     path: string
     redirect: string
     children?: AppCustomRouteRecordRaw[]
+    //=====
+    id: number
+    parentId: number
+    sort: number | null
+    status: boolean
+    permissionList?: any[]
+    type: number
   }
 }

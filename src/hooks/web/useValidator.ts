@@ -96,6 +96,32 @@ export const useValidator = () => {
     }
   }
 
+  // 指定长度的数字
+  const numberLength = (length: number, message?: string): FormItemRule => {
+    return {
+      validator: (_, val, callback) => {
+        if (!val) return callback()
+        if (!new RegExp(`^[0-9]{${length}}$`).test(val)) {
+          callback(new Error(message || `请输入${length}位数字`))
+        } else {
+          callback()
+        }
+      }
+    }
+  }
+
+  const validatecheckPwd = async (checkValue: () => Promise<string>) => {
+    return {
+      validator: async (_, val, callback) => {
+        const checkData = await checkValue()
+        if (val !== checkData) {
+          callback(new Error('两次输入的内容不一致!'))
+        } else {
+          callback()
+        }
+      }
+    }
+  }
   return {
     required,
     lengthRange,
@@ -104,6 +130,8 @@ export const useValidator = () => {
     phone,
     email,
     maxlength,
-    check
+    check,
+    numberLength,
+    validatecheckPwd
   }
 }

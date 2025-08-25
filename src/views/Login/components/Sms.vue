@@ -2,30 +2,25 @@
 import { reactive, ref, onMounted, unref } from 'vue'
 import { Form, FormSchema } from '@/components/Form'
 import { useI18n } from '@/hooks/web/useI18n'
-import { ElCheckbox, ElLink } from 'element-plus'
+import { ElInput, ElMessage } from 'element-plus'
 import { useForm } from '@/hooks/web/useForm'
+import { getSmsCode, smsLoginApi } from '@/api/login'
 import { useValidator } from '@/hooks/web/useValidator'
 import { Icon } from '@/components/Icon'
 import { useUserStore } from '@/store/modules/user'
 import { BaseButton } from '@/components/Button'
+import { useLogin } from './hooks'
+const { required, phone } = useValidator()
 
-import { useRoleMenu } from '@/hooks/fn/useRoleMenu'
-import { UserType } from '@/api/login/types'
-import { loginApi } from '@/api/login'
-const { getRole } = useRoleMenu()
-
-const { required } = useValidator()
-
-const emit = defineEmits(['to-register', 'to-wechat', 'to-sms'])
+const emit = defineEmits(['to-register', 'to-wechat', 'to-login'])
 
 const userStore = useUserStore()
 
 const { t } = useI18n()
 
 const rules = {
-  // username: [required()],
-  phone: [required()],
-  password: [required()]
+  phone: [required(), phone()],
+  code: [required()]
 }
 
 const schema = reactive<FormSchema[]>([
@@ -37,7 +32,7 @@ const schema = reactive<FormSchema[]>([
     formItemProps: {
       slots: {
         default: () => {
-          return <h2 class="text-2xl font-bold text-center w-[100%]">{t('login.login')}</h2>
+          return <h2 class="text-2xl font-bold text-center w-[100%]">验证码登录</h2>
         }
       }
     }
@@ -45,48 +40,38 @@ const schema = reactive<FormSchema[]>([
   {
     field: 'phone',
     label: t('login.phone'),
-    // value: '13077908822',
+    // value: 'admin',
     component: 'Input',
     colProps: {
       span: 24
     }
+    // componentProps: {
+    //   // placeholder: 'admin or test'
+    //   defaultValue: 13077908822
+    // }
   },
   {
-    field: 'password',
-    label: t('login.password'),
-    component: 'InputPassword',
-    colProps: {
-      span: 24
-    },
-    componentProps: {
-      style: {
-        width: '100%'
-      },
-      // 按下enter键触发登录
-      onKeydown: (_e: any) => {
-        if (_e.key === 'Enter') {
-          signIn()
-        }
-      }
-    }
-  },
-  {
-    field: 'tool',
+    field: 'code',
+    label: t('login.code'),
     colProps: {
       span: 24
     },
     formItemProps: {
       slots: {
-        default: () => {
+        default: (formData) => {
           return (
-            <>
-              <div class="flex justify-between items-center w-[100%]">
-                <ElCheckbox v-model={remember.value} label={t('login.remember')} size="small" />
-                <ElLink type="primary" underline={false}>
-                  {t('login.forgetPassword')}
-                </ElLink>
-              </div>
-            </>
+            <div class="w-[100%] flex">
+              <ElInput v-model={formData.code} placeholder={t('login.codePlaceholder')} />
+              <BaseButton
+                type="primary"
+                disabled={unref(getCodeLoading)}
+                class="ml-10px"
+                onClick={getCode}
+              >
+                {t('login.getCode')}
+                {unref(getCodeLoading) ? `(${unref(getCodeTime)})` : ''}
+              </BaseButton>
+            </div>
           )
         }
       }
@@ -110,11 +95,6 @@ const schema = reactive<FormSchema[]>([
                   onClick={signIn}
                 >
                   {t('login.login')}
-                </BaseButton>
-              </div>
-              <div class="w-[100%] mt-15px">
-                <BaseButton class="w-[100%]" onClick={toRegister}>
-                  {t('login.register')}
                 </BaseButton>
               </div>
             </>
@@ -142,9 +122,9 @@ const schema = reactive<FormSchema[]>([
           return (
             <>
               <div class="flex justify-between w-[100%]">
-                <div onClick={toSms}>
+                <div onClick={toLogin}>
                   <Icon
-                    icon="vi-ant-design:message-outlined"
+                    icon="vi-ant-design:lock-outlined"
                     size={iconSize}
                     class="cursor-pointer ant-icon"
                     color={iconColor}
@@ -160,24 +140,20 @@ const schema = reactive<FormSchema[]>([
                     hoverColor={hoverColor}
                   />
                 </div>
-                <div>
-                  <Icon
-                    icon="vi-ant-design:alipay-circle-filled"
-                    size={iconSize}
-                    color={iconColor}
-                    hoverColor={hoverColor}
-                    class="cursor-pointer ant-icon"
-                  />
-                </div>
-                <div>
-                  <Icon
-                    icon="vi-ant-design:weibo-circle-filled"
-                    size={iconSize}
-                    color={iconColor}
-                    hoverColor={hoverColor}
-                    class="cursor-pointer ant-icon"
-                  />
-                </div>
+                <Icon
+                  icon="vi-ant-design:alipay-circle-filled"
+                  size={iconSize}
+                  color={iconColor}
+                  hoverColor={hoverColor}
+                  class="cursor-pointer ant-icon"
+                />
+                <Icon
+                  icon="vi-ant-design:weibo-circle-filled"
+                  size={iconSize}
+                  color={iconColor}
+                  hoverColor={hoverColor}
+                  class="cursor-pointer ant-icon"
+                />
               </div>
             </>
           )
@@ -189,8 +165,6 @@ const schema = reactive<FormSchema[]>([
 
 const iconSize = 30
 
-const remember = ref(userStore.getRememberMe)
-
 const initLoginInfo = () => {
   const loginInfo = userStore.getLoginInfo
   if (loginInfo) {
@@ -198,6 +172,43 @@ const initLoginInfo = () => {
     setValues({ phone })
   }
 }
+
+const getCodeTime = ref(60)
+const getCodeLoading = ref(false)
+const getCode = async () => {
+  const formRef = await getElFormExpose()
+  const isPhone = await formRef?.validateField('phone')
+  if (!isPhone) {
+    return ElMessage.error('请输入手机号')
+  }
+  getCodeLoading.value = true
+  const timer = setInterval(() => {
+    getCodeTime.value--
+    if (getCodeTime.value <= 0) {
+      clearInterval(timer)
+      getCodeTime.value = 60
+      getCodeLoading.value = false
+    }
+  }, 1000)
+  // 向后端请求发送验证码
+  const formData = await getFormData()
+  const { phone } = formData
+  const res = await getSmsCode({ phone, type: 'login' })
+  if (res?.code === 200) {
+    ElMessage.success('验证码发送成功')
+  } else {
+    ElMessage.error('验证码发送失败')
+  }
+}
+
+const toWechat = () => {
+  emit('to-wechat')
+}
+
+const toLogin = () => {
+  emit('to-login')
+}
+
 onMounted(() => {
   initLoginInfo()
 })
@@ -208,46 +219,20 @@ const { getFormData, getElFormExpose, setValues } = formMethods
 const loading = ref(false)
 
 const iconColor = '#999'
-
 const hoverColor = 'var(--el-color-primary)'
-
-// 去注册页面
-const toRegister = () => {
-  emit('to-register')
-}
-
-// ==========================================
-const toWechat = () => {
-  emit('to-wechat')
-}
-
-const toSms = () => {
-  emit('to-sms')
-}
-
+const { successLogin } = useLogin()
+// 登录
 const signIn = async () => {
   const formRef = await getElFormExpose()
   await formRef?.validate(async (isValid) => {
     if (isValid) {
       loading.value = true
-      const formData = await getFormData<UserType>()
+      const formData = await getFormData<{ phone: string; code: string }>()
       try {
-        const res = await loginApi(formData)
-        if (res?.code === 200) {
-          const { userinfo, access_token } = res.data
-          // 是否记住我
-          if (unref(remember)) {
-            userStore.setLoginInfo({
-              phone: formData.phone,
-              username: formData.username
-            })
-          } else {
-            userStore.setLoginInfo(undefined)
-          }
-          userStore.setRememberMe(unref(remember))
-          userStore.setUserInfo(userinfo as UserType)
-          userStore.setToken(access_token as string) // 设置新token
-          getRole()
+        const res = await smsLoginApi(formData)
+        const { access_token = '', userinfo = {} } = res.data
+        if (access_token) {
+          successLogin(userinfo, access_token as string)
         }
       } finally {
         loading.value = false
