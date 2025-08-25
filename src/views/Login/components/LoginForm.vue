@@ -8,13 +8,12 @@ import { useValidator } from '@/hooks/web/useValidator'
 import { Icon } from '@/components/Icon'
 import { useUserStore } from '@/store/modules/user'
 import { BaseButton } from '@/components/Button'
-
-import { useRoleMenu } from '@/hooks/fn/useRoleMenu'
 import { UserType } from '@/api/login/types'
 import { loginApi } from '@/api/login'
-const { getRole } = useRoleMenu()
+import { useLogin } from './hooks'
 
 const { required } = useValidator()
+const { successLogin } = useLogin()
 
 const emit = defineEmits(['to-register', 'to-wechat', 'to-sms'])
 
@@ -45,7 +44,7 @@ const schema = reactive<FormSchema[]>([
   {
     field: 'phone',
     label: t('login.phone'),
-    // value: '13077908822',
+    value: '13077908822',
     component: 'Input',
     colProps: {
       span: 24
@@ -54,6 +53,7 @@ const schema = reactive<FormSchema[]>([
   {
     field: 'password',
     label: t('login.password'),
+    value: '112233',
     component: 'InputPassword',
     colProps: {
       span: 24
@@ -216,7 +216,6 @@ const toRegister = () => {
   emit('to-register')
 }
 
-// ==========================================
 const toWechat = () => {
   emit('to-wechat')
 }
@@ -231,27 +230,24 @@ const signIn = async () => {
     if (isValid) {
       loading.value = true
       const formData = await getFormData<UserType>()
-      try {
-        const res = await loginApi(formData)
-        if (res?.code === 200) {
-          const { userinfo, access_token } = res.data
-          // 是否记住我
-          if (unref(remember)) {
-            userStore.setLoginInfo({
-              phone: formData.phone,
-              username: formData.username
-            })
-          } else {
-            userStore.setLoginInfo(undefined)
-          }
-          userStore.setRememberMe(unref(remember))
-          userStore.setUserInfo(userinfo as UserType)
-          userStore.setToken(access_token as string) // 设置新token
-          getRole()
-        }
-      } finally {
-        loading.value = false
+
+      const res = await loginApi(formData)
+      console.log('xzz2021: signIn -> res', res)
+
+      const { userinfo, access_token } = res.data
+      // 是否记住我
+      if (unref(remember)) {
+        userStore.setLoginInfo({
+          phone: formData.phone,
+          username: formData.username
+        })
+      } else {
+        userStore.setLoginInfo(undefined)
       }
+      userStore.setRememberMe(unref(remember))
+      await successLogin(userinfo, access_token)
+
+      loading.value = false
     }
   })
 }

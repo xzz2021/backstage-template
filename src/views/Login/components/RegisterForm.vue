@@ -38,7 +38,7 @@ const schema = reactive<FormSchema[]>([
   {
     field: 'username',
     label: t('login.username'),
-    value: 'xzz2021',
+    value: '',
     component: 'Input',
     colProps: {
       span: 24
@@ -50,7 +50,7 @@ const schema = reactive<FormSchema[]>([
   {
     field: 'phone',
     label: t('login.phone'),
-    value: '13077908822',
+    value: '',
     component: 'Input',
     colProps: {
       span: 24
@@ -62,7 +62,7 @@ const schema = reactive<FormSchema[]>([
   {
     field: 'password',
     label: t('login.password'),
-    value: '112233',
+    value: '',
     component: 'InputPassword',
     colProps: {
       span: 24
@@ -78,7 +78,7 @@ const schema = reactive<FormSchema[]>([
   {
     field: 'check_password',
     label: t('login.checkPassword'),
-    value: '112233',
+    value: '',
     component: 'InputPassword',
     colProps: {
       span: 24
@@ -94,7 +94,7 @@ const schema = reactive<FormSchema[]>([
   {
     field: 'code',
     label: t('login.code'),
-    value: '112233',
+    value: '',
 
     colProps: {
       span: 24
@@ -233,16 +233,13 @@ const loginRegister = async () => {
   const formRef = await getElFormExpose()
   formRef?.validate(async (valid) => {
     if (valid) {
-      try {
-        const formData = await getFormData()
-        loading.value = true
-        const { password, phone, username, code } = formData
-        await registerApi({ password, phone, username, code })
-        ElMessage.success('注册成功, 欢迎登陆!')
-        toLogin()
-      } finally {
-        loading.value = false
-      }
+      const formData = await getFormData()
+      loading.value = true
+      const { password, phone, username, code } = formData
+      await registerApi({ password, phone, username, code })
+      ElMessage.success('注册成功, 欢迎登陆!')
+      loading.value = false
+      toLogin()
     }
   })
 }

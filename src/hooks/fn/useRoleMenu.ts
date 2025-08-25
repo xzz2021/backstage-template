@@ -16,12 +16,11 @@ export const useRoleMenu = () => {
   // 获取角色信息
   const getRole = async () => {
     const res = await getRoleMenuApi()
-    const { list } = res.data
+    const { list } = res
     if (list) {
       const routers = list ? formatToTree(list) : []
       userStore.setRoleRouters(routers)
       await permissionStore.generateRoutes('server', routers).catch(() => {})
-
       permissionStore.getAddRouters.forEach((route) => {
         addRoute(route as RouteRecordRaw) // 动态添加可访问路由表
       })

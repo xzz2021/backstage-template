@@ -1,25 +1,27 @@
 <script setup lang="ts">
-import { useTimeAgo } from '@/hooks/web/useTimeAgo'
+// import { useTimeAgo } from '@/hooks/web/useTimeAgo'
 import { ElRow, ElCol, ElSkeleton, ElCard, ElDivider, ElLink } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
-import { ref, reactive } from 'vue'
+import { ref } from 'vue'
 import { CountTo } from '@/components/CountTo'
-import { formatTime } from '@/utils'
-import { Echart } from '@/components/Echart'
-import { EChartsOption } from 'echarts'
-import { radarOption } from './echarts-data'
-import { Highlight } from '@/components/Highlight'
-import {
-  getCountApi,
-  getProjectApi,
-  getDynamicApi,
-  getTeamApi,
-  getRadarApi
-} from '@/api/dashboard/workplace'
-import type { WorkplaceTotal, Project, Dynamic, Team } from '@/api/dashboard/workplace/types'
-import { set } from 'lodash-es'
+// import { formatTime } from '@/utils'
+// import { Echart } from '@/components/Echart'
+// import { EChartsOption } from 'echarts'
+// import { radarOption } from './echarts-data'
+// import { Highlight } from '@/components/Highlight'
+// import {
+//   getCountApi,
+//   getProjectApi,
+//   getDynamicApi,
+//   getTeamApi,
+//   getRadarApi
+// } from '@/api/dashboard/workplace'
+// import type { WorkplaceTotal, Project, Dynamic, Team } from '@/api/dashboard/workplace/types'
+// import { set } from 'lodash-es'
 
-const loading = ref(true)
+const loading = ref(!true)
+/*
+
 
 // 获取统计数
 let totalSate = reactive<WorkplaceTotal>({
@@ -106,7 +108,7 @@ const getAllApi = async () => {
 }
 
 getAllApi()
-
+*/
 const { t } = useI18n()
 </script>
 
@@ -136,32 +138,17 @@ const { t } = useI18n()
             <div class="flex h-70px items-center justify-end lt-sm:mt-20px">
               <div class="px-8px text-right">
                 <div class="text-14px text-gray-400 mb-20px">{{ t('workplace.project') }}</div>
-                <CountTo
-                  class="text-20px"
-                  :start-val="0"
-                  :end-val="totalSate.project"
-                  :duration="2600"
-                />
+                <CountTo class="text-20px" :start-val="0" :end-val="1111" :duration="2600" />
               </div>
               <ElDivider direction="vertical" />
               <div class="px-8px text-right">
                 <div class="text-14px text-gray-400 mb-20px">{{ t('workplace.toDo') }}</div>
-                <CountTo
-                  class="text-20px"
-                  :start-val="0"
-                  :end-val="totalSate.todo"
-                  :duration="2600"
-                />
+                <CountTo class="text-20px" :start-val="0" :end-val="2222" :duration="2600" />
               </div>
               <ElDivider direction="vertical" border-style="dashed" />
               <div class="px-8px text-right">
                 <div class="text-14px text-gray-400 mb-20px">{{ t('workplace.access') }}</div>
-                <CountTo
-                  class="text-20px"
-                  :start-val="0"
-                  :end-val="totalSate.access"
-                  :duration="2600"
-                />
+                <CountTo class="text-20px" :start-val="0" :end-val="3333" :duration="2600" />
               </div>
             </div>
           </ElCol>
@@ -180,7 +167,7 @@ const { t } = useI18n()
           </div>
         </template>
         <ElSkeleton :loading="loading" animated>
-          <ElRow>
+          <!-- <ElRow>
             <ElCol
               v-for="(item, index) in projects"
               :key="`card-${index}`"
@@ -202,7 +189,7 @@ const { t } = useI18n()
                 </div>
               </ElCard>
             </ElCol>
-          </ElRow>
+          </ElRow> -->
         </ElSkeleton>
       </ElCard>
 
@@ -213,7 +200,7 @@ const { t } = useI18n()
             <ElLink type="primary" :underline="false">{{ t('workplace.more') }}</ElLink>
           </div>
         </template>
-        <ElSkeleton :loading="loading" animated>
+        <!-- <ElSkeleton :loading="loading" animated>
           <div v-for="(item, index) in dynamics" :key="`dynamics-${index}`">
             <div class="flex items-center">
               <img
@@ -234,7 +221,7 @@ const { t } = useI18n()
             </div>
             <ElDivider />
           </div>
-        </ElSkeleton>
+        </ElSkeleton> -->
       </ElCard>
     </ElCol>
     <ElCol :xl="8" :lg="8" :md="24" :sm="24" :xs="24" class="mb-20px">
@@ -266,9 +253,9 @@ const { t } = useI18n()
         <template #header>
           <span>xx{{ t('workplace.index') }}</span>
         </template>
-        <ElSkeleton :loading="loading" animated>
+        <!-- <ElSkeleton :loading="loading" animated>
           <Echart :options="radarOptionData" :height="400" />
-        </ElSkeleton>
+        </ElSkeleton> -->
       </ElCard>
 
       <ElCard shadow="never" class="mt-20px">
@@ -276,7 +263,7 @@ const { t } = useI18n()
           <span>{{ t('workplace.team') }}</span>
         </template>
         <ElSkeleton :loading="loading" animated>
-          <ElRow>
+          <!-- <ElRow>
             <ElCol v-for="item in team" :key="`team-${item.name}`" :span="12" class="mb-20px">
               <div class="flex items-center">
                 <Icon :icon="item.icon" class="mr-10px" />
@@ -285,7 +272,7 @@ const { t } = useI18n()
                 </ElLink>
               </div>
             </ElCol>
-          </ElRow>
+          </ElRow> -->
         </ElSkeleton>
       </ElCard>
     </ElCol>

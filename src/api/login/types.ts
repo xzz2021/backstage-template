@@ -22,6 +22,6 @@ export interface UserType {
 }
 
 export interface SmsLoginRes {
-  userinfo: UserType | { phone: string }
-  access_token?: string
+  userinfo: UserType
+  access_token: string
 }

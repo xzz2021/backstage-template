@@ -3,9 +3,9 @@ import { ElRow, ElCol, ElCard, ElSkeleton } from 'element-plus'
 import { CountTo } from '@/components/CountTo'
 import { useDesign } from '@/hooks/web/useDesign'
 import { useI18n } from '@/hooks/web/useI18n'
-import { ref, reactive } from 'vue'
-import { getCountApi } from '@/api/dashboard/analysis'
-import type { AnalysisTotalTypes } from '@/api/dashboard/analysis/types'
+import { ref } from 'vue'
+// import { getCountApi } from '@/api/dashboard/analysis'
+// import type { AnalysisTotalTypes } from '@/api/dashboard/analysis/types'
 
 const { t } = useI18n()
 
@@ -13,8 +13,9 @@ const { getPrefixCls } = useDesign()
 
 const prefixCls = getPrefixCls('panel')
 
-const loading = ref(true)
+const loading = ref(!true)
 
+/*
 let totalState = reactive<AnalysisTotalTypes>({
   users: 0,
   messages: 0,
@@ -32,6 +33,8 @@ const getCount = async () => {
 }
 
 getCount()
+
+*/
 </script>
 
 <template>

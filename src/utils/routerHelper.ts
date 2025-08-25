@@ -91,13 +91,18 @@ export const generateRoutesByFrontEnd = (
   return res
 }
 
+//  新增菜单不用手动加/
+const checkPath = (route: AppCustomRouteRecordRaw) => {
+  return route?.parentId ? route.path : '/' + route.path
+}
+
 // 后端控制路由生成
 export const generateRoutesByServer = (routes: AppCustomRouteRecordRaw[]): AppRouteRecordRaw[] => {
   const res: AppRouteRecordRaw[] = []
 
   for (const route of routes) {
     const data: AppRouteRecordRaw = {
-      path: route.path,
+      path: checkPath(route),
       name: route.name,
       redirect: route.redirect,
       meta: route.meta
