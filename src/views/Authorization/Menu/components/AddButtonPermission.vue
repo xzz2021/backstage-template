@@ -4,6 +4,10 @@ import { ElDrawer } from 'element-plus'
 import { reactive } from 'vue'
 import { useForm } from '@/hooks/web/useForm'
 import { useValidator } from '@/hooks/web/useValidator'
+import { useMenuStore } from '@/store/modules/menu'
+import { addPermission } from '@/api/menu'
+
+const menuStore = useMenuStore()
 
 const modelValue = defineModel<boolean>()
 
@@ -11,8 +15,16 @@ const { required } = useValidator()
 
 const formSchema = reactive<FormSchema[]>([
   {
-    field: 'label',
-    label: 'label',
+    field: 'name',
+    label: '权限名称',
+    component: 'Input',
+    colProps: {
+      span: 24
+    }
+  },
+  {
+    field: 'code',
+    label: '权限标识',
     component: 'Input',
     colProps: {
       span: 24
@@ -20,7 +32,7 @@ const formSchema = reactive<FormSchema[]>([
   },
   {
     field: 'value',
-    label: 'value',
+    label: '值',
     component: 'Input',
     colProps: {
       span: 24
@@ -46,9 +58,20 @@ const confirm = async () => {
   })
   if (valid) {
     const formData = await getFormData()
-    formData.id = Date.now()
-    emit('confirm', formData)
-    modelValue.value = false
+    try {
+      const { id, path } = menuStore.getCurrentMenu
+      formData.menuId = id
+      formData.name = (path + '_' + formData.value).toUpperCase()
+      const res = await addPermission(formData)
+      if (res?.data?.id) {
+        modelValue.value = false
+        emit('confirm', id)
+      }
+    } catch (error) {
+      console.log('🚀 ~ xzz: confirm -> error', error)
+    }
+    // 清空表单
+    // formMethods.resetForm()
   }
 }
 </script>

@@ -1,3 +1,5 @@
+import { ElMessage } from 'element-plus'
+
 export const formatFileSize = (size: number) => {
   let formatSize = ''
   if (size > 1024 * 1024 * 1024) {
@@ -101,6 +103,10 @@ export const formatDataFn = (data: any[]) => {
 }
 
 export const exportSeedData = (data: any[], fileName: string) => {
+  if (!data?.length) {
+    ElMessage.error('数据为空')
+    return
+  }
   const jsonData = formatDataFn(data)
   // 导出下载
   downloadFile({

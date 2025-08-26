@@ -30,11 +30,11 @@ const nodeClick = (treeData: any) => {
   currentTreeData.value = treeData
 }
 
-const treeData = ref<any[]>([])
+const treeData = ref<AppCustomRouteRecordRaw[]>([])
 const getMenuList = async () => {
   const res = await getMenuListApi()
   if (res) {
-    treeData.value = res.data.list
+    treeData.value = res.list
     await nextTick()
   }
 }

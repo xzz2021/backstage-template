@@ -231,23 +231,27 @@ const signIn = async () => {
       loading.value = true
       const formData = await getFormData<UserType>()
 
-      const res = await loginApi(formData)
-      console.log('xzz2021: signIn -> res', res)
-
-      const { userinfo, access_token } = res.data
-      // 是否记住我
-      if (unref(remember)) {
-        userStore.setLoginInfo({
-          phone: formData.phone,
-          username: formData.username
-        })
-      } else {
-        userStore.setLoginInfo(undefined)
+      try {
+        const res = await loginApi(formData)
+        if (res.code === 200) {
+          const { userinfo, access_token } = res.data
+          // 是否记住我
+          if (unref(remember)) {
+            userStore.setLoginInfo({
+              phone: formData.phone,
+              username: formData.username
+            })
+          } else {
+            userStore.setLoginInfo(undefined)
+          }
+          userStore.setRememberMe(unref(remember))
+          await successLogin(userinfo, access_token)
+        }
+      } catch (error) {
+        console.log('xzz2021: signIn -> error', error)
+      } finally {
+        loading.value = false
       }
-      userStore.setRememberMe(unref(remember))
-      await successLogin(userinfo, access_token)
-
-      loading.value = false
     }
   })
 }

@@ -566,7 +566,10 @@ export default {
     noTagsView: 'No tags view',
     activeMenu: 'Active menu',
     canTo: 'Can to',
-    name: 'Name'
+    name: 'Name',
+    redirect: 'Redirect',
+    parentMenu: 'Parent menu',
+    menuType: 'Menu type'
   },
   role: {
     roleName: 'Role name',

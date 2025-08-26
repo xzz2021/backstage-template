@@ -105,6 +105,11 @@ const tableColumns = reactive<TableColumn[]>([
     }
   },
   {
+    field: 'path',
+    label: '路径',
+    width: '165px'
+  },
+  {
     field: 'status',
     label: t('userDemo.status'),
     slots: {

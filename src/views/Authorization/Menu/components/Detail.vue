@@ -74,6 +74,11 @@ const detailSchema = ref<DescriptionsSchema[]>([
   {
     field: 'meta.activeMenu',
     label: '高亮菜单'
+    // slots: {
+    //   default: (data) => {
+    //     return renderTag(data.activeMenu)
+    //   }
+    // }
   },
   {
     field: 'permissionList',

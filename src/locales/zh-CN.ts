@@ -556,7 +556,10 @@ export default {
     noTagsView: '是否隐藏标签页',
     activeMenu: '高亮菜单',
     canTo: '是否可跳转',
-    name: '组件名称'
+    name: '组件名称',
+    redirect: '重定向',
+    parentMenu: '父级菜单',
+    menuType: '菜单类型'
   },
   role: {
     roleName: '角色名称',

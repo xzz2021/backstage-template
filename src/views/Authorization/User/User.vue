@@ -1,4 +1,4 @@
-<script setup lang="tsx">
+<!-- <script setup lang="tsx">
 import { ContentWrap } from '@/components/ContentWrap'
 import { useI18n } from '@/hooks/web/useI18n'
 import { Table } from '@/components/Table'
@@ -200,7 +200,7 @@ const setSearchParams = (params: any) => {
 
 const treeEl = ref<typeof ElTree>()
 
-const currentNodeKey = ref('')
+const currentNodeKey = ref<number>()
 const departmentList = ref<DepartmentItem[]>([])
 const fetchDepartment = async () => {
   const res = await getDepartmentApi()
@@ -229,7 +229,7 @@ const currentChange = (data: DepartmentItem) => {
 
 const filterNode = (value: string, data: DepartmentItem) => {
   if (!value) return true
-  return data.departmentName.includes(value)
+  return data.name.includes(value)
 }
 
 const dialogVisible = ref(false)
@@ -263,7 +263,7 @@ const delData = async (row?: DepartmentUserItem) => {
 const action = (row: DepartmentUserItem, type: string) => {
   dialogTitle.value = t(type === 'edit' ? 'exampleDemo.edit' : 'exampleDemo.detail')
   actionType.value = type
-  currentRow.value = { ...row, department: unref(treeEl)?.getCurrentNode() || {} }
+  currentRow.value = { ...row, departments: unref(treeEl)?.getCurrentNode() || {} }
   dialogVisible.value = true
 }
 
@@ -381,4 +381,4 @@ const save = async () => {
       </template>
     </Dialog>
   </div>
-</template>
+</template> -->

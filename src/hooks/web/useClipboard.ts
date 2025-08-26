@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-
+import { ElMessage } from 'element-plus'
 const useClipboard = () => {
   const copied = ref(false)
   const text = ref('')
@@ -17,6 +17,7 @@ const useClipboard = () => {
         text.value = str
         copied.value = true
         resetCopied()
+        ElMessage.success('复制成功')
       })
       return
     }
@@ -35,13 +36,25 @@ const useClipboard = () => {
     document.body.removeChild(input)
   }
 
+  const getText = async () => {
+    if (navigator.clipboard) {
+      try {
+        const text = await navigator.clipboard.readText()
+        return text
+      } catch (error) {
+        console.log('✨ 🍰 ✨ xzz2021: getText -> error', error)
+        return ''
+      }
+    }
+  }
+
   const resetCopied = () => {
     setTimeout(() => {
       copied.value = false
     }, 1500)
   }
 
-  return { copy, text, copied, isSupported }
+  return { copy, text, copied, isSupported, getText }
 }
 
 export { useClipboard }

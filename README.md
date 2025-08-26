@@ -100,3 +100,7 @@ pnpm run build:pro
 The `Chrome 80+` browser is recommended for local development
 
 Support modern browsers, not IE
+
+## resource
+
+- `icon`: https://icon-sets.iconify.design/

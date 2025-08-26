@@ -107,11 +107,11 @@ const rules = reactive({
 const { formRegister, formMethods } = useForm()
 const { setValues, getFormData, getElFormExpose } = formMethods
 
-const treeData = ref([])
+const treeData = ref<AppCustomRouteRecordRaw[]>([])
 const getMenuList = async () => {
   const res = await getMenuListApi()
   if (res) {
-    treeData.value = res.data.list
+    treeData.value = res.list
     if (!props.currentRow) return
     await nextTick()
     const checked: any[] = []

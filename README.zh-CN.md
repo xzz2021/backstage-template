@@ -94,3 +94,7 @@ pnpm run build:pro
 - `mod` 不确定分类的修改
 - `wip` 开发中
 - `types` 类型
+
+## 资源索引
+
+- `icon图标`: https://icon-sets.iconify.design/
