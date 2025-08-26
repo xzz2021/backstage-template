@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "i": "pnpm install",
-    "dev": "pnpm vite --mode base",
+    "dev": "pnpm vite --mode base --open",
     "ts:check": "pnpm vue-tsc --noEmit --skipLibCheck",
     "build:pro": "pnpm vite build --mode pro",
     "build:gitee": "pnpm vite build --mode gitee",

@@ -1,7 +1,11 @@
 export interface DepartmentItem {
-  id: string
-  departmentName: string
   children?: DepartmentItem[]
+  id: number
+  name: string
+  sort: number | null
+  parentId: number | null
+  status: boolean
+  remark: string
 }
 
 export interface DepartmentListResponse {
@@ -16,17 +20,20 @@ export interface DepartmentUserParams {
   account?: string
 }
 
+export interface DepartmentUserResponse {
+  list: DepartmentUserItem[]
+  total: number
+}
+
 export interface DepartmentUserItem {
-  id: string
+  id: number
   username: string
   account: string
   email: string
   createTime: string
   role: string
-  department: DepartmentItem
-}
-
-export interface DepartmentUserResponse {
-  list: DepartmentUserItem[]
-  total: number
+  departments: DepartmentItem
+  departmentId: number | string
+  roles: { id: number; name: string }[] | number[]
+  roleArr: any
 }
