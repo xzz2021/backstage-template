@@ -3,9 +3,12 @@ import { PropType, ref, unref, nextTick } from 'vue'
 import { Descriptions, DescriptionsSchema } from '@/components/Descriptions'
 import { ElTag, ElTree } from 'element-plus'
 import { findIndex } from '@/utils'
-import { getMenuListApi } from '@/api/menu'
+import { useI18n } from '@/hooks/web/useI18n'
+import { getMenuWithPermissionByRoleId } from '@/api/role'
 
-defineProps({
+const { t } = useI18n()
+
+const props = defineProps({
   currentRow: {
     type: Object as PropType<any>,
     default: () => undefined
@@ -31,18 +34,22 @@ const nodeClick = (treeData: any) => {
 }
 
 const treeData = ref<AppCustomRouteRecordRaw[]>([])
+
 const getMenuList = async () => {
-  const res = await getMenuListApi()
+  // 1. 获取菜单列表
+  const res = (await getMenuWithPermissionByRoleId(props.currentRow.id)) as any
   if (res) {
-    treeData.value = res.list
+    // 2. 获取当前角色菜单列表 3. 合并
+    treeData.value = res
     await nextTick()
   }
 }
+
 getMenuList()
 
 const detailSchema = ref<DescriptionsSchema[]>([
   {
-    field: 'roleName',
+    field: 'name',
     label: '角色名称'
   },
   {
@@ -80,14 +87,14 @@ const detailSchema = ref<DescriptionsSchema[]>([
                 >
                   {{
                     default: (data) => {
-                      return <span>{data?.data?.title}</span>
+                      return <span>{t(data?.data?.meta?.title)}</span>
                     }
                   }}
                 </ElTree>
               </div>
               <div class="flex-1">
                 {unref(currentTreeData)
-                  ? unref(currentTreeData)?.meta?.permission?.map((v: string) => {
+                  ? unref(currentTreeData)?.permissionList?.map((v: string) => {
                       return <ElTag class="ml-2 mt-2">{filterPermissionName(v)}</ElTag>
                     })
                   : null}
