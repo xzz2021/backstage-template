@@ -23,7 +23,7 @@ export const delMenuApi = (id) => {
 export const addPermission = (data): Promise<IResponse<{ id: number }>> => {
   return request.post({ url: '/api/permission/add', data })
 }
-export const updatePermission = (data) => {
+export const updatePermission = (data): Promise<IResponse<{ id: number }>> => {
   return request.post({ url: '/api/permission/update', data })
 }
 export const delPermission = (id): Promise<IResponse<{ id: number }>> => {

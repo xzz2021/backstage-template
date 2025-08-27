@@ -28,10 +28,10 @@ onMounted(() => {
     const obj = new WxLogin({
       self_redirect: !true,
       id: 'weixinLogin', // 需要显示的容器id
-      appid: 'wxe1b01012d6934e93', // 微信开放平台appid wx*******
+      appid: 'wxe1b07777734e93', // 微信开放平台appid wx*******
       scope: 'snsapi_login', //  网页默认即可
       redirect_uri: encodeURIComponent(WECHAT_REDIRECT_URL), // 授权成功后回调的url
-      // https://yun3d.com/?code=001jwj100IWKwT1KuD100J7adA2jwj1j&state=tduaqkxdvupveiucst1ou
+      // https://xzz.com/?code=001jwj100IWKwT1KuD100J7adA2jwj1j&state=tduaqkxdvupveiucst1ou
       //  code=081pFdml242ERe4gg9ol27qAIx4pFdmU&state=ip2u2w3a7ef2xcl3sui0hk
       state: weixinState.value, // 可设置为简单的随机数加session用来校验
       style: isDark ? 'white' : 'black' // 提供"black"、"white"可选。二维码的样式

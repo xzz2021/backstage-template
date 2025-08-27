@@ -4,17 +4,19 @@ import { useForm } from '@/hooks/web/useForm'
 import { PropType, reactive, watch, ref, unref } from 'vue'
 import { useValidator } from '@/hooks/web/useValidator'
 import { useI18n } from '@/hooks/web/useI18n'
-import { ElButton, ElInput, ElMessage, ElPopconfirm, ElTable, ElTableColumn } from 'element-plus'
+import { ElButton, ElMessage, ElPopconfirm, ElTable, ElTableColumn } from 'element-plus'
 import AddButtonPermission from './AddButtonPermission.vue'
 import { BaseButton } from '@/components/Button'
 import { cloneDeep } from 'lodash-es'
 import { useMenuStore } from '@/store/modules/menu'
-import { batchCreatePermissionApi, delPermission, updatePermission } from '@/api/menu'
+import { batchCreatePermissionApi, delPermission } from '@/api/menu'
 import { useClipboard } from '@/hooks/web/useClipboard'
 
 const { t } = useI18n()
 
 const { required } = useValidator()
+
+const menuStore = useMenuStore()
 
 const props = defineProps({
   currentRow: {
@@ -23,14 +25,18 @@ const props = defineProps({
   }
 })
 
-const handleEdit = async (row: any) => {
-  // 深拷贝当前行数据到编辑行
-  permissionEditingRow.value = { ...row }
+const handleAdd = (data: any) => {
+  menuStore.setDrawerFormData(data)
+  showDrawer.value = true
+}
+
+const handleEdit = async (_row: any) => {
+  menuStore.setDrawerFormData(_row)
+  showDrawer.value = true
 }
 
 const showDrawer = ref(false)
 // 存储正在编辑的行的数据
-const permissionEditingRow = ref<any>(null)
 const cacheComponent = ref('')
 
 const formSchema = reactive<FormSchema[]>([
@@ -216,7 +222,7 @@ const formSchema = reactive<FormSchema[]>([
                 <BaseButton
                   type="primary"
                   size="small"
-                  onClick={() => (showDrawer.value = true)}
+                  onClick={() => handleAdd({ menuId: data.id, resource: data.path })}
                   disabled={!data?.id}
                 >
                   添加权限
@@ -234,29 +240,21 @@ const formSchema = reactive<FormSchema[]>([
               <ElTable data={data?.permissionList}>
                 <ElTableColumn type="index" prop="id" />
                 <ElTableColumn
-                  prop="label"
-                  label="权限标识"
+                  prop="name"
+                  label="权限名称"
                   v-slots={{
-                    default: ({ row }: any) =>
-                      permissionEditingRow.value && permissionEditingRow.value.id === row.id ? (
-                        <ElInput v-model={permissionEditingRow.value.label} size="small" />
-                      ) : (
-                        <div class="mr-1" key={row.value}>
-                          {row.label}
-                        </div>
-                      )
+                    default: ({ row }: any) => (
+                      <div class="mr-1" key={row.value}>
+                        {row.name}
+                      </div>
+                    )
                   }}
                 />
                 <ElTableColumn
-                  prop="value"
-                  label="值"
+                  prop="code"
+                  label="权限标识"
                   v-slots={{
-                    default: ({ row }: any) =>
-                      permissionEditingRow.value && permissionEditingRow.value.id === row.id ? (
-                        <ElInput v-model={permissionEditingRow.value.value} size="small" />
-                      ) : (
-                        <span>{row.value}</span>
-                      )
+                    default: ({ row }: any) => <span>{row.code}</span>
                   }}
                 />
 
@@ -264,36 +262,22 @@ const formSchema = reactive<FormSchema[]>([
                   label="操作"
                   width="160"
                   v-slots={{
-                    default: ({ row }: any) =>
-                      permissionEditingRow.value && permissionEditingRow.value.id === row.id ? (
-                        <>
-                          <ElButton size="small" type="primary" onClick={handleSave}>
-                            确定
-                          </ElButton>
-                          <ElButton
-                            size="small"
-                            type="warning"
-                            onClick={() => (permissionEditingRow.value = null)}
-                          >
-                            取消
-                          </ElButton>
-                        </>
-                      ) : (
-                        <>
-                          <ElButton size="small" type="primary" onClick={() => handleEdit(row)}>
-                            编辑
-                          </ElButton>
-                          <ElPopconfirm title="确定删除?" onConfirm={() => handleDelete(row)}>
-                            {{
-                              reference: () => (
-                                <ElButton size="small" type="danger">
-                                  删除
-                                </ElButton>
-                              )
-                            }}
-                          </ElPopconfirm>
-                        </>
-                      )
+                    default: ({ row }: any) => (
+                      <>
+                        <ElButton size="small" type="primary" onClick={() => handleEdit(row)}>
+                          编辑
+                        </ElButton>
+                        <ElPopconfirm title="确定删除?" onConfirm={() => handleDelete(row)}>
+                          {{
+                            reference: () => (
+                              <ElButton size="small" type="danger">
+                                删除
+                              </ElButton>
+                            )
+                          }}
+                        </ElPopconfirm>
+                      </>
+                    )
                   }}
                 />
               </ElTable>
@@ -333,7 +317,6 @@ const formSchema = reactive<FormSchema[]>([
     label: t('menu.noCache'),
     component: 'Switch'
   },
-
   {
     field: 'meta.canTo',
     label: t('menu.canTo'),
@@ -365,10 +348,6 @@ const submit = async () => {
     const formData = await getFormData()
     delete formData.children
     delete formData.permissionList
-    // if (formData.id && formData.id === formData.parentId) {
-    //   ElMessage.error('父级菜单不能选择自己')
-    //   return
-    // }
     return formData
   }
 }
@@ -376,20 +355,12 @@ const submit = async () => {
 const batchCreatePermission = async () => {
   const formData = await getFormData()
   formData.nodeid = Date.now().toString()
-  try {
-    const { id, path } = useMenuStore().getCurrentMenu
-    const res = await batchCreatePermissionApi({ menuId: id, path })
-    if (res?.data?.count) {
-      emit('refresh2', id)
-      ElMessage.success('快速生成权限模版成功')
-    } else {
-      ElMessage.error(res?.message || '生成权限模版失败')
-    }
-  } catch (error) {
-    console.log('🚀 ~ xzz: confirm -> error', error)
-  }
-  // 清空表单
-  // formMethods.resetForm()
+
+  const { id, path } = useMenuStore().getCurrentMenu
+  await batchCreatePermissionApi({ menuId: id, path })
+
+  emit('refresh')
+  ElMessage.success('快速生成权限模版成功')
 }
 
 watch(
@@ -397,8 +368,8 @@ watch(
   async (value) => {
     if (!value) return
     const currentRow = cloneDeep(value)
-    const { id } = currentRow
-    id && (await useMenuStore().setCurrentMenu(id)) // 设置当前菜单id
+    // const { id } = currentRow
+    // id && (await useMenuStore().setCurrentMenu(id)) // 设置当前菜单id
     cacheComponent.value = currentRow.type === 1 ? currentRow.component : ''
     if (currentRow.parentId === 0) {
       setSchema([
@@ -456,51 +427,12 @@ defineExpose({
   submit
 })
 
-const emit = defineEmits(['refresh', 'refresh2'])
+const emit = defineEmits(['refresh'])
 
 const handleDelete = async (tag: any) => {
-  try {
-    const res = await delPermission(tag.id)
-    if (res?.data?.id) {
-      // permissionEditingRow.value = null // 重置编辑状态
-      // 删除对应的权限
-      const formData = await getFormData()
-      // console.log('✨ 🍰 ✨ xzz2021: handleDelete -> formData', formData)
-      // setValues({
-      //   permissions: formData?.permissions?.filter((v: any) => v.value !== tag.value)
-      // })
-      emit('refresh2', formData?.id)
-    }
-  } catch (error) {
-    console.log('🚀 ~ xzz: handleDelete -> error', error)
-  }
-}
-
-const handleSave = async () => {
-  const formData = await getFormData()
-  const index = formData?.permissionList?.findIndex((x) => x.id === permissionEditingRow.value.id)
-  if (index !== -1) {
-    const newPermission = { ...permissionEditingRow.value }
-    newPermission.name = (formData.path + '_' + newPermission.value).toUpperCase()
-    // formData.permissionList[index] = newPermission
-    try {
-      const res = await updatePermission(newPermission)
-      if (res?.data?.id) {
-        permissionEditingRow.value = null // 重置编辑状态
-        emit('refresh')
-      } else {
-        // 更新失败  还原
-        // formData.permissionList[index] = permissionEditingRow.value
-      }
-    } catch (error) {
-      console.log('🚀 ~ xzz: handleSave -> error', error)
-    }
-  }
-}
-
-const confirm = async (id: number) => {
-  if (!id) return ElMessage.error('菜单id不存在, 请刷新页面后再试!')
-  emit('refresh2', id)
+  await delPermission(tag.id)
+  ElMessage.success('删除成功')
+  emit('refresh')
 }
 
 const { copy, getText } = useClipboard()
@@ -551,5 +483,5 @@ const writeFormdata = async () => {
 
 <template>
   <Form :rules="rules" @register="formRegister" :schema="formSchema" />
-  <AddButtonPermission v-model="showDrawer" @confirm="confirm" />
+  <AddButtonPermission v-model="showDrawer" @refresh="emit('refresh')" />
 </template>

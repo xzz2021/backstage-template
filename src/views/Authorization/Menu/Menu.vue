@@ -19,14 +19,16 @@ import SortMenu from './components/SortMenu.vue'
 import HasPermission from '@/components/Permission/src/Permission.vue'
 import { ElMessage } from 'element-plus'
 import Seed from '../Seed.vue'
-// import { storeToRefs } from 'pinia'
+import { storeToRefs } from 'pinia'
+import { findNode } from '@/utils/tree'
 
 const { t } = useI18n()
 
 const delId = ref<number>(0)
 const { getRole } = useRoleMenu()
 const menuStore = useMenuStore()
-// const { getAllMenuList } = storeToRefs(menuStore)
+const { setCurrentMenu } = menuStore
+const { currentMenu } = storeToRefs(menuStore)
 const { tableRegister, tableState, tableMethods } = useTable({
   fetchDataApi: async () => {
     return await menuStore.getMenuList()
@@ -140,7 +142,7 @@ const tableColumns = reactive<TableColumn[]>([
 const dialogVisible = ref(false)
 const dialogTitle = ref('')
 
-const currentRow = ref()
+// const currentRow = ref()
 const actionType = ref('')
 
 const writeRef = ref<ComponentRef<typeof Write>>()
@@ -148,15 +150,18 @@ const writeRef = ref<ComponentRef<typeof Write>>()
 const saveLoading = ref(false)
 
 const action = (row: any, type: string) => {
+  // console.log('🚀 ~ xzz: action -> row', row)
   dialogTitle.value = t(type === 'edit' ? 'exampleDemo.edit' : 'exampleDemo.detail')
   actionType.value = type
-  currentRow.value = row
+  // currentRow.value = row
+  setCurrentMenu(unref(row))
   dialogVisible.value = true
 }
 
 const AddAction = () => {
   dialogTitle.value = t('exampleDemo.add')
-  currentRow.value = { status: true }
+  // currentRow.value = { status: true }
+  setCurrentMenu({ status: true })
   dialogVisible.value = true
   actionType.value = 'add'
 }
@@ -219,11 +224,6 @@ const saveSort = async () => {
   }
 }
 
-const refresh2 = async (_currentId: number) => {
-  await getList()
-  // const curItem = getAllMenuList.find((item: any) => item.id === currentId)
-  // currentRow.value.permissionList = curItem?.permissionList || []
-}
 const formatDataFn = (data: any[]) => {
   return data.map((item) => {
     const { id, children, permissionList, parentId, meta, ...rest } = item
@@ -244,6 +244,14 @@ const formatDataFn = (data: any[]) => {
       children: children?.length ? formatDataFn(children) : undefined
     }
   })
+}
+
+const updateListAndCurrentMenu = async () => {
+  await getList()
+  const id = currentMenu.value?.id || 0
+  //  此处不是平面数据  是嵌套的children
+  const findNodeData = findNode(dataList.value, (item) => item.id === id)
+  setCurrentMenu(findNodeData || {})
 }
 </script>
 
@@ -271,12 +279,11 @@ const formatDataFn = (data: any[]) => {
     <Write
       v-if="actionType === 'edit' || actionType === 'add'"
       ref="writeRef"
-      :current-row="currentRow"
-      @refresh="getList"
-      @refresh2="refresh2"
+      :current-row="currentMenu"
+      @refresh="updateListAndCurrentMenu"
     />
 
-    <Detail v-if="actionType === 'detail'" :current-row="currentRow" />
+    <Detail v-if="actionType === 'detail'" :current-row="currentMenu" />
     <SortMenu v-if="actionType === 'sort'" ref="sortMenuRef" />
     <template #footer>
       <BaseButton

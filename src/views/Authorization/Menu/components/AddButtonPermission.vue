@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import { FormSchema, Form } from '@/components/Form'
-import { ElDrawer } from 'element-plus'
-import { reactive } from 'vue'
+import { ElDrawer, ElMessage } from 'element-plus'
+import { reactive, watch } from 'vue'
 import { useForm } from '@/hooks/web/useForm'
 import { useValidator } from '@/hooks/web/useValidator'
 import { useMenuStore } from '@/store/modules/menu'
-import { addPermission } from '@/api/menu'
+import { addPermission, updatePermission } from '@/api/menu'
 
 const menuStore = useMenuStore()
-
 const modelValue = defineModel<boolean>()
-
 const { required } = useValidator()
 
 const formSchema = reactive<FormSchema[]>([
@@ -43,11 +41,11 @@ const formSchema = reactive<FormSchema[]>([
 const { formRegister, formMethods } = useForm()
 const { getFormData, getElFormExpose } = formMethods
 
-const emit = defineEmits(['confirm'])
+const emit = defineEmits(['refresh'])
 
 const rules = reactive({
-  label: [required()],
-  value: [required()]
+  name: [required()],
+  code: [required()]
 })
 
 const confirm = async () => {
@@ -58,26 +56,37 @@ const confirm = async () => {
   })
   if (valid) {
     const formData = await getFormData()
-    try {
-      const { id, path } = menuStore.getCurrentMenu
-      formData.menuId = id
-      formData.name = (path + '_' + formData.value).toUpperCase()
-      const res = await addPermission(formData)
-      if (res?.data?.id) {
-        modelValue.value = false
-        emit('confirm', id)
-      }
-    } catch (error) {
-      console.log('🚀 ~ xzz: confirm -> error', error)
-    }
+    const isEdit = !!formData.id
+    isEdit ? await updatePermission(formData) : await addPermission(formData)
+
+    ElMessage.success(isEdit ? '更新权限成功' : '添加权限成功')
+    emit('refresh')
     // 清空表单
-    // formMethods.resetForm()
+    // elFormExpose?.resetFields()
+    modelValue.value = false
   }
 }
+
+const onClose = async () => {
+  const elFormExpose = await getElFormExpose()
+  elFormExpose?.resetFields()
+}
+
+watch(
+  () => menuStore.drawerFormData,
+  async (value) => {
+    if (!value) return
+    formMethods.setValues(value)
+  },
+  {
+    deep: true
+    // immediate: true
+  }
+)
 </script>
 
 <template>
-  <ElDrawer v-model="modelValue" title="新增按钮权限">
+  <ElDrawer v-model="modelValue" title="自定义权限" append-to-body @close="onClose">
     <template #default>
       <Form :rules="rules" @register="formRegister" :schema="formSchema" />
     </template>

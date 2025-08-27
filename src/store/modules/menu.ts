@@ -1,17 +1,33 @@
 import { defineStore } from 'pinia'
 import { getMenuListApi } from '@/api/menu'
+
+export interface DrawerFormData {
+  id?: number
+  name: string
+  code: string
+  path: string
+}
+
 export interface MenuState {
   allMenuList: AppCustomRouteRecordRaw[]
   currentMenu: Partial<AppCustomRouteRecordRaw>
+  drawerFormData: DrawerFormData
 }
+
 export const useMenuStore = defineStore('menu', {
   state: (): MenuState => ({
     allMenuList: [],
-    currentMenu: {}
+    currentMenu: {},
+    drawerFormData: {
+      name: '',
+      code: '',
+      path: ''
+    }
   }),
   getters: {
     getAllMenuList: (state) => state.allMenuList,
-    getCurrentMenu: (state) => state.currentMenu
+    getCurrentMenu: (state) => state.currentMenu,
+    getDrawerFormData: (state) => state.drawerFormData
   },
   actions: {
     async getMenuList() {
@@ -20,9 +36,11 @@ export const useMenuStore = defineStore('menu', {
       this.allMenuList = list
       return { list, total }
     },
-    async setCurrentMenu(id: number) {
-      const menu = this.allMenuList.find((item) => item.id === id)
+    setCurrentMenu(menu: Partial<AppCustomRouteRecordRaw>) {
       this.currentMenu = menu || {}
+    },
+    setDrawerFormData(data: DrawerFormData) {
+      this.drawerFormData = data
     }
   },
   persist: []
