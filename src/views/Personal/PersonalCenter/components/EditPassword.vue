@@ -4,6 +4,10 @@ import { useForm } from '@/hooks/web/useForm'
 import { reactive, ref } from 'vue'
 import { useValidator } from '@/hooks/web/useValidator'
 import { ElMessage, ElMessageBox, ElDivider } from 'element-plus'
+import { updatePasswordApi } from '@/api/user'
+const props = defineProps<{
+  userid: number
+}>()
 
 const { required } = useValidator()
 
@@ -77,8 +81,8 @@ const { getFormData, getElFormExpose } = formMethods
 
 const saveLoading = ref(false)
 const save = async () => {
-  const elForm = await getElFormExpose()
-  const valid = await elForm?.validate().catch((err) => {
+  const elFormExpose = await getElFormExpose()
+  const valid = await elFormExpose?.validate().catch((err) => {
     console.log(err)
   })
   if (valid) {
@@ -91,7 +95,10 @@ const save = async () => {
         try {
           saveLoading.value = true
           // 这里可以调用修改密码的接口
+          const formData = await getFormData()
+          await updatePasswordApi({ ...formData, id: props.userid })
           ElMessage.success('修改成功')
+          elFormExpose?.resetFields()
         } catch (error) {
           console.log(error)
         } finally {

@@ -4,13 +4,12 @@ import { ElMessageBox } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useTagsViewStore } from './tagsView'
 import router from '@/router'
-
-import { UserLoginType, UserType } from '@/api/login/types'
+import { UserItem } from '@/api/user/types'
+import { UserLoginType } from '@/api/login/types'
 import defaultAvatar from '@/assets/imgs/avatar.jpg'
-// import { getUnReadMsgCountApi } from '@/api/notice'
 
 interface UserState {
-  userInfo?: UserType
+  userInfo: UserItem | undefined
   tokenKey: string
   token: string
   roleRouters?: string[] | AppCustomRouteRecordRaw[]
@@ -19,19 +18,19 @@ interface UserState {
   unReadCount: number
 }
 
+// const initUserInfo: UserItem = {
+//   id: 0,
+//   username: '',
+//   phone: '',
+//   avatar: '',
+//   roles: [],
+//   departments: [],
+//   email: ''
+// }
 export const useUserStore = defineStore('user', {
   state: (): UserState => {
     return {
-      userInfo: {
-        id: 0,
-        username: '',
-        phone: '',
-        avatar: '',
-        roles: [],
-        department: { id: 0, name: '' },
-        createdAt: '',
-        email: ''
-      },
+      userInfo: undefined,
       tokenKey: 'Authorization',
       token: '',
       roleRouters: undefined,
@@ -51,7 +50,7 @@ export const useUserStore = defineStore('user', {
     getToken(): string {
       return this.token
     },
-    getUserInfo(): UserType | undefined {
+    getUserInfo(): UserItem | undefined {
       return this.userInfo
     },
     getRoleRouters(): string[] | AppCustomRouteRecordRaw[] | undefined {
@@ -77,7 +76,7 @@ export const useUserStore = defineStore('user', {
     setToken(token: string) {
       this.token = token
     },
-    setUserInfo(userInfo?: UserType) {
+    setUserInfo(userInfo?: UserItem) {
       this.userInfo = userInfo
     },
     setRoleRouters(roleRouters: string[] | AppCustomRouteRecordRaw[]) {
@@ -109,7 +108,7 @@ export const useUserStore = defineStore('user', {
       const tagsViewStore = useTagsViewStore()
       tagsViewStore.delAllViews()
       this.setToken('')
-      this.setUserInfo(undefined)
+      this.setUserInfo()
       this.setRoleRouters([])
       router.replace('/login')
     },

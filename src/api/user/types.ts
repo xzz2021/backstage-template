@@ -26,6 +26,7 @@ export interface UserItem {
   email?: string
   roles?: { id: number; name: string }[]
   departments?: { id: number; name: string }[]
+  createdAt?: string
 }
 
 export interface DepartmentUserItem {

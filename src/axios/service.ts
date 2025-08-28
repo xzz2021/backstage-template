@@ -45,21 +45,31 @@ axiosInstance.interceptors.response.use(
   (error: AxiosError) => {
     console.log('err： ' + error) // for debug
     // console.log('xzz2021: error', error)
-    if (error?.status === 500) {
-      errMsg('网络异常,或后端服务进程出错!')
+    let msg = (error.response?.data as any)?.message
+
+    switch (error?.status) {
+      case 500:
+        msg = msg || '网络异常,或后端服务进程出错!'
+        break
+      case 404:
+        msg = msg || '接口不存在,请联系后端管理员!'
+        break
+      case 403:
+        msg = msg || '当前用户没有操作权限,请联系管理员!'
+        break
+      case 401:
+        msg = msg || '登录过期, 鉴权失败, 请重新登录!'
+        break
+      default:
+        msg = msg || '网络异常,或后端服务进程出错!'
+        break
     }
-    if (error?.status == 404) {
-      errMsg('接口不存在,请联系后端管理员!')
-    }
-    if (error?.status == 403) {
-      errMsg('当前用户没有操作权限,请联系管理员!')
-    }
+    errMsg(msg)
+
     if (error?.status == 401) {
-      errMsg('登录过期, 鉴权失败, 请重新登录!')
       const userStore = useUserStoreWithOut()
       userStore.logout()
     }
-    errMsg((error.response?.data as any)?.message || '网络异常,或后端服务进程出错!')
     return Promise.reject(error)
   }
 )

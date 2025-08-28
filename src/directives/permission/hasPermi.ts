@@ -5,7 +5,7 @@ import router from '@/router'
 const { t } = useI18n()
 
 const hasPermission = (value: string): boolean => {
-  const permission = (router.currentRoute.value.meta.permission || []) as string[]
+  const permission = (router.currentRoute.value.meta.permissions || []) as string[]
   if (!value) {
     throw new Error(t('permission.hasPermission'))
   }

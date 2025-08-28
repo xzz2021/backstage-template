@@ -201,13 +201,13 @@ const searchSchema = reactive<FormSchema[]>([
   {
     field: 'status',
     label: t('userDemo.status'),
-    component: 'Switch',
+    component: 'Select',
     componentProps: {
-      activeText: t('userDemo.enable'),
-      inactiveText: t('userDemo.disable'),
-      inlinePrompt: true
-    },
-    value: true
+      options: [
+        { label: t('userDemo.enable'), value: true },
+        { label: t('userDemo.disable'), value: false }
+      ]
+    }
   }
 ])
 </script>

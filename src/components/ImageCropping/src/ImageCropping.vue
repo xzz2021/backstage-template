@@ -108,7 +108,7 @@ const intiCropper = () => {
     }
   })
 }
-
+const filename = ref('')
 const uploadChange = (uploadFile: UploadFile) => {
   // 判断是否是图片
   if (uploadFile?.raw?.type.indexOf('image') === -1) {
@@ -116,6 +116,7 @@ const uploadChange = (uploadFile: UploadFile) => {
     return
   }
   if (!uploadFile.raw) return
+  filename.value = uploadFile.raw.name
   // 获取图片的访问地址
   const url = URL.createObjectURL(uploadFile.raw)
   unref(cropperRef)?.replace(url)
@@ -165,7 +166,10 @@ onBeforeUnmount(() => {
 })
 
 defineExpose({
-  cropperExpose: cropperRef
+  cropperExpose: cropperRef,
+  getFileName: () => {
+    return filename.value
+  }
 })
 </script>
 

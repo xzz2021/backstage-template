@@ -10,7 +10,7 @@ const props = defineProps({
 })
 
 const currentPermission = computed(() => {
-  return unref(currentRoute)?.meta?.permission || []
+  return unref(currentRoute)?.meta?.permissions || []
 })
 
 const hasPermission = computed(() => {

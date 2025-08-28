@@ -7,38 +7,41 @@ import UploadAvatar from './components/UploadAvatar.vue'
 import { Dialog } from '@/components/Dialog'
 import EditInfo from './components/EditInfo.vue'
 import EditPassword from './components/EditPassword.vue'
+import { getPersonByIdApi } from '@/api/user'
+import { useUserStore } from '@/store/modules/user'
+import { storeToRefs } from 'pinia'
+import { UserItem } from '@/api/user/types'
 
-const userInfo = ref()
+const userStore = useUserStore()
+const { userInfo } = storeToRefs(userStore)
+const activeName = ref('first')
+const dialogVisible = ref(false)
+const uploadAvatarRef = ref<ComponentRef<typeof UploadAvatar>>()
+const avatarLoading = ref(false)
+
 const fetchDetailUserApi = async () => {
-  // 这里可以调用接口获取用户信息
-  const data = {
-    id: 1,
-    username: 'admin',
-    realName: 'admin',
-    phoneNumber: '18888888888',
-    email: '502431556@qq.com',
-    avatarUrl: '',
-    roleList: ['超级管理员']
+  const res = await getPersonByIdApi()
+  if (res.data) {
+    userStore.setUserInfo(res.data)
+  } else {
+    ElMessage.error('获取用户信息失败,请刷新页面!')
   }
-  userInfo.value = data
 }
 fetchDetailUserApi()
 
-const activeName = ref('first')
-
-const dialogVisible = ref(false)
-
-const uploadAvatarRef = ref<ComponentRef<typeof UploadAvatar>>()
-const avatarLoading = ref(false)
 const saveAvatar = async () => {
   try {
     avatarLoading.value = true
-    const base64 = unref(uploadAvatarRef)?.getBase64()
-    console.log(base64)
+    const imgUrl = await unref(uploadAvatarRef)?.getAvatarUrl()
     // 这里可以调用修改头像接口
-    fetchDetailUserApi()
-    ElMessage.success('修改成功')
-    dialogVisible.value = false
+    if (imgUrl) {
+      dialogVisible.value = false
+      const currentUserInfo = userStore.getUserInfo || {}
+      userStore.setUserInfo({
+        ...(currentUserInfo as UserItem),
+        avatar: imgUrl
+      })
+    }
   } catch (error) {
     console.log(error)
   } finally {
@@ -57,25 +60,20 @@ const saveAvatar = async () => {
         >
           <ElImage
             class="w-[150px] h-[150px] rounded-full"
-            :src="userInfo?.avatarUrl || defaultAvatar"
+            :src="userInfo?.avatar || defaultAvatar"
             fit="fill"
           />
         </div>
       </div>
       <ElDivider />
       <div class="flex justify-between items-center">
-        <div>账号：</div>
+        <div>昵称：</div>
         <div>{{ userInfo?.username }}</div>
       </div>
       <ElDivider />
       <div class="flex justify-between items-center">
-        <div>昵称：</div>
-        <div>{{ userInfo?.realName }}</div>
-      </div>
-      <ElDivider />
-      <div class="flex justify-between items-center">
         <div>手机号码：</div>
-        <div>{{ userInfo?.phoneNumber ?? '-' }}</div>
+        <div>{{ userInfo?.phone ?? '-' }}</div>
       </div>
       <ElDivider />
       <div class="flex justify-between items-center">
@@ -86,30 +84,46 @@ const saveAvatar = async () => {
       <div class="flex justify-between items-center">
         <div>所属角色：</div>
         <div>
-          <template v-if="userInfo?.roleList?.length">
-            <ElTag v-for="item in userInfo?.roleList || []" :key="item" class="ml-2 mb-w"
-              >{{ item }}
+          <template v-if="userInfo?.roles?.length">
+            <ElTag v-for="item in userInfo?.roles || []" :key="item.id" class="ml-2 mb-w"
+              >{{ item.name }}
             </ElTag>
           </template>
           <template v-else>-</template>
         </div>
       </div>
       <ElDivider />
+      <div class="flex justify-between items-center">
+        <div>所属部门：</div>
+        <div
+          ><ElTag>
+            {{ userInfo?.departments?.map((item) => item.name).join(',') ?? '-' }}
+          </ElTag>
+        </div>
+      </div>
+      <ElDivider />
+      <div class="flex items-center justify-center">
+        <div class="text-12px">注册于：{{ userInfo?.createdAt || '-' }}</div>
+      </div>
     </ContentWrap>
     <ContentWrap title="基本资料" class="flex-[3] ml-20px">
       <ElTabs v-model="activeName">
         <ElTabPane label="基本信息" name="first">
-          <EditInfo :user-info="userInfo" />
+          <EditInfo :user-info="userInfo" @refresh="fetchDetailUserApi" />
         </ElTabPane>
         <ElTabPane label="修改密码" name="second">
-          <EditPassword />
+          <EditPassword :userid="userInfo?.id || 0" />
         </ElTabPane>
       </ElTabs>
     </ContentWrap>
   </div>
 
   <Dialog v-model="dialogVisible" title="修改头像" width="800px">
-    <UploadAvatar ref="uploadAvatarRef" :url="userInfo?.avatarUrl || defaultAvatar" />
+    <UploadAvatar
+      ref="uploadAvatarRef"
+      :url="userInfo?.avatar || defaultAvatar"
+      :user-id="userInfo?.id || 0"
+    />
 
     <template #footer>
       <ElButton type="primary" :loading="avatarLoading" @click="saveAvatar"> 保存 </ElButton>

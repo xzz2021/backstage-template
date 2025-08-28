@@ -7,10 +7,6 @@ interface DetailUserResponse {
   department: { id: number; name: string }
   roles: { id: number; name: string }[]
 }
-
-interface PersonResponse2 {
-  userInfo: UserItem
-}
 // 根据 部门id 进行分页查询
 export const getUserByDepartmentIdApi = (
   params: DepartmentUserParams
@@ -37,14 +33,14 @@ export const updateUserApi = (data): Promise<IResponse> => {
   return request.post({ url: '/api/user/update', data })
 }
 
-//  根据id获取用户个人中心信息  及角色数组
-export const getPersonByIdApi = (params: { id: number }) => {
-  return request.get<PersonResponse2>({ url: '/api/user/detailInfo', params })
+//  获取用户  个人   详细信息 包含角色 部门创建时间
+export const getPersonByIdApi = (): Promise<IResponse<UserItem>> => {
+  return request.get({ url: '/api/user/detailInfo' })
 }
 
 // 更新用户信息
 export const updatePersonApi = (data) => {
-  return request.post({ url: '/api/user/updateInfo', data })
+  return request.post({ url: '/api/user/updatePersonalInfo', data })
 }
 
 // 更新用户密码
