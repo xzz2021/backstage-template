@@ -1,6 +1,7 @@
 export interface UserLoginType {
   username: string
-  password: string
+  password?: string
+  phone: string
 }
 
 export interface SmsLoginType {

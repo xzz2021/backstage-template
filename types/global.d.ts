@@ -47,8 +47,9 @@ declare global {
 
   declare interface IResponse<T = any> {
     code: number
+    id?: number
     data: T extends any ? T : T & any
-    list: T extends any ? T : T & any
+    list: T extends any ? T[] : T & any[]
     total: number
     message: string
   }

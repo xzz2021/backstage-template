@@ -240,6 +240,7 @@ const signIn = async () => {
             userStore.setLoginInfo({
               phone: formData.phone,
               username: formData.username
+              // password: formData.password
             })
           } else {
             userStore.setLoginInfo(undefined)

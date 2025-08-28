@@ -6,7 +6,7 @@ import { ref } from 'vue'
 export const useDepartmentStore = defineStore('department', () => {
   const departmentList = ref<DepartmentItem[]>([])
 
-  const getDepartmentList = async (params: any) => {
+  const getDepartmentList = async (params?: any) => {
     const res = await getDepartmentListApi(params)
     const { list = [], total = 0 } = res || {}
     departmentList.value = list

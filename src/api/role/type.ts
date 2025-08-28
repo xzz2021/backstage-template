@@ -1,12 +1,14 @@
-export interface RoleItemType {
+export interface RoleItem {
   id: number
   name: string
-  description: string
+  code: string
+  status: boolean
+  remark: string
   createdAt: string
   updatedAt: string
 }
 
-export interface RoleList {
-  list: Partial<RoleItemType>[]
-  total: number
-}
+// export interface RoleList {
+//   list: Partial<RoleItem>[]
+//   total: number
+// }

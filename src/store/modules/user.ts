@@ -1,17 +1,14 @@
 import { defineStore } from 'pinia'
 import { store } from '../index'
-import { UserType } from '@/api/login/types'
 import { ElMessageBox } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
-import { loginOutApi } from '@/api/login'
 import { useTagsViewStore } from './tagsView'
 import router from '@/router'
 
-interface UserLoginType {
-  username: string
-  password?: string
-  phone?: string
-}
+import { UserLoginType, UserType } from '@/api/login/types'
+import defaultAvatar from '@/assets/imgs/avatar.jpg'
+// import { getUnReadMsgCountApi } from '@/api/notice'
+
 interface UserState {
   userInfo?: UserType
   tokenKey: string
@@ -19,18 +16,32 @@ interface UserState {
   roleRouters?: string[] | AppCustomRouteRecordRaw[]
   rememberMe: boolean
   loginInfo?: UserLoginType
+  unReadCount: number
 }
 
 export const useUserStore = defineStore('user', {
   state: (): UserState => {
     return {
-      userInfo: undefined,
+      userInfo: {
+        id: 0,
+        username: '',
+        phone: '',
+        avatar: '',
+        roles: [],
+        department: { id: 0, name: '' },
+        createdAt: '',
+        email: ''
+      },
       tokenKey: 'Authorization',
       token: '',
       roleRouters: undefined,
       // 记住我
       rememberMe: true,
-      loginInfo: undefined
+      loginInfo: {
+        username: '',
+        phone: ''
+      },
+      unReadCount: 0
     }
   },
   getters: {
@@ -51,6 +62,12 @@ export const useUserStore = defineStore('user', {
     },
     getLoginInfo(): UserLoginType | undefined {
       return this.loginInfo
+    },
+    getUserAvatar(): string {
+      return this.userInfo?.avatar || defaultAvatar
+    },
+    getUnReadCount(): number {
+      return this.unReadCount
     }
   },
   actions: {
@@ -74,12 +91,19 @@ export const useUserStore = defineStore('user', {
         type: 'warning'
       })
         .then(async () => {
-          const res = await loginOutApi().catch(() => {})
-          if (res) {
-            this.reset()
-          }
+          this.reset()
+
+          // const res = await loginOutApi().catch(() => {})
+          // if (res) {
+          //   this.reset()
+          // }
         })
         .catch(() => {})
+    },
+    async cmdLogout() {
+      // const res = await forceLogoutApi(id).catch(() => {})
+      // 这里是收到 强制退出命令    应该做下打点记录  调用登出接口 及 登出原因类型
+      this.reset()
     },
     reset() {
       const tagsViewStore = useTagsViewStore()
@@ -98,6 +122,10 @@ export const useUserStore = defineStore('user', {
     setLoginInfo(loginInfo: UserLoginType | undefined) {
       this.loginInfo = loginInfo
     }
+    // async setUnReadCount() {
+    //   const res = await getUnReadMsgCountApi()
+    //   this.unReadCount = res?.total || 0
+    // }
   },
   persist: true
 })

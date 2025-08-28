@@ -14,10 +14,12 @@ import { BaseButton } from '@/components/Button'
 import { formatToDateTime } from '@/utils/dateUtil'
 import { ElMessage } from 'element-plus'
 import Seed from '../Seed.vue'
-import { addRoleApi, delRoleApi, editRoleApi, getRoleListApi } from '@/api/role'
+import { addRoleApi, delRoleApi, editRoleApi } from '@/api/role'
+import { useRoleStore } from '@/store/modules/role'
 const { t } = useI18n()
 const ids = ref<string[]>([])
 
+const roleStore = useRoleStore()
 const { tableRegister, tableState, tableMethods } = useTable({
   fetchDataApi: async () => {
     const { currentPage, pageSize } = tableState
@@ -26,7 +28,7 @@ const { tableRegister, tableState, tableMethods } = useTable({
       pageSize: unref(pageSize),
       ...unref(searchParams)
     }
-    const res = await getRoleListApi(params)
+    const res = await roleStore.getRoleList(params)
     return res
   },
   fetchDelApi: async () => {

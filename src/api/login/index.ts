@@ -13,7 +13,7 @@ export const registerApi = (data: UserRegisterType): Promise<IResponse<UserType>
   return request.post({ url: 'api/auth/register', data })
 }
 
-export const getRoleMenuApi = (): Promise<IResponse<AppCustomRouteRecordRaw[]>> => {
+export const getRoleMenuApi = (): Promise<IResponse<AppCustomRouteRecordRaw>> => {
   return request.get({ url: '/api/role/getRoleMenu' })
 }
 
