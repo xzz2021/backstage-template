@@ -3,14 +3,13 @@ import { Form, FormSchema } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
 import { PropType, reactive, ref, unref, watch } from 'vue'
 import { useValidator } from '@/hooks/web/useValidator'
-import { DictionaryItem, DictionaryEntry } from '@/api/dictionary/types'
+import { DictionaryItem } from '@/api/dictionary/types'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox, ElTree } from 'element-plus'
 import { useDictionaryStore } from '@/store/modules/dictionary'
 import { ContentWrap } from '@/components/ContentWrap'
 import { ElInput } from 'element-plus'
 import { Dialog } from '@/components/Dialog'
-import { delDictionaryApi } from '@/api/dictionary'
 import { ElPopover, ElButton } from 'element-plus'
 import { storeToRefs } from 'pinia'
 const { required } = useValidator()
@@ -41,16 +40,15 @@ const submit = async () => {
   })
   if (valid) {
     const formData = await getFormData()
+    console.log('🚀 ~ submit ~ formData:', formData)
     delete formData.entries
 
     try {
       saveLoading.value = true
-      const res = await dictionaryStore.upsertDictionary(formData as DictionaryEntry)
-      if (res) {
-        dialogVisible.value = false
-        ElMessage.success('更新成功!')
-        currentChange({ id: formData.id, name: formData.name })
-      }
+      await dictionaryStore.upsertDictionary(formData as DictionaryItem)
+      dialogVisible.value = false
+      ElMessage.success('更新成功!')
+      currentChange({ id: Number(formData.id) })
     } catch (error) {
       console.log('🚀 ~ submit ~ error:', error)
     } finally {
@@ -83,6 +81,16 @@ const formSchema = reactive<FormSchema[]>([
     field: 'code',
     label: '字典编码',
     component: 'Input'
+  },
+  {
+    field: 'sort',
+    label: '排序',
+    component: 'InputNumber',
+    componentProps: {
+      min: 0,
+      // 只允许整数 默认0
+      precision: 0
+    }
   },
 
   {
@@ -122,7 +130,7 @@ const actionType = ref('')
 const emit = defineEmits(['currentChange'])
 const currentNodeKey = ref<number>(1)
 
-const currentChange = (data: { id: number; name: string }) => {
+const currentChange = (data: { id: number; name?: string }) => {
   currentNodeKey.value = Number(data.id)
   emit('currentChange', currentNodeKey.value)
 }
@@ -155,13 +163,8 @@ const deleteType = (id: number) => {
     cancelButtonText: '取消',
     type: 'warning'
   }).then(async () => {
-    const res = await delDictionaryApi([id.toString()])
-    if (res?.code === 200) {
-      ElMessage.success('删除成功!')
-      await refreshList()
-    } else {
-      ElMessage.error('删除失败!')
-    }
+    await dictionaryStore.deleteDictionary([id])
+    currentChange({ id: allDictionaryList.value[0].id as number })
   })
 }
 

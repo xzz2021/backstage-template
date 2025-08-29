@@ -4,6 +4,8 @@ import { ElRow, ElCol, ElSkeleton, ElCard, ElDivider, ElLink } from 'element-plu
 import { useI18n } from '@/hooks/web/useI18n'
 import { ref } from 'vue'
 import { CountTo } from '@/components/CountTo'
+import defaultAvatar from '@/assets/imgs/avatar.jpg'
+import { useUserStore } from '@/store/modules/user'
 // import { formatTime } from '@/utils'
 // import { Echart } from '@/components/Echart'
 // import { EChartsOption } from 'echarts'
@@ -110,6 +112,7 @@ const getAllApi = async () => {
 getAllApi()
 */
 const { t } = useI18n()
+const userStore = useUserStore()
 </script>
 
 <template>
@@ -120,7 +123,7 @@ const { t } = useI18n()
           <ElCol :xl="12" :lg="12" :md="12" :sm="24" :xs="24">
             <div class="flex items-center">
               <img
-                src="@/assets/imgs/avatar.jpg"
+                :src="userStore.getUserAvatar || defaultAvatar"
                 alt=""
                 class="w-70px h-70px rounded-[50%] mr-20px"
               />

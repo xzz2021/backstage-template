@@ -15,16 +15,13 @@ const generateSeed = async () => {
     ElMessage.error('请输入seed数据')
     return
   }
-  const res = await dictionaryStore.upsertDictionaries(JSON.parse(seedData.value))
-  if (res) {
-    ElMessage.success('生成成功')
-    // 更新列表
-    seedDialog.value = false
-    await dictionaryStore.updateDictionaryList()
-    seedData.value = ''
-  } else {
-    ElMessage.error('生成失败')
-  }
+  await dictionaryStore.generateDictionarySeed(JSON.parse(seedData.value))
+
+  ElMessage.success('生成成功')
+  // 更新列表
+  seedDialog.value = false
+  await dictionaryStore.updateDictionaryList()
+  seedData.value = ''
 }
 
 const exportSeed = async () => {

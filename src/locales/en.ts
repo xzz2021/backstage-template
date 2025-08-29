@@ -513,6 +513,7 @@ export default {
     title: 'Title',
     add: 'Add',
     del: 'Delete',
+    batchDel: 'Batch delete',
     edit: 'Edit',
     author: 'Author',
     displayTime: 'Display time',

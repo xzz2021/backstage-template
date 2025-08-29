@@ -96,19 +96,13 @@ const formSchema = reactive<FormSchema[]>([
   {
     field: 'status',
     label: t('userDemo.status'),
-    component: 'Select',
-    value: true,
+    component: 'Switch',
     componentProps: {
-      options: [
-        {
-          value: false,
-          label: t('userDemo.disable')
-        },
-        {
-          value: true,
-          label: t('userDemo.enable')
-        }
-      ]
+      activeValue: true,
+      inactiveValue: false,
+      activeText: t('userDemo.enable'),
+      inactiveText: t('userDemo.disable'),
+      inlinePrompt: true
     }
   },
   // {

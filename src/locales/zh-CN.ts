@@ -503,6 +503,7 @@ export default {
     title: '标题',
     add: '新增',
     del: '删除',
+    batchDel: '批量删除',
     edit: '编辑',
     author: '作者',
     displayTime: '创建时间',

@@ -2,45 +2,42 @@
 import { ContentWrap } from '@/components/ContentWrap'
 import { useI18n } from '@/hooks/web/useI18n'
 import { Table } from '@/components/Table'
-import { ref, unref } from 'vue'
+import { ref, unref, onMounted } from 'vue'
 import { useTable } from '@/hooks/web/useTable'
-import { Search } from '@/components/Search'
+// import { Search } from '@/components/Search'
 import Write from './components/Write.vue'
 import Detail from './components/Detail.vue'
 import { Dialog } from '@/components/Dialog'
 import { BaseButton } from '@/components/Button'
-
-import type { FormSchema } from '@/components/Form'
+import { ElLink } from 'element-plus'
+// import type { FormSchema } from '@/components/Form'
 import { formatToDateTime } from '@/utils/dateUtil'
 import { ElMessage } from 'element-plus'
 import TypeWrite from './components/TypeWrite.vue'
 import { TableColumn } from '@/components/Table'
 import Seed from './components/Seed.vue'
+import { storeToRefs } from 'pinia'
+import { useClipboard } from '@/hooks/web/useClipboard'
 const { t } = useI18n()
 import { useDictionaryStore } from '@/store/modules/dictionary'
 import { DictionaryEntry } from '@/api/dictionary/types'
 const dictionaryStore = useDictionaryStore()
+const { allDictionaryList } = storeToRefs(dictionaryStore)
 const { tableRegister, tableState, tableMethods } = useTable({
   fetchDataApi: async () => {
-    // const params = {
-    //   ...unref(searchParams)
-    // }
     const dictionaryId = unref(currentNodeKey)
     // 触发更新字典   然后根据id索引到当前list
-    const dicList = await dictionaryStore.getAllDictionaryList
-    const currentDic = dicList.find((v) => v.id === dictionaryId)
-    // 获取当前字典的key
+    const currentDic = unref(allDictionaryList).find((v) => v.id === dictionaryId)
     currentDicKey.value = currentDic?.code || ''
     const currentDicEntry = currentDic?.entries || []
-    // 如果params 有值 则进行筛选
     return {
       list: currentDicEntry,
       total: currentDicEntry.length
     }
   },
   fetchDelApi: async () => {
-    const res = await dictionaryStore.deleteDictEntry(unref(ids).map((v) => Number(v)))
-    return !!res
+    await dictionaryStore.deleteDictEntry(unref(ids).map((v) => Number(v)))
+    return true
   }
 })
 
@@ -48,19 +45,19 @@ const { loading, dataList, pageSize, currentPage } = tableState
 const { getList, getElTableExpose, delList } = tableMethods
 
 // const searchParams = ref<{ name?: string; code?: string }>({})
-const setSearchParams = (params: any) => {
-  // currentPage.value = 1
-  // searchParams.value = params
-  // 筛选dataList
-  if (Object.keys(params).length > 0) {
-    const currentData = dataList.value.filter(
-      (v) => v.name.includes(params.name) || v.code.includes(params.code)
-    )
-    dataList.value = currentData
-  } else {
-    getList()
-  }
-}
+// const setSearchParams = (params: any) => {
+//   // currentPage.value = 1
+//   // searchParams.value = params
+//   // 筛选dataList
+//   if (Object.keys(params).length > 0) {
+//     const currentData = dataList.value.filter(
+//       (v) => v.name.includes(params.name) || v.code.includes(params.code)
+//     )
+//     dataList.value = currentData
+//   } else {
+//     getList()
+//   }
+// }
 
 const currentDicKey = ref<string>('')
 const tableColumns = ref<TableColumn[]>([
@@ -138,7 +135,7 @@ const AddAction = () => {
   actionType.value = ''
 }
 
-const currentNodeKey = ref<number>(1)
+const currentNodeKey = ref<number>()
 const currentChange = (id: number) => {
   currentNodeKey.value = Number(id)
   getList()
@@ -161,13 +158,6 @@ const delData = async (row?: DictionaryEntry) => {
     delLoading.value = false
     getList()
   })
-  // const res = await dictionaryStore.delDicEntry(unref(ids))
-  // if (res) {
-  //   ElMessage.success('删除成功')
-  //   getList()
-  // } else {
-  //   ElMessage.error('删除失败')
-  // }
 }
 
 const action = async (row: DictionaryEntry, type: string) => {
@@ -183,18 +173,18 @@ const writeRef = ref<ComponentRef<typeof Write>>()
 
 const saveLoading = ref(false)
 
-const searchSchema = ref<FormSchema[]>([
-  {
-    field: 'name',
-    label: '名称',
-    component: 'Input'
-  },
-  {
-    field: 'code',
-    label: '编码',
-    component: 'Input'
-  }
-])
+// const searchSchema = ref<FormSchema[]>([
+//   {
+//     field: 'name',
+//     label: '名称',
+//     component: 'Input'
+//   },
+//   {
+//     field: 'code',
+//     label: '编码',
+//     component: 'Input'
+//   }
+// ])
 
 const save = async () => {
   const write = unref(writeRef)
@@ -204,15 +194,11 @@ const save = async () => {
     try {
       //  提交 新增 或者 修改
       saveLoading.value = true
-      const res = await dictionaryStore.upsertDicEntry(formData as DictionaryEntry)
-      if (res) {
-        dialogVisible.value = false
-        ElMessage.success('更新成功!')
-        currentPage.value = 1
-        getList()
-      } else {
-        ElMessage.error('更新失败!')
-      }
+      await dictionaryStore.upsertDicEntry(formData as DictionaryEntry)
+      dialogVisible.value = false
+      ElMessage.success('更新成功!')
+      currentPage.value = 1
+      getList()
     } catch (error) {
       console.log('🚀 ~ xzz: save -> error', error)
     } finally {
@@ -220,20 +206,35 @@ const save = async () => {
     }
   }
 }
+
+onMounted(async () => {
+  allDictionaryList.value.length > 0 && currentChange(allDictionaryList.value[0].id as number)
+})
+const { copy } = useClipboard()
 </script>
 
 <template>
   <div class="flex w-100% h-100%">
     <TypeWrite @currentChange="currentChange" />
     <ContentWrap class="flex-[3] ml-20px">
-      <Search @reset="getList" @search="setSearchParams" :schema="searchSchema" />
-      <div class="mb-10px">
-        <BaseButton type="primary" @click="AddAction">{{ t('exampleDemo.add') }}</BaseButton>
-        <BaseButton :loading="delLoading" type="danger" @click="delData()">
-          {{ t('exampleDemo.del') }}
+      <!-- <Search @reset="getList" @search="setSearchParams" :schema="searchSchema" /> -->
+
+      <Seed />
+      <ElLink class="mx-10px" @click="copy(currentDicKey)" type="primary">
+        {{ currentDicKey && `当前字典: ${currentDicKey}` }}</ElLink
+      >
+      <div class="my-10px">
+        <BaseButton type="primary" @click="AddAction" :disabled="!currentNodeKey">{{
+          t('exampleDemo.add')
+        }}</BaseButton>
+        <BaseButton
+          :loading="delLoading"
+          type="danger"
+          @click="delData()"
+          :disabled="!currentNodeKey"
+        >
+          {{ t('exampleDemo.batchDel') }}
         </BaseButton>
-        <span class="mx-10px">{{ currentDicKey }}</span>
-        <Seed />
       </div>
       <Table
         v-model:current-page="currentPage"

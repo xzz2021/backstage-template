@@ -1,10 +1,9 @@
 import {
   delDicEntryApi,
   delDictionaryApi,
-  getDicEntryListApi,
+  generateDictionarySeedApi,
   getDictionaryListApi,
   upsertDicEntryApi,
-  upsertDictionariesApi,
   upsertDictionaryApi
 } from '@/api/dictionary'
 import { defineStore } from 'pinia'
@@ -46,40 +45,28 @@ export const useDictionaryStore = defineStore('dictionary', {
       const res = await getDictionaryListApi()
       this.allDictionaryList = res?.data?.list
       this.dictionaryMap = mapDic(res?.data?.list)
-      return this.allDictionaryList
     },
-
-    async upsertDictionary(data: DictionaryEntry) {
-      const res = await upsertDictionaryApi(data)
-      if (res?.code === 200) {
-        await this.updateDictionaryList()
-        return true
-      }
-      return false
+    async upsertDictionary(data: DictionaryItem) {
+      await upsertDictionaryApi(data)
+      await this.updateDictionaryList()
     },
-    async deleteDictionary(id: number) {
-      const res = await delDictionaryApi([id.toString()])
-      if (res?.code === 200) {
-        ElMessage.success('删除成功!')
-        await this.updateDictionaryList()
-      }
+    async deleteDictionary(ids: number[]) {
+      await delDictionaryApi(ids)
+      ElMessage.success('删除成功!')
+      await this.updateDictionaryList()
     },
     async deleteDictEntry(ids: number[]) {
-      const res = await delDicEntryApi(ids)
-      if (res?.code === 200) {
-        ElMessage.success('删除成功!')
-        await this.updateDictionaryList()
-        return true
-      }
-      return false
+      await delDicEntryApi(ids)
+      ElMessage.success('删除成功!')
+      await this.updateDictionaryList()
     },
     // 获取指定字典的字典项列表
-    async setDictionaryEntryList(params?: any) {
-      const res = await getDicEntryListApi(params)
-      const { list = [], total = 0 } = res?.data || {}
-      this.dicEntryList = list
-      return { list, total }
-    },
+    // async setDictionaryEntryList(params?: any) {
+    //   const res = await getDicEntryListApi(params)
+    //   const { list = [], total = 0 } = res?.data || {}
+    //   this.dicEntryList = list
+    //   return { list, total }
+    // },
     async upsertDicEntry(data: DictionaryEntry) {
       const res = await upsertDicEntryApi(data)
       if (res?.code === 200) {
@@ -88,12 +75,9 @@ export const useDictionaryStore = defineStore('dictionary', {
       }
       return false
     },
-    async upsertDictionaries(seedData: any[]) {
-      const res = await upsertDictionariesApi(seedData)
-      if (res?.code === 200) {
-        return true
-      }
-      return false
+    async generateDictionarySeed(data: DictionaryItem[]) {
+      await generateDictionarySeedApi(data)
+      // await this.updateDictionaryList()
     }
   },
   persist: true

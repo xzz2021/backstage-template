@@ -1,36 +1,30 @@
 import request from '@/axios'
-import type { BaseResponse, DictionaryList } from './types'
+import type { DictionaryList, DictionaryItem, DictionaryEntry } from './types'
 
 //  此处后端合并了处理分页查询和 带id过滤的分页查询
 export const getDictionaryListApi = (): Promise<IResponse<DictionaryList>> => {
   return request.get({ url: '/api/dictionary/all' })
 }
 
-export const upsertDictionaryApi = (data) => {
+export const upsertDictionaryApi = (data: DictionaryItem): Promise<IResponse<{ id: number }>> => {
   return request.post({ url: '/api/dictionary/upsert', data })
 }
 
-export const delDictionaryApi = (ids: string[]) => {
+export const delDictionaryApi = (ids: number[]): Promise<IResponse<{ count: number }>> => {
   return request.post({ url: '/api/dictionary/delete', data: { ids } })
 }
 
 //  字典项
-export const upsertDicEntryApi = (data) => {
-  return request.post<BaseResponse>({ url: '/api/dictionary/entry/upsert', data })
+export const upsertDicEntryApi = (data: DictionaryEntry): Promise<IResponse<{ id: number }>> => {
+  return request.post({ url: '/api/dictionary/entry/upsert', data })
 }
 
-export const delDicEntryApi = (ids: number[]) => {
+export const delDicEntryApi = (ids: number[]): Promise<IResponse<{ count: number }>> => {
   return request.post({ url: '/api/dictionary/entry/delete', data: { ids } })
 }
 
-export const getDicEntryListApi = (params: any): Promise<IResponse<DictionaryList>> => {
-  return request.get({ url: '/api/dictionary/entry/list', params })
-}
-
-export const addCargoApi = (data: { cargo_name: string }) => {
-  return request.post({ url: '/api/dictionary/entry/addcargo', data })
-}
-
-export const upsertDictionariesApi = (data: any[]) => {
-  return request.post({ url: '/api/dictionary/admin/upsertDictionaries', data })
+export const generateDictionarySeedApi = (
+  data: DictionaryItem[]
+): Promise<IResponse<{ count: number }>> => {
+  return request.post({ url: '/api/dictionary/admin/generateDictionarySeed', data })
 }
