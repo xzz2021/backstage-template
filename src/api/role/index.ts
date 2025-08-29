@@ -19,6 +19,6 @@ export const delRoleApi = (id) => {
   return request.delete({ url: '/api/role/' + id })
 }
 
-export const generateRoleSeedApi = (data: any) => {
-  return request.post({ url: '/api/role/admin/batchUpsert', data })
+export const generateRoleSeedApi = (data: RoleItem[]): Promise<IResponse<{ success: boolean }>> => {
+  return request.post({ url: '/api/role/generateRoleSeed', data })
 }

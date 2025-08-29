@@ -60,6 +60,9 @@ axiosInstance.interceptors.response.use(
       case 401:
         msg = msg || '登录过期, 鉴权失败, 请重新登录!'
         break
+      // case 400:
+      //   msg = msg || '后端已知错误!'
+      //   break
       default:
         msg = msg || '网络异常,或后端服务进程出错!'
         break

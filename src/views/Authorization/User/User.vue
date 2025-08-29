@@ -12,7 +12,6 @@ import { Dialog } from '@/components/Dialog'
 import { BaseButton } from '@/components/Button'
 import { addUserApi, getUserByDepartmentIdApi, updateUserApi } from '@/api/user'
 import type { FormSchema } from '@/components/Form'
-import { formatToDateTime } from '@/utils/dateUtil'
 import { ElMessage } from 'element-plus'
 import { deleteUserByIdsApi } from '@/api/department'
 import { TableColumn } from '@/components/Table'
@@ -96,7 +95,7 @@ const tableColumns = ref<TableColumn[]>([
     field: 'createdAt',
     slots: {
       default: (data: any) => {
-        return <>{formatToDateTime(data.row.createdAt)}</>
+        return <>{data.row.createdAt || '-'}</>
       }
     }
   },

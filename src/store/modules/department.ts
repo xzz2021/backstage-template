@@ -1,4 +1,4 @@
-import { delDepartmentApi, generateSeedApi, getDepartmentListApi } from '@/api/department'
+import { delDepartmentApi, getDepartmentListApi } from '@/api/department'
 import { DepartmentItem } from '@/api/department/types'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
@@ -13,15 +13,6 @@ export const useDepartmentStore = defineStore('department', () => {
     return { list, total }
   }
 
-  const generateSeed = async (data: any) => {
-    const res = await generateSeedApi(data)
-    if (res) {
-      return true
-    } else {
-      return false
-    }
-  }
-
   const delDepartment = async (id: number) => {
     await delDepartmentApi(id)
   }
@@ -29,7 +20,6 @@ export const useDepartmentStore = defineStore('department', () => {
   return {
     departmentList,
     getDepartmentList,
-    generateSeed,
     delDepartment
   }
 })

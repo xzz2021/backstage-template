@@ -12,10 +12,11 @@ import { BaseButton } from '@/components/Button'
 import { FormSchema } from '@/components/Form'
 import { ElMessage, ElTag } from 'element-plus'
 import { Table, TableColumn } from '@/components/Table'
-import { editDepartmentApi, addDepartmentApi } from '@/api/department'
+import { editDepartmentApi, addDepartmentApi, generateDepartmentSeedApi } from '@/api/department'
 import type { DepartmentItem } from '@/api/department/types'
-import Seed from './components/Seed.vue'
+import Seed from '../Seed.vue'
 import { useDepartmentStore } from '@/store/modules/department'
+import { treeMapEach } from '@/utils/tree'
 
 const { getDepartmentList, delDepartment } = useDepartmentStore()
 const { tableRegister, tableState, tableMethods } = useTable({
@@ -210,6 +211,20 @@ const searchSchema = reactive<FormSchema[]>([
     }
   }
 ])
+
+const generateDepartmentSeedData = (data: DepartmentItem[]) => {
+  const aaa = data.map((item) => {
+    return treeMapEach(item, {
+      conversion: (item) => {
+        // console.log('🚀 ~ xzz: generateDepartmentSeedData -> item', item)
+        const { name, status, remark, children } = item
+        return { name, status, remark, children }
+      }
+    })
+  })
+  console.log('🚀 ~ xzz: generateDepartmentSeedData -> aaa', aaa)
+  return aaa
+}
 </script>
 
 <template>
@@ -221,7 +236,14 @@ const searchSchema = reactive<FormSchema[]>([
       <!-- <BaseButton :loading="delLoading" type="danger" @click="delData(null)">
         {{ t('exampleDemo.del') }}
       </BaseButton> -->
-      <Seed @getList="getList" />
+      <Seed
+        @getList="getList"
+        :keyData="{
+          treeList: generateDepartmentSeedData(dataList),
+          filename: '部门'
+        }"
+        @generateSeed="generateDepartmentSeedApi"
+      />
     </div>
 
     <Table

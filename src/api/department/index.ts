@@ -30,6 +30,6 @@ export const delDepartmentApi = (id: number) => {
   return request.delete({ url: '/api/department/delete', data: { id } })
 }
 
-export const generateSeedApi = (data: any) => {
-  return request.post({ url: '/api/department/admin/batchUpsert', data })
+export const generateDepartmentSeedApi = (data: any) => {
+  return request.post({ url: '/api/department/generateDepartmentSeed', data })
 }

@@ -8,7 +8,7 @@ import { useValidator } from '@/hooks/web/useValidator'
 import { Icon } from '@/components/Icon'
 import { useUserStore } from '@/store/modules/user'
 import { BaseButton } from '@/components/Button'
-import { UserType } from '@/api/login/types'
+import { UserLoginType } from '@/api/login/types'
 import { loginApi } from '@/api/login'
 import { useLogin } from './hooks'
 
@@ -44,7 +44,7 @@ const schema = reactive<FormSchema[]>([
   {
     field: 'phone',
     label: t('login.phone'),
-    value: '13077908822',
+    // value: '13077908822',
     component: 'Input',
     colProps: {
       span: 24
@@ -53,7 +53,7 @@ const schema = reactive<FormSchema[]>([
   {
     field: 'password',
     label: t('login.password'),
-    value: '112233',
+    // value: '112233',
     component: 'InputPassword',
     colProps: {
       span: 24
@@ -187,23 +187,16 @@ const schema = reactive<FormSchema[]>([
   }
 ])
 
+const { formRegister, formMethods } = useForm()
+const { getFormData, getElFormExpose, setValues } = formMethods
+
 const iconSize = 30
 
 const remember = ref(userStore.getRememberMe)
 
-const initLoginInfo = () => {
-  const loginInfo = userStore.getLoginInfo
-  if (loginInfo) {
-    const { phone } = loginInfo
-    setValues({ phone })
-  }
-}
 onMounted(() => {
-  initLoginInfo()
+  setValues(userStore.getLoginInfo || {})
 })
-
-const { formRegister, formMethods } = useForm()
-const { getFormData, getElFormExpose, setValues } = formMethods
 
 const loading = ref(false)
 
@@ -229,25 +222,23 @@ const signIn = async () => {
   await formRef?.validate(async (isValid) => {
     if (isValid) {
       loading.value = true
-      const formData = await getFormData<UserType>()
-
+      const formData = await getFormData<UserLoginType>()
+      console.log('xzz2021: signIn -> formData', formData)
       try {
         const res = await loginApi(formData)
-        if (res.code === 200) {
-          const { userinfo, access_token } = res.data
-          // 是否记住我
-          if (unref(remember)) {
-            userStore.setLoginInfo({
-              phone: formData.phone,
-              username: formData.username
-              // password: formData.password
-            })
-          } else {
-            userStore.setLoginInfo(undefined)
-          }
-          userStore.setRememberMe(unref(remember))
-          await successLogin(userinfo, access_token)
+        const { userinfo, access_token } = res.data
+        // 是否记住我
+        if (unref(remember)) {
+          userStore.setLoginInfo({
+            // username: formData?.username || '',
+            phone: formData.phone,
+            password: formData.password
+          })
+        } else {
+          userStore.setLoginInfo(undefined)
         }
+        userStore.setRememberMe(unref(remember))
+        await successLogin(userinfo, access_token)
       } catch (error) {
         console.log('xzz2021: signIn -> error', error)
       } finally {

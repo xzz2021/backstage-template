@@ -3,7 +3,7 @@ import type { DictionaryList, DictionaryItem, DictionaryEntry } from './types'
 
 //  此处后端合并了处理分页查询和 带id过滤的分页查询
 export const getDictionaryListApi = (): Promise<IResponse<DictionaryList>> => {
-  return request.get({ url: '/api/dictionary/all' })
+  return request.get({ url: '/api/dictionary/list' })
 }
 
 export const upsertDictionaryApi = (data: DictionaryItem): Promise<IResponse<{ id: number }>> => {
@@ -25,6 +25,6 @@ export const delDicEntryApi = (ids: number[]): Promise<IResponse<{ count: number
 
 export const generateDictionarySeedApi = (
   data: DictionaryItem[]
-): Promise<IResponse<{ count: number }>> => {
-  return request.post({ url: '/api/dictionary/admin/generateDictionarySeed', data })
+): Promise<IResponse<{ success: boolean }>> => {
+  return request.post({ url: '/api/dictionary/generateDictionarySeed', data: { data } })
 }

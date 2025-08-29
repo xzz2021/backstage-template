@@ -14,8 +14,9 @@ import { BaseButton } from '@/components/Button'
 import { formatToDateTime } from '@/utils/dateUtil'
 import { ElMessage } from 'element-plus'
 import Seed from '../Seed.vue'
-import { addRoleApi, delRoleApi, editRoleApi } from '@/api/role'
+import { addRoleApi, delRoleApi, editRoleApi, generateRoleSeedApi } from '@/api/role'
 import { useRoleStore } from '@/store/modules/role'
+
 const { t } = useI18n()
 const ids = ref<string[]>([])
 
@@ -193,6 +194,10 @@ const delAction = async (idx: number) => {
     // delLoading.value = false
   })
 }
+
+// const handleGenerateSeed = async (data: any[]) => {
+//    await generateRoleSeedApi(data)
+// }
 </script>
 
 <template>
@@ -201,7 +206,17 @@ const delAction = async (idx: number) => {
     <div class="mb-10px">
       <BaseButton type="primary" @click="AddAction">{{ t('exampleDemo.add') }}</BaseButton>
 
-      <Seed @getList="getList" :keyData="{ treeList: dataList, filename: '角色' }" />
+      <Seed
+        @getList="getList"
+        :keyData="{
+          treeList: dataList.map((item) => {
+            const { id, menus, ...rest } = item
+            return rest
+          }),
+          filename: '角色'
+        }"
+        @generateSeed="generateRoleSeedApi"
+      />
     </div>
     <Table
       v-model:pageSize="pageSize"

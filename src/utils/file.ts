@@ -102,15 +102,22 @@ export const formatDataFn = (data: any[]) => {
   })
 }
 
-export const exportSeedData = (data: any[], fileName: string) => {
+export const exportSeedData = (data: any[], fileName: string, download = false) => {
   if (!data?.length) {
     ElMessage.error('数据为空')
     return
   }
-  const jsonData = formatDataFn(data)
+  // const jsonData = formatDataFn(data)
+  const jsonData = JSON.stringify(data, null, 2)
   // 导出下载
-  downloadFile({
-    url: 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(jsonData, null, 2)),
-    fileName: `${fileName}-seed.json`
-  })
+  if (download) {
+    downloadFile({
+      url: 'data:text/json;charset=utf-8,' + encodeURIComponent(jsonData),
+      fileName: `${fileName}-seed.json`
+    })
+  } else {
+    // 复制到剪贴板
+    navigator.clipboard.writeText(jsonData)
+    ElMessage.success('复制成功')
+  }
 }

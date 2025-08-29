@@ -25,7 +25,7 @@ const generateSeed = async () => {
     return
   }
   await emit('generateSeed', JSON.parse(seedData.value))
-  ElMessage.success('生成成功')
+  // ElMessage.success('生成成功')
   // 更新列表
   seedDialog.value = false
   emit('getList')
@@ -33,10 +33,12 @@ const generateSeed = async () => {
 }
 </script>
 <template>
-  <BaseButton type="primary" @click="() => exportSeedData(keyData.treeList, keyData.filename)"
-    >一键导出seed</BaseButton
-  >
-  <BaseButton type="danger" @click="seedDialog = true">增量生成seed</BaseButton>
+  <Permission permission="seed">
+    <BaseButton type="primary" @click="() => exportSeedData(keyData.treeList, keyData.filename)">
+      一键复制seed
+    </BaseButton>
+    <BaseButton type="danger" @click="seedDialog = true">增量更新数据</BaseButton>
+  </Permission>
   <Dialog v-model="seedDialog" title="生成新数据">
     <div class="text-[red] m-[10px]">请将seed数据粘贴到下方(必须是数组): </div>
     <ElInput v-model="seedData" type="textarea" :rows="16" />

@@ -15,12 +15,14 @@ import { formatToDateTime } from '@/utils/dateUtil'
 import { ElMessage } from 'element-plus'
 import TypeWrite from './components/TypeWrite.vue'
 import { TableColumn } from '@/components/Table'
-import Seed from './components/Seed.vue'
+import Seed from '../Seed.vue'
 import { storeToRefs } from 'pinia'
 import { useClipboard } from '@/hooks/web/useClipboard'
-const { t } = useI18n()
+import { treeMapEach } from '@/utils/tree'
 import { useDictionaryStore } from '@/store/modules/dictionary'
-import { DictionaryEntry } from '@/api/dictionary/types'
+import { DictionaryEntry, DictionaryItem } from '@/api/dictionary/types'
+import { generateDictionarySeedApi } from '@/api/dictionary'
+const { t } = useI18n()
 const dictionaryStore = useDictionaryStore()
 const { allDictionaryList } = storeToRefs(dictionaryStore)
 const { tableRegister, tableState, tableMethods } = useTable({
@@ -207,10 +209,35 @@ const save = async () => {
   }
 }
 
-onMounted(async () => {
+const updateDictionaryList = async () => {
+  await dictionaryStore.updateDictionaryList()
   allDictionaryList.value.length > 0 && currentChange(allDictionaryList.value[0].id as number)
+}
+onMounted(async () => {
+  await updateDictionaryList()
 })
+
 const { copy } = useClipboard()
+
+const generateDictionarySeedData = (data: DictionaryItem[]) => {
+  return data.map((item) => {
+    console.log('🚀 ~ xzz: generateDictionarySeedData -> item', item)
+    return item
+    return treeMapEach(item, {
+      conversion: (item) => {
+        const { name, code, status, sort, description, entries } = item
+        return {
+          name,
+          code,
+          status,
+          sort,
+          description,
+          entries
+        }
+      }
+    })
+  })
+}
 </script>
 
 <template>
@@ -219,7 +246,14 @@ const { copy } = useClipboard()
     <ContentWrap class="flex-[3] ml-20px">
       <!-- <Search @reset="getList" @search="setSearchParams" :schema="searchSchema" /> -->
 
-      <Seed />
+      <Seed
+        @getList="updateDictionaryList"
+        :keyData="{
+          treeList: generateDictionarySeedData(allDictionaryList),
+          filename: '部门'
+        }"
+        @generateSeed="generateDictionarySeedApi"
+      />
       <ElLink class="mx-10px" @click="copy(currentDicKey)" type="primary">
         {{ currentDicKey && `当前字典: ${currentDicKey}` }}</ElLink
       >

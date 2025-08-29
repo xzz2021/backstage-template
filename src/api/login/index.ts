@@ -1,7 +1,7 @@
 import request from '@/axios'
-import type { UserType, SmsLoginType, UserRegisterType, SmsLoginRes } from './types'
+import type { UserLoginType, SmsLoginType, UserRegisterType, SmsLoginRes, UserType } from './types'
 
-export const loginApi = (data: UserType): Promise<IResponse<SmsLoginRes>> => {
+export const loginApi = (data: UserLoginType): Promise<IResponse<SmsLoginRes>> => {
   return request.post({ url: '/api/auth/login', data })
 }
 
