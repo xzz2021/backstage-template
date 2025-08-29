@@ -9,10 +9,13 @@ import { useValidator } from '@/hooks/web/useValidator'
 import { FormSchema } from '@/components/Form'
 import { useDesign } from '@/hooks/web/useDesign'
 import { useLockStore } from '@/store/modules/lock'
+import { useUserStore } from '@/store/modules/user'
+import { storeToRefs } from 'pinia'
 
 const { getPrefixCls } = useDesign()
 const prefixCls = getPrefixCls('lock-dialog')
-
+const userStore = useUserStore()
+const { userInfo } = storeToRefs(userStore)
 const { required } = useValidator()
 
 const { t } = useI18n()
@@ -24,6 +27,9 @@ const props = defineProps({
     type: Boolean
   }
 })
+const { formRegister, formMethods } = useForm()
+
+const { getFormData, getElFormExpose, getComponentExpose } = formMethods
 
 const emit = defineEmits(['update:modelValue'])
 
@@ -73,10 +79,6 @@ const schema: FormSchema[] = reactive([
   }
 ])
 
-const { formRegister, formMethods } = useForm()
-
-const { getFormData, getElFormExpose, getComponentExpose } = formMethods
-
 const handleLock = async () => {
   const formExpose = await getElFormExpose()
   formExpose?.validate(async (valid) => {
@@ -101,8 +103,10 @@ const handleLock = async () => {
     :title="dialogTitle"
   >
     <div class="flex flex-col items-center">
-      <img src="@/assets/imgs/avatar.jpg" alt="" class="w-70px h-70px rounded-[50%]" />
-      <span class="text-14px my-10px text-[var(--top-header-text-color)]">Archer</span>
+      <img :src="userInfo?.avatar" alt="" class="w-70px h-70px rounded-[50%]" />
+      <span class="text-14px my-10px text-[var(--top-header-text-color)]">{{
+        userInfo?.username
+      }}</span>
     </div>
     <Form :is-col="false" :schema="schema" :rules="rules" @register="formRegister" />
     <template #footer>

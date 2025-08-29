@@ -8,10 +8,14 @@ import LockPage from './components/LockPage.vue'
 import { useLockStore } from '@/store/modules/lock'
 import { useUserStore } from '@/store/modules/user'
 import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import defaultAvatar from '@/assets/imgs/avatar.jpg'
 
 const { push } = useRouter()
 
 const userStore = useUserStore()
+
+const { userInfo } = storeToRefs(userStore)
 
 const lockStore = useLockStore()
 
@@ -34,10 +38,6 @@ const lockScreen = () => {
   dialogVisible.value = true
 }
 
-const toDocument = () => {
-  window.open('https://element-plus-admin-doc.cn/')
-}
-
 const toPage = (path: string) => {
   push(path)
 }
@@ -47,29 +47,26 @@ const toPage = (path: string) => {
   <ElDropdown class="custom-hover" :class="prefixCls" trigger="click">
     <div class="flex items-center">
       <img
-        src="@/assets/imgs/avatar.jpg"
+        :src="userInfo?.avatar || defaultAvatar"
         alt=""
         class="w-[calc(var(--logo-height)-25px)] rounded-[50%]"
       />
       <span class="<lg:hidden text-14px pl-[5px] text-[var(--top-header-text-color)]">{{
-        userStore.getUserInfo?.username
+        userInfo?.username
       }}</span>
     </div>
     <template #dropdown>
       <ElDropdownMenu>
-        <ElDropdownItem>
-          <div @click="toPage('/personal/personal-center')">
+        <ElDropdownItem @click="toPage('/personal/personal-center')">
+          <div>
             {{ t('router.personalCenter') }}
           </div>
         </ElDropdownItem>
-        <ElDropdownItem>
-          <div @click="toDocument">{{ t('common.document') }}</div>
+        <ElDropdownItem divided @click="lockScreen">
+          <div>{{ t('lock.lockScreen') }}</div>
         </ElDropdownItem>
-        <ElDropdownItem divided>
-          <div @click="lockScreen">{{ t('lock.lockScreen') }}</div>
-        </ElDropdownItem>
-        <ElDropdownItem>
-          <div @click="loginOut">{{ t('common.loginOut') }}</div>
+        <ElDropdownItem @click="loginOut">
+          <div>{{ t('common.loginOut') }}</div>
         </ElDropdownItem>
       </ElDropdownMenu>
     </template>

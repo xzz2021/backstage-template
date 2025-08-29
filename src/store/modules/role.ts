@@ -8,7 +8,7 @@ export const useRoleStore = defineStore('role', () => {
 
   const getRoleList = async (params?: any) => {
     const res = await getRoleListApi(params)
-    const { list = [], total = 0 } = res || {}
+    const { list = [], total = 0 } = res.data || {}
     roleList.value = list
 
     return { list, total }

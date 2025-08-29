@@ -1,9 +1,11 @@
 import request from '@/axios'
 
-export const getMenuListApi = async (): Promise<{
-  list: AppCustomRouteRecordRaw[]
-  total: number
-}> => {
+export const getMenuListApi = async (): Promise<
+  IResponse<{
+    list: AppCustomRouteRecordRaw[]
+    total: number
+  }>
+> => {
   return await request.get({ url: '/api/menu/getMenuList' })
 }
 

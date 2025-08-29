@@ -32,7 +32,7 @@ export const useMenuStore = defineStore('menu', {
   actions: {
     async getMenuList() {
       const res = await getMenuListApi()
-      const { list = [], total = 0 } = res
+      const { list = [], total = 0 } = res.data
       this.allMenuList = list
       return { list, total }
     },

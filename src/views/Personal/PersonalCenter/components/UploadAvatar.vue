@@ -45,13 +45,10 @@ const getAvatarUrl = async () => {
     formData.append('file', blob as Blob, filename)
     formData.append('id', props.userId.toString())
     const res = await uploadAvatarApi(formData)
-    if (res?.code === 200) {
-      // 上传成功 更新用户头像
-      ElMessage.success('头像更换成功')
-      return res?.data?.filePath
-    } else {
-      ElMessage.error('上传失败')
-    }
+
+    // 上传成功 更新用户头像
+    ElMessage.success('头像更换成功')
+    return res?.data?.filePath
   } catch (error) {
     console.log(error)
   }

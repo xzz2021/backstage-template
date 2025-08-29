@@ -38,6 +38,7 @@ export const useUserStore = defineStore('user', {
       rememberMe: true,
       loginInfo: {
         username: '',
+        password: '',
         phone: ''
       },
       unReadCount: 0

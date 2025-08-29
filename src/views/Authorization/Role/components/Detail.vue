@@ -1,14 +1,13 @@
 <script setup lang="tsx">
-import { PropType, ref, unref, nextTick } from 'vue'
+import { PropType, ref, unref } from 'vue'
 import { Descriptions, DescriptionsSchema } from '@/components/Descriptions'
 import { ElTag, ElTree } from 'element-plus'
 import { findIndex } from '@/utils'
 import { useI18n } from '@/hooks/web/useI18n'
-import { getMenuWithPermissionByRoleId } from '@/api/role'
 
 const { t } = useI18n()
 
-const props = defineProps({
+defineProps({
   currentRow: {
     type: Object as PropType<any>,
     default: () => undefined
@@ -34,18 +33,6 @@ const nodeClick = (treeData: any) => {
 }
 
 const treeData = ref<AppCustomRouteRecordRaw[]>([])
-
-const getMenuList = async () => {
-  // 1. 获取菜单列表
-  const res = (await getMenuWithPermissionByRoleId(props.currentRow.id)) as any
-  if (res) {
-    // 2. 获取当前角色菜单列表 3. 合并
-    treeData.value = res
-    await nextTick()
-  }
-}
-
-getMenuList()
 
 const detailSchema = ref<DescriptionsSchema[]>([
   {

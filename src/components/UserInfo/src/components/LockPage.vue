@@ -1,22 +1,19 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { ElInput } from 'element-plus'
-import { resetRouter } from '@/router'
-import { useRouter } from 'vue-router'
 import { useStorage } from '@/hooks/web/useStorage'
 import { useLockStore } from '@/store/modules/lock'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useNow } from '@/hooks/web/useNow'
 import { useDesign } from '@/hooks/web/useDesign'
 import { Icon } from '@/components/Icon'
-import { loginOutApi } from '@/api/login'
 import { useTagsViewStore } from '@/store/modules/tagsView'
+import { useUserStore } from '@/store/modules/user'
+import { storeToRefs } from 'pinia'
 
 const tagsViewStore = useTagsViewStore()
 
 const { clear } = useStorage()
-
-const { replace } = useRouter()
 
 const password = ref('')
 const loading = ref(false)
@@ -49,14 +46,13 @@ async function unLock() {
 
 // 返回登录
 async function goLogin() {
-  const res = await loginOutApi().catch(() => {})
-  if (res) {
-    clear()
-    tagsViewStore.delAllViews()
-    resetRouter() // 重置静态路由表
-    lockStore.resetLockInfo()
-    replace('/login')
-  }
+  // const res = await loginOutApi().catch(() => {})
+  // if (res) {
+  clear()
+  tagsViewStore.delAllViews()
+  lockStore.resetLockInfo()
+  userStore.reset() //  直接退出登录
+  // }
 }
 
 const passwordInputRef = ref<ComponentRef<typeof ElInput>>()
@@ -69,6 +65,9 @@ function handleShowForm(show = false) {
     })
   }
 }
+
+const userStore = useUserStore()
+const { userInfo } = storeToRefs(userStore)
 </script>
 
 <template>
@@ -101,16 +100,18 @@ function handleShowForm(show = false) {
       <div :class="`${prefixCls}-entry`" v-show="!showDate">
         <div :class="`${prefixCls}-entry-content`">
           <div class="flex flex-col items-center">
-            <img src="@/assets/imgs/avatar.jpg" alt="" class="w-70px h-70px rounded-[50%]" />
-            <span class="text-14px my-10px text-[var(--logo-title-text-color)]">Archer</span>
+            <img :src="userInfo?.avatar" alt="" class="w-70px h-70px rounded-[50%]" />
+            <span class="text-14px my-10px text-[var(--logo-title-text-color)]">{{
+              userInfo?.username
+            }}</span>
           </div>
           <ElInput
             type="password"
             :placeholder="t('lock.placeholder')"
             class="enter-x"
             v-model="password"
-            @keydown.enter="unLock"
             ref="passwordInputRef"
+            @keyup.enter="unLock"
           />
           <span :class="`text-14px ${prefixCls}-entry__err-msg enter-x`" v-if="errMsg">
             {{ t('lock.message') }}

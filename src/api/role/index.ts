@@ -1,6 +1,9 @@
 import request from '@/axios'
+import { RoleItem } from './type'
 
-export const getRoleListApi = (params?: any): Promise<IResponse> => {
+export const getRoleListApi = (
+  params?: any
+): Promise<IResponse<{ list: RoleItem[]; total: number }>> => {
   return request.get({ url: '/api/role/getRoleList', params })
 }
 
@@ -10,12 +13,6 @@ export const addRoleApi = (data) => {
 
 export const editRoleApi = (data) => {
   return request.post({ url: '/api/role/update', data })
-}
-
-export const getMenuWithPermissionByRoleId = async (id: number) => {
-  const res = await request.get({ url: '/api/role/getMenuByRoleId', params: { id } })
-  // const newRes = formatToTree(res.list)
-  return res
 }
 
 export const delRoleApi = (id) => {

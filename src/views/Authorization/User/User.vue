@@ -36,7 +36,7 @@ const { tableRegister, tableState, tableMethods } = useTable({
       pageSize: unref(pageSize),
       ...unref(searchParams)
     })
-    return res
+    return res.data
   },
   fetchDelApi: async () => {
     const res = await deleteUserByIdsApi(unref(ids))
@@ -229,7 +229,7 @@ const save = async () => {
       //  提交 新增 或者 修改
       saveLoading.value = true
       const res = isEdit ? await updateUserApi(formData) : await addUserApi(formData)
-      if (res.id) {
+      if (res.code === 200) {
         dialogVisible.value = false
         ElMessage.success('更新成功!')
         currentPage.value = 1

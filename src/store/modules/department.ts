@@ -8,9 +8,8 @@ export const useDepartmentStore = defineStore('department', () => {
 
   const getDepartmentList = async (params?: any) => {
     const res = await getDepartmentListApi(params)
-    const { list = [], total = 0 } = res || {}
+    const { list = [], total = 0 } = res?.data || {}
     departmentList.value = list
-
     return { list, total }
   }
 

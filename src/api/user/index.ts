@@ -10,12 +10,12 @@ interface DetailUserResponse {
 // 根据 部门id 进行分页查询
 export const getUserByDepartmentIdApi = (
   params: DepartmentUserParams
-): Promise<IResponse<UserItem>> => {
+): Promise<IResponse<{ list: UserItem[]; total: number }>> => {
   return request.get({ url: '/api/user/listByDepartmentId', params })
 }
 
-export const resetPasswordApi = (data) => {
-  return request.post<IdResponse>({ url: '/api/user/resetPassword', data })
+export const resetPasswordApi = (data): Promise<IResponse<IdResponse>> => {
+  return request.post({ url: '/api/user/resetPassword', data })
 }
 export const getUserByIdApi = (params: { id: number }) => {
   return request.get<DetailUserResponse>({ url: '/api/user/detailById', params })
@@ -34,7 +34,7 @@ export const updateUserApi = (data): Promise<IResponse> => {
 }
 
 //  获取用户  个人   详细信息 包含角色 部门创建时间
-export const getPersonByIdApi = (): Promise<IResponse<UserItem>> => {
+export const getPersonByIdApi = (): Promise<IResponse<{ userinfo: UserItem }>> => {
   return request.get({ url: '/api/user/detailInfo' })
 }
 

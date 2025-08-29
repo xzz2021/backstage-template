@@ -10,7 +10,6 @@ import EditPassword from './components/EditPassword.vue'
 import { getPersonByIdApi } from '@/api/user'
 import { useUserStore } from '@/store/modules/user'
 import { storeToRefs } from 'pinia'
-import { UserItem } from '@/api/user/types'
 
 const userStore = useUserStore()
 const { userInfo } = storeToRefs(userStore)
@@ -22,7 +21,7 @@ const avatarLoading = ref(false)
 const fetchDetailUserApi = async () => {
   const res = await getPersonByIdApi()
   if (res.data) {
-    userStore.setUserInfo(res.data)
+    userStore.setUserInfo(res.data.userinfo)
   } else {
     ElMessage.error('获取用户信息失败,请刷新页面!')
   }
@@ -36,11 +35,11 @@ const saveAvatar = async () => {
     // 这里可以调用修改头像接口
     if (imgUrl) {
       dialogVisible.value = false
-      const currentUserInfo = userStore.getUserInfo || {}
-      userStore.setUserInfo({
-        ...(currentUserInfo as UserItem),
-        avatar: imgUrl
-      })
+      userInfo?.value &&
+        userStore.setUserInfo({
+          ...userInfo.value,
+          avatar: imgUrl
+        })
     }
   } catch (error) {
     console.log(error)
@@ -126,8 +125,8 @@ const saveAvatar = async () => {
     />
 
     <template #footer>
-      <ElButton type="primary" :loading="avatarLoading" @click="saveAvatar"> 保存 </ElButton>
       <ElButton @click="dialogVisible = false">关闭</ElButton>
+      <ElButton type="primary" :loading="avatarLoading" @click="saveAvatar"> 保存 </ElButton>
     </template>
   </Dialog>
 </template>
