@@ -41,5 +41,5 @@ export const batchCreatePermissionApi = (data): Promise<IResponse<{ count: numbe
 }
 
 export const generateMenuSeedApi = (data) => {
-  return request.post({ url: '/api/menu/admin/batchUpsert', data })
+  return request.post({ url: '/api/menu/generateMenuSeed', data: { data } })
 }

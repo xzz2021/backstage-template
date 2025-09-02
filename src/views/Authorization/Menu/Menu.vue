@@ -10,10 +10,9 @@ import Write from './components/Write.vue'
 import Detail from './components/Detail.vue'
 import { Dialog } from '@/components/Dialog'
 import { BaseButton } from '@/components/Button'
-
 import { useRoleMenu } from '@/hooks/fn/useRoleMenu'
 import { useMenuStore } from '@/store/modules/menu'
-import { editMenuApi, addMenuApi, delMenuApi, sortMenuApi } from '@/api/menu'
+import { editMenuApi, addMenuApi, delMenuApi, sortMenuApi, generateMenuSeedApi } from '@/api/menu'
 import { hasPermi } from '@/components/Permission'
 import SortMenu from './components/SortMenu.vue'
 import HasPermission from '@/components/Permission/src/Permission.vue'
@@ -262,7 +261,11 @@ const updateListAndCurrentMenu = async () => {
       <BaseButton type="primary" @click="sortMenuAction">菜单排序</BaseButton>
       <HasPermission permission="refresh">
         <BaseButton type="success" @click="getRole">更新菜单</BaseButton>
-        <Seed @getList="getList" :keyData="{ treeList: dataList, filename: '菜单' }" />
+        <Seed
+          @getList="getList"
+          :keyData="{ treeList: dataList, filename: '菜单' }"
+          @generateSeed="generateMenuSeedApi"
+        />
       </HasPermission>
     </div>
     <Table
