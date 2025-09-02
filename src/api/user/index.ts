@@ -21,10 +21,6 @@ export const getUserByIdApi = (params: { id: number }) => {
   return request.get<DetailUserResponse>({ url: '/api/user/detailById', params })
 }
 
-export const getAllUserApi = () => {
-  return request.get({ url: '/api/user/all' })
-}
-
 export const addUserApi = (data) => {
   return request.post({ url: '/api/user/add', data })
 }

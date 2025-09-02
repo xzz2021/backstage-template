@@ -41,9 +41,9 @@ const generateSeed = async () => {
       type="success"
       @click="() => exportSeedData(keyData.treeList, keyData.filename, true)"
     >
-      一键生成seed文件
+      下载seed文件
     </BaseButton>
-    <BaseButton type="danger" @click="seedDialog = true">增量更新数据</BaseButton>
+    <BaseButton type="danger" @click="seedDialog = true">增量更新seed</BaseButton>
   </Permission>
   <Dialog v-model="seedDialog" title="生成新数据">
     <div class="text-[red] m-[10px]">请将seed数据粘贴到下方(必须是数组): </div>

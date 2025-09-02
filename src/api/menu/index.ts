@@ -33,10 +33,12 @@ export const delPermission = (id): Promise<IResponse<{ id: number }>> => {
 }
 
 export const sortMenuApi = (data) => {
-  return request.post({ url: '/api/menu/sort', data })
+  return request.post({ url: '/api/menu/sort', data: { data } })
 }
 
-export const batchCreatePermissionApi = (data): Promise<IResponse<{ count: number }>> => {
+export const batchCreatePermissionApi = (data: {
+  menuId: number
+}): Promise<IResponse<{ count: number }>> => {
   return request.post({ url: '/api/permission/batchCreate', data })
 }
 

@@ -20,5 +20,5 @@ export const delRoleApi = (id) => {
 }
 
 export const generateRoleSeedApi = (data: RoleItem[]): Promise<IResponse<{ success: boolean }>> => {
-  return request.post({ url: '/api/role/generateRoleSeed', data })
+  return request.post({ url: '/api/role/generateRoleSeed', data: { data } })
 }

@@ -11,7 +11,7 @@ export const upsertDictionaryApi = (data: DictionaryItem): Promise<IResponse<{ i
 }
 
 export const delDictionaryApi = (ids: number[]): Promise<IResponse<{ count: number }>> => {
-  return request.post({ url: '/api/dictionary/delete', data: { ids } })
+  return request.delete({ url: '/api/dictionary/delete', data: { ids } })
 }
 
 //  字典项

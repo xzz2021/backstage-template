@@ -356,8 +356,12 @@ const batchCreatePermission = async () => {
   const formData = await getFormData()
   formData.nodeid = Date.now().toString()
 
-  const { id, path } = useMenuStore().getCurrentMenu
-  await batchCreatePermissionApi({ menuId: id, path })
+  const { id } = useMenuStore().getCurrentMenu
+  if (!id) {
+    ElMessage.error('请先选择菜单')
+    return
+  }
+  await batchCreatePermissionApi({ menuId: id })
 
   emit('refresh')
   ElMessage.success('快速生成权限模版成功')
