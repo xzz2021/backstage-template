@@ -23,7 +23,6 @@ import {
 import { InputPassword } from '@/components/InputPassword'
 import { Editor } from '@/components/Editor'
 import { JsonEditor } from '@/components/JsonEditor'
-import { IconPicker } from '@/components/IconPicker'
 import { IAgree } from '@/components/IAgree'
 import { ComponentName } from '../types'
 
@@ -52,7 +51,6 @@ const componentMap: Recordable<Component, ComponentName> = {
   TreeSelect: ElTreeSelect,
   Upload: ElUpload,
   JsonEditor: JsonEditor,
-  IconPicker: IconPicker,
   IAgree: IAgree
 }
 

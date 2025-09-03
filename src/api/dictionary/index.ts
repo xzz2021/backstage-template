@@ -20,7 +20,7 @@ export const upsertDicEntryApi = (data: DictionaryEntry): Promise<IResponse<{ id
 }
 
 export const delDicEntryApi = (ids: number[]): Promise<IResponse<{ count: number }>> => {
-  return request.post({ url: '/api/dictionary/entry/delete', data: { ids } })
+  return request.delete({ url: '/api/dictionary/entry/delete', data: { ids } })
 }
 
 export const generateDictionarySeedApi = (

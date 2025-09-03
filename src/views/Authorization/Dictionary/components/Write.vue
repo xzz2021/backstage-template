@@ -5,9 +5,6 @@ import { PropType, reactive, watch } from 'vue'
 import { useValidator } from '@/hooks/web/useValidator'
 import { useI18n } from 'vue-i18n'
 import { DictionaryEntry } from '@/api/dictionary/types'
-// import { ElInput, ElButton } from 'element-plus'
-// import { ref } from 'vue'
-// import { usePermissionStore } from '@/store/modules/permission'
 
 const { required } = useValidator()
 

@@ -18,10 +18,6 @@ export const getAllDepartmentListApi = () => {
   return request.get({ url: '/api/department/alllist' })
 }
 
-export const delDepartmentApi222 = (id) => {
-  return request.delete({ url: '/api/department/' + id })
-}
-
 export const deleteUserByIdsApi = (ids: string[]) => {
   return request.delete({ url: '/api/user/delete', data: { ids } })
 }

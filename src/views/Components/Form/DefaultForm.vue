@@ -1765,12 +1765,6 @@ const schema = reactive<FormSchema[]>([
     label: t('formDemo.iconPicker')
   },
   {
-    field: 'field88',
-    component: 'IconPicker',
-    label: t('formDemo.default'),
-    value: 'vi-tdesign:archway'
-  },
-  {
     field: 'field89',
     component: 'Divider',
     label: t('formDemo.iAgree')
