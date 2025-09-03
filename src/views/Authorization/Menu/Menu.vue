@@ -17,7 +17,7 @@ import { hasPermi } from '@/components/Permission'
 import SortMenu from './components/SortMenu.vue'
 import HasPermission from '@/components/Permission/src/Permission.vue'
 import { ElMessage } from 'element-plus'
-import Seed from '../Seed.vue'
+import Seed from '@/components/Seed.vue'
 import { storeToRefs } from 'pinia'
 import { findNode } from '@/utils/tree'
 

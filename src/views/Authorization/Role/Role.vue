@@ -13,7 +13,7 @@ import { Dialog } from '@/components/Dialog'
 import { BaseButton } from '@/components/Button'
 import { formatToDateTime } from '@/utils/dateUtil'
 import { ElMessage } from 'element-plus'
-import Seed from '../Seed.vue'
+import Seed from '@/components/Seed.vue'
 import { addRoleApi, delRoleApi, editRoleApi, generateRoleSeedApi } from '@/api/role'
 import { useRoleStore } from '@/store/modules/role'
 

@@ -14,7 +14,7 @@ import { ElMessage, ElTag } from 'element-plus'
 import { Table, TableColumn } from '@/components/Table'
 import { editDepartmentApi, addDepartmentApi, generateDepartmentSeedApi } from '@/api/department'
 import type { DepartmentItem } from '@/api/department/types'
-import Seed from '../Seed.vue'
+import Seed from '@/components/Seed.vue'
 import { useDepartmentStore } from '@/store/modules/department'
 import { treeMapEach } from '@/utils/tree'
 
