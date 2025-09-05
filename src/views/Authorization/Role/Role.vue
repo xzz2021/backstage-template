@@ -11,11 +11,11 @@ import Write from './components/Write.vue'
 import Detail from './components/Detail.vue'
 import { Dialog } from '@/components/Dialog'
 import { BaseButton } from '@/components/Button'
-import { formatToDateTime } from '@/utils/dateUtil'
 import { ElMessage } from 'element-plus'
 import Seed from '@/components/Seed.vue'
 import { addRoleApi, delRoleApi, editRoleApi, generateRoleSeedApi } from '@/api/role'
 import { useRoleStore } from '@/store/modules/role'
+import { exportExcelData } from '@/utils/file'
 
 const { t } = useI18n()
 const ids = ref<string[]>([])
@@ -69,15 +69,10 @@ const tableColumns = reactive<TableColumn[]>([
       }
     }
   },
-  {
-    field: 'createdAt',
-    label: t('tableDemo.displayTime'),
-    slots: {
-      default: (data: any) => {
-        return <>{formatToDateTime(data.row.createdAt)}</>
-      }
-    }
-  },
+  // {
+  //   field: 'createdAt',
+  //   label: t('tableDemo.displayTime')
+  // },
   {
     field: 'remark',
     label: t('userDemo.remark')
@@ -198,6 +193,18 @@ const delAction = async (idx: number) => {
 // const handleGenerateSeed = async (data: any[]) => {
 //    await generateRoleSeedApi(data)
 // }
+
+const exportExcel = () => {
+  const column: { label: string; key: string }[] = []
+  tableColumns.forEach((item) => {
+    if (item.field === 'index' || item.field === 'action') return
+    column.push({
+      label: item.label || '',
+      key: item.field || ''
+    })
+  })
+  exportExcelData(unref(dataList), '角色', column)
+}
 </script>
 
 <template>
@@ -218,6 +225,7 @@ const delAction = async (idx: number) => {
         @generateSeed="generateRoleSeedApi"
       />
     </div>
+    <BaseButton type="success" @click="exportExcel">导出excel</BaseButton>
     <Table
       v-model:pageSize="pageSize"
       v-model:currentPage="currentPage"

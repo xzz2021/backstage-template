@@ -1,4 +1,6 @@
 import { ElMessage } from 'element-plus'
+import * as XLSX from 'xlsx'
+import { AudioTypes, DocTypes, FileIcon, ImageTypes, VideoTypes } from '@/constants/file'
 
 export const formatFileSize = (size: number) => {
   let formatSize = ''
@@ -21,6 +23,29 @@ export const getFileSha256 = async (file: File) => {
   const hashArray = Array.from(new Uint8Array(hashBuffer)) // 转换为字节数组
   const hashHex = hashArray.map((byte) => byte.toString(16).padStart(2, '0')).join('') // 转换为十六进制字符串
   return hashHex
+}
+
+export const getFileIcon = (extension: string) => {
+  return FileIcon[extension]
+}
+
+export const isImage = (extension: string) => {
+  return ImageTypes.includes(extension)
+}
+
+type FileType = 'image' | 'video' | 'doc' | 'other' | 'audio'
+export const getFileType = (extension: string): FileType => {
+  if (ImageTypes.includes(extension)) {
+    return 'image'
+  } else if (VideoTypes.includes(extension)) {
+    return 'video'
+  } else if (DocTypes.includes(extension)) {
+    return 'doc'
+  } else if (AudioTypes.includes(extension)) {
+    return 'audio'
+  } else {
+    return 'other'
+  }
 }
 
 export function downloadFile({
@@ -120,4 +145,34 @@ export const exportSeedData = (data: any[], fileName: string, download = false) 
     navigator.clipboard.writeText(jsonData)
     ElMessage.success('复制成功')
   }
+}
+
+export const exportExcelData = (
+  dataList: any[],
+  fileName: string = 'filename',
+  column?: { label: string; key: string }[]
+) => {
+  let worksheet
+  if (column?.length) {
+    const aoa = [
+      column.map((c) => c.label),
+      ...dataList.map((row) => column.map((c) => row[c.key] ?? ''))
+    ]
+    worksheet = XLSX.utils.aoa_to_sheet(aoa)
+  } else {
+    worksheet = XLSX.utils.json_to_sheet(dataList)
+  }
+  // 计算每一列的最大宽度（基于字符串长度）
+  const colWidths = Object.keys(dataList[0]).map((key) =>
+    Math.max(
+      key.length, // 表头宽度
+      ...dataList.map((row) => String(row[key]).length) // 数据宽度
+    )
+  )
+
+  // 设置列宽（wch = char width）
+  worksheet['!cols'] = colWidths.map((w) => ({ wch: w < 20 ? 20 : w + 6 }))
+  const workbook = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(workbook, worksheet, fileName)
+  XLSX.writeFile(workbook, `${fileName}.xlsx`)
 }

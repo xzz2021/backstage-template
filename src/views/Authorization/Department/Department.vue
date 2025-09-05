@@ -213,17 +213,15 @@ const searchSchema = reactive<FormSchema[]>([
 ])
 
 const generateDepartmentSeedData = (data: DepartmentItem[]) => {
-  const aaa = data.map((item) => {
+  // 后端也有做dto排除字段, 这里可以省略
+  return data.map((item) => {
     return treeMapEach(item, {
       conversion: (item) => {
-        // console.log('🚀 ~ xzz: generateDepartmentSeedData -> item', item)
         const { name, status, remark, children } = item
         return { name, status, remark, children }
       }
     })
   })
-  console.log('🚀 ~ xzz: generateDepartmentSeedData -> aaa', aaa)
-  return aaa
 }
 </script>
 

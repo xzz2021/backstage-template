@@ -98,6 +98,9 @@ importers:
       xgplayer:
         specifier: ^3.0.20
         version: 3.0.20(core-js@3.40.0)
+      xlsx:
+        specifier: https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz
+        version: https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz
     devDependencies:
       '@commitlint/cli':
         specifier: ^19.6.1
@@ -5208,6 +5211,12 @@ packages:
     resolution: {integrity: sha512-UNKZJRyODOZGdka83ao8fI18xdhzOV8qG4aNEOOkuOQbXFXfXsJMr/dazRHFP+uXmTqiCXr568euee3ch7CS7g==}
     peerDependencies:
       core-js: '>=3.12.1'
+
+  xlsx@https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz:
+    resolution: {tarball: https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz}
+    version: 0.20.3
+    engines: {node: '>=0.8'}
+    hasBin: true
 
   xml-name-validator@4.0.0:
     resolution: {integrity: sha1-eaAG4uYxSahgDxVDDwpHJdFSSDU=}
@@ -10868,6 +10877,8 @@ snapshots:
       downloadjs: 1.4.7
       eventemitter3: 4.0.7
       xgplayer-subtitles: 3.0.20(core-js@3.40.0)
+
+  xlsx@https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz: {}
 
   xml-name-validator@4.0.0: {}
 
