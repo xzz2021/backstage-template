@@ -1,20 +1,21 @@
 <script setup lang="tsx">
 import { ContentWrap } from '@/components/ContentWrap'
-import { Dialog } from '@/components/Dialog'
 import { useI18n } from '@/hooks/web/useI18n'
 import { Table, TableColumn } from '@/components/Table'
 import type { FileItem } from '@/api/file/types'
 import { useTable } from '@/hooks/web/useTable'
 import { ref, unref, reactive } from 'vue'
 import { BaseButton } from '@/components/Button'
-import { formatToDateTime } from '@/utils/dateUtil'
-import { delFileApi, getFileListApi, batchDeleteFileApi } from '@/api/file'
+import { getFileListApi, deleteFileApi } from '@/api/file'
 import { formatFileSize, downloadFile } from '@/utils/file'
 import RenderFile from './components/RenderFile.vue'
 import { ElMessage } from 'element-plus'
 import UploadBtn from './components/UploadBtn.vue'
+import { useClipboard } from '@vueuse/core'
 
-const ids = ref<string[]>([])
+const { copy } = useClipboard()
+
+const ids = ref<number[]>([])
 
 const { tableRegister, tableState, tableMethods } = useTable({
   fetchDataApi: async () => {
@@ -30,7 +31,7 @@ const { tableRegister, tableState, tableMethods } = useTable({
   },
 
   fetchDelApi: async () => {
-    const res = await batchDeleteFileApi(unref(ids))
+    const res = await deleteFileApi(unref(ids))
     return !!res
   }
 })
@@ -52,19 +53,7 @@ const searchParams = ref<any>({})
 // }
 
 const { t } = useI18n()
-const delFile = async (sha256: string) => {
-  try {
-    const res = await delFileApi(sha256)
-    if (res.code == 200) {
-      getList()
-      ElMessage.success('删除成功')
-    } else {
-      ElMessage.error('删除失败' + res.data.message)
-    }
-  } catch (error) {
-    console.log(error)
-  }
-}
+
 const tableColumns = reactive<TableColumn[]>([
   { field: 'select', type: 'selection' },
   {
@@ -73,41 +62,29 @@ const tableColumns = reactive<TableColumn[]>([
     type: 'index'
   },
   {
-    field: 'filename',
+    field: 'name',
     label: '文件预览',
     width: 170,
     slots: {
       default: (data: any) => {
-        const { url, extension, filename } = data.row
-        return <RenderFile url={url} extension={extension} filename={filename} />
+        const { url, extension, name } = data.row
+        return <RenderFile url={url} extension={extension} filename={name} />
       }
     }
   },
-  // {
-  //   field: 'name',
-  //   label: '名称'
-  // },
-  // {
-  //   field: 'extension',
-  //   label: '文件类型'
-  // },
+
   {
     field: 'size',
     label: '文件大小',
     formatter: (row: any) => formatFileSize(row.size)
   },
   {
-    field: 'uploadTime',
-    label: '上传时间',
-    formatter: (row: any) => formatToDateTime(row.uploadTime)
+    field: 'mimeType',
+    label: '文件类型'
   },
   {
-    field: 'uploader',
-    label: '上传人'
-  },
-  {
-    field: 'remark',
-    label: t('userDemo.remark')
+    field: 'createdAt',
+    label: '上传时间'
   },
   {
     field: 'action',
@@ -118,19 +95,16 @@ const tableColumns = reactive<TableColumn[]>([
         const row = data.row
         return (
           <>
-            {/* <BaseButton
-              type="primary"
-              onClick={() => downloadFile({ url: row.url, fileName: row.filename })}
-            >
-              编辑
-            </BaseButton> */}
+            <BaseButton type="success" onClick={() => copyUrl(row.url)}>
+              复制
+            </BaseButton>
             <BaseButton
               type="primary"
-              onClick={() => downloadFile({ url: row.url, fileName: row.filename })}
+              onClick={() => downloadFile({ url: row.url, fileName: row.name })}
             >
               下载
             </BaseButton>
-            <BaseButton type="danger" onClick={() => delFile(row.sha256)}>
+            <BaseButton type="danger" onClick={() => delData(row.id)}>
               {t('exampleDemo.del')}
             </BaseButton>
           </>
@@ -140,17 +114,15 @@ const tableColumns = reactive<TableColumn[]>([
   }
 ])
 
-const dialogVisible = ref(false)
-const dialogTitle = ref('')
-
-// const currentRow = ref<FileItem | null>(null)
-// const actionType = ref('')
-
 const delLoading = ref(false)
 
-const delData = async () => {
-  const elTableExpose = await getElTableExpose()
-  ids.value = elTableExpose?.getSelectionRows().map((v: FileItem) => v.sha256) || []
+const delData = async (id?: number) => {
+  if (id) {
+    ids.value = [id]
+  } else {
+    const elTableExpose = await getElTableExpose()
+    ids.value = elTableExpose?.getSelectionRows().map((v: FileItem) => v.id) || []
+  }
   if (ids.value.length === 0) {
     ElMessage.warning('请选择要删除的文件')
     return
@@ -174,15 +146,14 @@ const delData = async () => {
 //     component: 'Input'
 //   }
 // ])
+
+const copyUrl = (url: string) => {
+  copy(url)
+  ElMessage.success('文件链接复制成功')
+}
 </script>
 
 <template>
-  <!-- <audio
-    class="audio"
-    src="http://127.0.0.1:5000/static/test/无名的人.mp3"
-    controls
-    autoplay
-  ></audio> -->
   <ContentWrap>
     <!-- <Search :schema="searchSchema" @search="setSearchParams" @reset="setSearchParams" /> -->
 
@@ -197,6 +168,7 @@ const delData = async () => {
       v-model:pageSize="pageSize"
       v-model:currentPage="currentPage"
       align="center"
+      headerAlign="center"
       :columns="tableColumns"
       :data="dataList"
       :loading="loading"
@@ -206,10 +178,4 @@ const delData = async () => {
       @register="tableRegister"
     />
   </ContentWrap>
-
-  <Dialog v-model="dialogVisible" :title="dialogTitle">
-    <template #footer>
-      <BaseButton @click="dialogVisible = false">{{ t('dialogDemo.close') }}</BaseButton>
-    </template>
-  </Dialog>
 </template>

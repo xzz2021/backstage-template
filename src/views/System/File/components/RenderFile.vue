@@ -1,31 +1,22 @@
 <template>
   <div class="w-full h-[100px] flex justify-center items-center gap-1 px-1">
     <RenderPreview class="cursor-pointer" />
-    <div class="cursor-pointer leading-none" @click="copyUrl(url)">
-      <Icon icon="vi-ep:document-copy" class="" />
-    </div>
   </div>
 </template>
 <script setup lang="tsx">
 import { getFileType } from '@/utils/file'
 import { Icon } from '@/components/Icon'
-import { useClipboard } from '@vueuse/core'
 import { createVideoViewer } from '@/components/VideoPlayer'
-import { ElImage, ElMessage } from 'element-plus'
+import { ElImage } from 'element-plus'
 import { defineComponent } from 'vue'
 import { createAudioViewer } from '@/components/AudioPlayer'
-import ScrollText from './ScrollText.vue'
 interface PropsItem {
   extension: string
   url: string
   filename: string
 }
 const props = defineProps<PropsItem>()
-const { copy } = useClipboard()
-const copyUrl = (url: string) => {
-  copy(url)
-  ElMessage.success('文件链接复制成功')
-}
+
 const RenderPreview = defineComponent({
   render() {
     const type = getFileType(props.extension)
@@ -50,34 +41,35 @@ const RenderPreview = defineComponent({
             class="w-full flex items-center"
           >
             <Icon icon="vi-tdesign:music" style={{ color: '#0dc70b' }} />
-            <ScrollText text={filename} />
+            <div class="ml-2 w-[100px] overflow-hidden text-ellipsis whitespace-nowrap">
+              {filename}
+            </div>
           </div>
         )
       case 'video':
         return (
-          <div
-            onClick={() => {
-              createVideoViewer({
-                url
-              })
-            }}
-            class="w-full flex items-center"
-          >
+          <div onClick={() => createVideoViewer({ url })} class="w-full flex items-center">
             <Icon icon="vi-tdesign:video-camera-music" style={{ color: '#ff6b12' }} />
-            <ScrollText text={filename} />
+            <div class="ml-2 w-[120px] overflow-hidden text-ellipsis whitespace-nowrap">
+              {filename}
+            </div>
           </div>
         )
       case 'doc':
         return (
           <div class="w-full flex items-center">
             <Icon icon="vi-ep:document" style={{ color: '#0070ff' }} />
-            <ScrollText text={filename} />
+            <div class="ml-2 w-[120px] overflow-hidden text-ellipsis whitespace-nowrap">
+              {filename}
+            </div>
           </div>
         )
-      case 'other':
-        return <div>{filename}</div>
       default:
-        return null
+        return (
+          <div class="ml-2 w-[120px] overflow-hidden text-ellipsis whitespace-nowrap">
+            {filename}
+          </div>
+        )
     }
   }
 })

@@ -70,6 +70,9 @@ axiosInstance.interceptors.response.use(
     errMsg(msg)
 
     if (error?.status == 401) {
+      // 取消后面的所有请求
+      service?.cancelAllRequest()
+      console.log('取消后面的所有请求')
       const userStore = useUserStoreWithOut()
       userStore.logout()
     }

@@ -221,7 +221,6 @@ const { copy } = useClipboard()
 
 const generateDictionarySeedData = (data: DictionaryItem[]) => {
   return data.map((item) => {
-    console.log('🚀 ~ xzz: generateDictionarySeedData -> item', item)
     return item
     return treeMapEach(item, {
       conversion: (item) => {
