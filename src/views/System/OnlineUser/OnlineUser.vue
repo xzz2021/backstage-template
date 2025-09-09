@@ -3,16 +3,18 @@ import { ContentWrap } from '@/components/ContentWrap'
 import { useI18n } from '@/hooks/web/useI18n'
 import { Table, TableColumn } from '@/components/Table'
 import { useTable } from '@/hooks/web/useTable'
-import { reactive } from 'vue'
+import { onBeforeUnmount, onMounted, reactive } from 'vue'
 import { BaseButton } from '@/components/Button'
 import { useSystemStore } from '@/store/modules/system'
 import { ElMessage } from 'element-plus'
+import { useSSEStore } from '@/store/modules/sse'
 
+const sseStore = useSSEStore()
 const systemStore = useSystemStore()
-const { getUserList, unlock } = systemStore
+const { getOnlineUserList, forceLogout } = systemStore
 const { tableRegister, tableState, tableMethods } = useTable({
   fetchDataApi: async () => {
-    return await getUserList()
+    return await getOnlineUserList()
   }
 })
 const { loading, dataList, total, currentPage, pageSize } = tableState
@@ -40,13 +42,13 @@ const tableColumns = reactive<TableColumn[]>([
     label: '手机号'
   },
   {
-    field: 'lastLoginIp',
+    field: 'ip',
     label: '登录IP'
   },
   {
     field: 'lastLoginAt',
     label: '登录时间',
-    width: '165px'
+    width: '265px'
   },
   {
     field: 'action',
@@ -57,12 +59,8 @@ const tableColumns = reactive<TableColumn[]>([
       default: (data: any) => {
         return (
           <>
-            <BaseButton
-              type="success"
-              onClick={() => unlockFn(data.row.id)}
-              disabled={!data.row.lockedUntil}
-            >
-              解锁
+            <BaseButton type="danger" onClick={() => forceLogoutFn(data.row.id)}>
+              下线
             </BaseButton>
           </>
         )
@@ -71,19 +69,24 @@ const tableColumns = reactive<TableColumn[]>([
   }
 ])
 
-const unlockFn = async (id: number) => {
-  const res = await unlock(id)
+//  这里只是发出 退出 命令
+const forceLogoutFn = async (id: number) => {
+  const res = await forceLogout(id)
   ElMessage.success(res?.message)
   getList()
 }
+// 当在线用户变化时 触发更新列表
+onMounted(() => {
+  sseStore.emitter.on('onlineUser', getList)
+})
+
+onBeforeUnmount(() => {
+  sseStore.emitter.off('onlineUser', getList)
+})
 </script>
 
 <template>
   <ContentWrap>
-    <!-- <div class="mb-10px">
-      <BaseButton :loading="delLoading" type="danger" @click="getList"> 刷新 </BaseButton>
-    </div> -->
-
     <Table
       v-model:pageSize="pageSize"
       v-model:currentPage="currentPage"

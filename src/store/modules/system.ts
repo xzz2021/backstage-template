@@ -1,4 +1,4 @@
-import { forceLogoutApi, getUserListApi, unlockApi } from '@/api/system'
+import { forceLogoutApi, getOnlineUserListApi, getUserListApi, unlockApi } from '@/api/system'
 import { UserListItem } from '@/api/system/types'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
@@ -11,6 +11,11 @@ export const useSystemStore = defineStore('system', () => {
     const { list = [], total = 0 } = res?.data || {}
     userList.value = list
     return { list, total }
+  }
+
+  const getOnlineUserList = async (params?: any) => {
+    const res = await getOnlineUserListApi(params)
+    return res?.data
   }
 
   const forceLogout = async (id: number) => {
@@ -26,6 +31,7 @@ export const useSystemStore = defineStore('system', () => {
   return {
     userList,
     getUserList,
+    getOnlineUserList,
     forceLogout,
     unlock
   }

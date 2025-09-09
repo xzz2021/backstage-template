@@ -13,3 +13,7 @@ export const forceLogoutApi = (id: number): Promise<IResponse> => {
 export const unlockApi = (id: number): Promise<IResponse> => {
   return request.post({ url: '/api/auth/unlock', data: { id } })
 }
+
+export const getOnlineUserListApi = (params: any): Promise<IResponse<UserListResponse>> => {
+  return request.get({ url: '/api/user/online/list', params })
+}

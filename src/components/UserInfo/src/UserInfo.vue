@@ -3,13 +3,16 @@ import { ElDropdown, ElDropdownMenu, ElDropdownItem } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useDesign } from '@/hooks/web/useDesign'
 import LockDialog from './components/LockDialog.vue'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import LockPage from './components/LockPage.vue'
 import { useLockStore } from '@/store/modules/lock'
 import { useUserStore } from '@/store/modules/user'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import defaultAvatar from '@/assets/imgs/avatar.jpg'
+import { useSSEStore } from '@/store/modules/sse'
+
+const sseStore = useSSEStore()
 
 const { push } = useRouter()
 
@@ -41,6 +44,10 @@ const lockScreen = () => {
 const toPage = (path: string) => {
   push(path)
 }
+
+onMounted(() => {
+  sseStore.initServerMsgListener()
+})
 </script>
 
 <template>

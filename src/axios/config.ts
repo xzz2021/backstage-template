@@ -3,6 +3,7 @@ import { ElMessage } from 'element-plus'
 import qs from 'qs'
 import { SUCCESS_CODE, TRANSFORM_REQUEST_DATA } from '@/constants'
 import { objToFormData } from '@/utils'
+import { useSSEStore } from '@/store/modules/sse'
 
 const defaultRequestInterceptors = (config: InternalAxiosRequestConfig) => {
   if (
@@ -41,6 +42,8 @@ const defaultResponseInterceptors = (response: AxiosResponse) => {
     // 如果是文件流，直接过
     return response
   } else if (response.data.code === SUCCESS_CODE) {
+    const sseStore = useSSEStore()
+    sseStore.setServerConnectStatus(true)
     return response.data
   } else {
     // console.log('xzz2021: defaultResponseInterceptors -> response.data', response.data)
