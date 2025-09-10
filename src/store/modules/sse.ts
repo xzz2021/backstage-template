@@ -58,9 +58,11 @@ export const useSSEStore = defineStore('sse', () => {
     }
     const uid = userStore.userInfo?.id
     if (!uid) return
-    const sseUrl = uniqueSlash(`${import.meta.env.VITE_BASE_API_URL}/sse/${uid}`)
+    const sseUrl = uniqueSlash(
+      `${import.meta.env.VITE_BASE_API_URL}/sse/${uid}?token=${encodeURIComponent(userStore.token)}`
+    )
 
-    console.log('sseUrl=-====', sseUrl)
+    // console.log('sseUrl=-====', sseUrl)
 
     eventSource = new EventSource(sseUrl, {
       withCredentials: true

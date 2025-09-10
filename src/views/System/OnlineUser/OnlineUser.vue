@@ -8,8 +8,10 @@ import { BaseButton } from '@/components/Button'
 import { useSystemStore } from '@/store/modules/system'
 import { ElMessage } from 'element-plus'
 import { useSSEStore } from '@/store/modules/sse'
+import { useUserStore } from '@/store/modules/user'
 
 const sseStore = useSSEStore()
+const userStore = useUserStore()
 const systemStore = useSystemStore()
 const { getOnlineUserList, forceLogout } = systemStore
 const { tableRegister, tableState, tableMethods } = useTable({
@@ -33,10 +35,9 @@ const tableColumns = reactive<TableColumn[]>([
   },
   {
     field: 'username',
-    label: '用户名',
-    align: 'center'
+    label: '用户名'
+    // align: 'center'
   },
-
   {
     field: 'phone',
     label: '手机号'
@@ -59,7 +60,11 @@ const tableColumns = reactive<TableColumn[]>([
       default: (data: any) => {
         return (
           <>
-            <BaseButton type="danger" onClick={() => forceLogoutFn(data.row.id)}>
+            <BaseButton
+              type="danger"
+              onClick={() => forceLogoutFn(data.row.id)}
+              disabled={data.row.id === userStore.userInfo?.id}
+            >
               下线
             </BaseButton>
           </>
