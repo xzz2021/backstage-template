@@ -81,7 +81,7 @@ export const useSSEStore = defineStore('sse', () => {
       }
       // 在线用户数量变更时
       else if (type === 'updateOnlineUserCount') {
-        onlineUserCount.value = ~~data
+        onlineUserCount.value = ~~data // 双按位取反  效果等价于把一个数 向零取整  把原数的小数部分截掉，只保留整数部分
         emitter.emit('onlineUser', onlineUserCount.value)
       } else if (type === 'focusLogOut') {
         closeEventSource()

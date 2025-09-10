@@ -2,6 +2,14 @@ export interface UserLoginType {
   username?: string
   password: string
   phone: string
+  captchaText: string
+  captchaId: string
+}
+
+export interface UserLoginInfoType {
+  username?: string
+  password: string
+  phone: string
 }
 
 export interface SmsLoginType {
@@ -9,7 +17,7 @@ export interface SmsLoginType {
   code: string
 }
 
-export type UserRegisterType = UserLoginType & SmsLoginType
+export type UserRegisterType = UserLoginInfoType & SmsLoginType
 
 export interface UserType {
   id: number

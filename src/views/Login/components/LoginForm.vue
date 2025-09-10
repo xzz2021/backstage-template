@@ -9,7 +9,7 @@ import { Icon } from '@/components/Icon'
 import { useUserStore } from '@/store/modules/user'
 import { BaseButton } from '@/components/Button'
 import { UserLoginType } from '@/api/login/types'
-import { loginApi } from '@/api/login'
+import { loginApi, getCaptchaApi } from '@/api/login'
 import { useLogin } from './hooks'
 
 const { required } = useValidator()
@@ -21,10 +21,20 @@ const userStore = useUserStore()
 
 const { t } = useI18n()
 
+const captcha = ref<{ svg: string; id: string }>({ svg: '', id: '' })
+
+const updateCaptcha = async () => {
+  const res = await getCaptchaApi()
+  const { svg, id } = res.data
+  captcha.value = { svg, id }
+}
+updateCaptcha()
+
 const rules = {
   // username: [required()],
   phone: [required()],
-  password: [required()]
+  password: [required()],
+  captchaText: [required()]
 }
 
 const schema = reactive<FormSchema[]>([
@@ -66,6 +76,27 @@ const schema = reactive<FormSchema[]>([
       onKeydown: (_e: any) => {
         if (_e.key === 'Enter') {
           signIn()
+        }
+      }
+    }
+  },
+  {
+    field: 'captchaText',
+    label: '验证码',
+    component: 'Input',
+    colProps: {
+      span: 24
+    },
+    componentProps: {
+      slots: {
+        suffix: () => {
+          return (
+            <div
+              v-html={captcha.value.svg}
+              class="cursor-pointer leading-0"
+              onClick={updateCaptcha}
+            ></div>
+          )
         }
       }
     }
@@ -223,9 +254,11 @@ const signIn = async () => {
     if (isValid) {
       loading.value = true
       const formData = await getFormData<UserLoginType>()
-      console.log('xzz2021: signIn -> formData', formData)
       try {
-        const res = await loginApi(formData)
+        const res = await loginApi({
+          ...formData,
+          captchaId: captcha.value.id
+        })
         const { userinfo, access_token } = res.data
         // 是否记住我
         if (unref(remember)) {

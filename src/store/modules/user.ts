@@ -5,7 +5,7 @@ import { useI18n } from '@/hooks/web/useI18n'
 import { useTagsViewStore } from './tagsView'
 import router from '@/router'
 import { UserItem } from '@/api/user/types'
-import { UserLoginType } from '@/api/login/types'
+import { UserLoginInfoType } from '@/api/login/types'
 import defaultAvatar from '@/assets/imgs/avatar.jpg'
 
 interface UserState {
@@ -14,7 +14,7 @@ interface UserState {
   token: string
   roleRouters?: string[] | AppCustomRouteRecordRaw[]
   rememberMe: boolean
-  loginInfo?: UserLoginType
+  loginInfo?: UserLoginInfoType
   unReadCount: number
 }
 
@@ -56,7 +56,7 @@ export const useUserStore = defineStore('user', {
     getRememberMe(): boolean {
       return this.rememberMe
     },
-    getLoginInfo(): UserLoginType | undefined {
+    getLoginInfo(): UserLoginInfoType | undefined {
       return this.loginInfo
     },
     getUserAvatar(): string {
@@ -115,7 +115,7 @@ export const useUserStore = defineStore('user', {
     setRememberMe(rememberMe: boolean) {
       this.rememberMe = rememberMe
     },
-    setLoginInfo(loginInfo: UserLoginType | undefined) {
+    setLoginInfo(loginInfo: UserLoginInfoType | undefined) {
       this.loginInfo = loginInfo
     }
     // async setUnReadCount() {

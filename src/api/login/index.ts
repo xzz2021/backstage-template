@@ -36,3 +36,7 @@ export const wechatBind = (data: any): Promise<IResponse<SmsLoginRes>> => {
 export const loginOutApi = (): Promise<IResponse> => {
   return request.get({ url: '/api/auth/logout' })
 }
+
+export const getCaptchaApi = (): Promise<IResponse<{ svg: string; id: string }>> => {
+  return request.get({ url: '/api/captcha/common' })
+}
