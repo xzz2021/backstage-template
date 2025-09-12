@@ -71,12 +71,6 @@ const schema = reactive<FormSchema[]>([
     componentProps: {
       style: {
         width: '100%'
-      },
-      // 按下enter键触发登录
-      onKeydown: (_e: any) => {
-        if (_e.key === 'Enter') {
-          signIn()
-        }
       }
     }
   },
@@ -97,6 +91,12 @@ const schema = reactive<FormSchema[]>([
               onClick={updateCaptcha}
             ></div>
           )
+        }
+      },
+      // 按下enter键触发登录
+      onKeydown: (_e: any) => {
+        if (_e.key === 'Enter') {
+          signIn()
         }
       }
     }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, unref, watch, computed, nextTick, onBeforeUnmount } from 'vue'
+import { ref, unref, computed, onBeforeUnmount } from 'vue'
 import { useDraggable, useElementSize, useWindowSize } from '@vueuse/core'
 import { Icon } from '@/components/Icon'
 
@@ -9,6 +9,7 @@ interface AudioPlayerProps {
   id?: string
   filename?: string
   show?: boolean
+  destroy?: () => void
 }
 
 const props = withDefaults(defineProps<AudioPlayerProps>(), {
@@ -30,7 +31,7 @@ const { width: boxWidth, height: boxHeight } = useElementSize(audioRef)
 
 const initialPosition = (() => {
   try {
-    const stored = sessionStorage.getItem('AudioDialogXY')
+    const stored = localStorage.getItem('AudioDialogXY')
     if (stored) {
       const { top, left } = JSON.parse(stored)
       if (typeof top === 'number' && typeof left === 'number') {
@@ -40,7 +41,10 @@ const initialPosition = (() => {
   } catch (e) {
     console.warn('Failed to parse stored audio position:', e)
   }
-  return { top: 40, left: windowWidth.value - boxWidth.value }
+  return {
+    top: windowHeight.value / 4 - boxHeight.value,
+    left: (windowWidth.value - boxWidth.value) / 2
+  }
 })()
 
 const axis = ref(initialPosition)
@@ -58,39 +62,42 @@ const audioStyle = computed(() => {
   }
 })
 
-watch(
-  () => props.show,
-  async (isShown) => {
-    await nextTick()
-    if (isShown) {
-      unref(audioEl)?.play()
-    } else {
-      unref(audioEl)?.pause()
-    }
-  }
-)
-
-const close = () => {
-  emit('close')
-  unref(audioEl)?.pause()
-}
-
-onBeforeUnmount(() => {
-  sessionStorage.setItem(
+const setStorage = () => {
+  localStorage.setItem(
     'AudioDialogXY',
     JSON.stringify({
       top: y.value,
       left: x.value
     })
   )
+}
+
+const close = () => {
+  setStorage()
+  unref(audioEl)?.pause()
+  emit('close')
+}
+
+onBeforeUnmount(() => {
+  setStorage()
+  props.destroy?.()
 })
 </script>
 
 <template>
-  <div ref="audioRef" class="audio-player" :style="audioStyle" v-show="show">
+  <div
+    ref="audioRef"
+    class="audio-player bg-[var(--el-color-primary)] text-white"
+    :style="audioStyle"
+    v-show="show"
+  >
     <div class="p-10px">
       <div class="flex justify-between">
-        <div class="truncate max-w-[200px]">{{ filename }}</div>
+        <div class="overflow-hidden max-w-[240px]">
+          <div class="whitespace-nowrap inline-block">
+            {{ filename }}
+          </div>
+        </div>
         <Icon
           icon="ep:close"
           @click="close"
@@ -103,7 +110,6 @@ onBeforeUnmount(() => {
           ref="audioEl"
           :src="url"
           controls
-          autoplay
           @error="console.error('Audio loading failed')"
         ></audio>
       </div>
@@ -116,19 +122,9 @@ onBeforeUnmount(() => {
   position: fixed;
   z-index: 9999;
   cursor: move;
-  background: linear-gradient(0deg, #409eff 0%, #0195ce 41%, #00f1ff 100%);
   border-radius: 8px;
   box-shadow: 0 2px 12px #0000001a;
   transition: transform 0.2s ease;
   user-select: none;
-
-  &:active {
-    cursor: move;
-  }
-
-  /* 
-  &:hover {
-    transform: scale(1.02);
-  } */
 }
 </style>

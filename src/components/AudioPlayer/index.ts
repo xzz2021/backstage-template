@@ -41,7 +41,11 @@ export function createAudioViewer(options: AudioViewerOptions) {
     }, 150)
   }
 
-  const propsData: Partial<AudioViewerOptions> = { ...options, id, onClose }
+  const propsData: Partial<AudioViewerOptions> = {
+    ...options,
+    id,
+    onClose
+  }
   document.body.appendChild(container)
   instance = createVNode(AudioPlayer, propsData)
   render(instance, container)
