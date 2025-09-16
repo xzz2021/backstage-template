@@ -6,42 +6,42 @@ export const getMenuListApi = async (): Promise<
     total: number
   }>
 > => {
-  return await request.get({ url: '/api/menu/getMenuList' })
+  return await request.get({ url: 'menu/getMenuList' })
 }
 
 export const addMenuApi = (data) => {
   console.log('data', data)
-  return request.post({ url: '/api/menu/add', data })
+  return request.post({ url: 'menu/add', data })
 }
 
 export const editMenuApi = (data): Promise<IResponse<{ id: number }>> => {
-  return request.post({ url: '/api/menu/update', data })
+  return request.post({ url: 'menu/update', data })
 }
 
 export const delMenuApi = (id) => {
-  return request.delete({ url: '/api/menu/' + id })
+  return request.delete({ url: 'menu/' + id })
 }
 
 export const addPermission = (data): Promise<IResponse<{ id: number }>> => {
-  return request.post({ url: '/api/permission/add', data })
+  return request.post({ url: 'permission/add', data })
 }
 export const updatePermission = (data): Promise<IResponse<{ id: number }>> => {
-  return request.post({ url: '/api/permission/update', data })
+  return request.post({ url: 'permission/update', data })
 }
 export const delPermission = (id): Promise<IResponse<{ id: number }>> => {
-  return request.delete({ url: '/api/permission/' + id })
+  return request.delete({ url: 'permission/' + id })
 }
 
 export const sortMenuApi = (data) => {
-  return request.post({ url: '/api/menu/sort', data: { data } })
+  return request.post({ url: 'menu/sort', data: { data } })
 }
 
 export const batchCreatePermissionApi = (data: {
   menuId: number
 }): Promise<IResponse<{ count: number }>> => {
-  return request.post({ url: '/api/permission/batchCreate', data })
+  return request.post({ url: 'permission/batchCreate', data })
 }
 
 export const generateMenuSeedApi = (data) => {
-  return request.post({ url: '/api/menu/generateMenuSeed', data: { data } })
+  return request.post({ url: 'menu/generateMenuSeed', data: { data } })
 }

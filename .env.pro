@@ -2,7 +2,7 @@
 VITE_NODE_ENV=production
 
 # 接口前缀
-VITE_API_BASE_PATH=
+VITE_API_BASE_PATH=api/
 
 # 打包路径
 VITE_BASE_PATH=/
@@ -41,6 +41,6 @@ VITE_HIDE_GLOBAL_SETTING=false
 
 
 # 接口前缀
-VITE_API_BASE_PATH= "https://xzz.xzz.com/"
+VITE_API_BASE_PATH=api/ "https://xzz.xzz.com/"
 
 VITE_WECHAT_REDIRECT_URL='https://xzz.xzz.com/#/login'

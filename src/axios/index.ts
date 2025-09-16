@@ -4,7 +4,7 @@ import { useUserStoreWithOut } from '@/store/modules/user'
 import { throttleWrap } from './throttle'
 
 const request = (option: AxiosConfig) => {
-  const { url, method, params, data, headers, responseType } = option
+  const { url, method, params, data, headers, responseType, withCredentials } = option
 
   const userStore = useUserStoreWithOut()
   const config = {
@@ -19,7 +19,8 @@ const request = (option: AxiosConfig) => {
         ? 'bearer ' + userStore.getToken
         : '',
       ...headers
-    }
+    },
+    credentials: withCredentials ? 'include' : 'omit'
   }
 
   // return service.request(config) //  返回原始请求   用于测试 后端限流

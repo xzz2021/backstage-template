@@ -34,3 +34,7 @@ export interface SmsLoginRes {
   userinfo: UserType
   access_token: string
 }
+
+export interface RefreshTokenRes {
+  access_token: string
+}

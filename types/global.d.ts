@@ -43,6 +43,7 @@ declare global {
     method?: AxiosMethod
     headers?: RawAxiosRequestHeaders
     responseType?: AxiosResponseType
+    withCredentials?: boolean
   }
 
   declare interface IResponse<T = any> {

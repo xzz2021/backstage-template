@@ -11,6 +11,7 @@ import { BaseButton } from '@/components/Button'
 import { UserLoginType } from '@/api/login/types'
 import { loginApi, getCaptchaApi } from '@/api/login'
 import { useLogin } from './hooks'
+import { AxiosError } from 'axios'
 
 const { required } = useValidator()
 const { successLogin } = useLogin()
@@ -274,6 +275,10 @@ const signIn = async () => {
         await successLogin(userinfo, access_token)
       } catch (error) {
         console.log('xzz2021: signIn -> error', error)
+        if (error instanceof AxiosError && error.response?.status === 401) {
+          // 只有当后面的登录失败时，才更新验证码
+          updateCaptcha()
+        }
       } finally {
         loading.value = false
       }

@@ -6,6 +6,7 @@ import { ElMessage } from 'element-plus'
 import { REQUEST_TIMEOUT } from '@/constants'
 
 import { useUserStoreWithOut } from '@/store/modules/user'
+import { refresher } from './refresh'
 
 const errMsg = (msg: string) => {
   ElMessage({
@@ -13,6 +14,26 @@ const errMsg = (msg: string) => {
     grouping: true,
     type: 'error'
   })
+}
+
+const tryNewToken = async () => {
+  const userStore = useUserStoreWithOut()
+  service.cancelAllRequest()
+  try {
+    const token = await refresher.tryRefresh()
+    console.log('xzz2021: tryNewToken -> token', token)
+    userStore.setToken(token)
+    // 刷新token成功后，继续执行上一次的axios请求  继续发起也没有用  因为没法返回数据给原始调用处
+    // await service.retryAllRequest()
+    return true
+  } catch (error: any) {
+    console.log('xzz2021: tryNewToken -> error', error)
+    if (error?.status === 401) {
+      // service.cancelAllRequest()
+      // userStore.logout()
+    }
+    return false
+  }
 }
 export const PATH_URL = import.meta.env.VITE_API_BASE_PATH
 
@@ -23,14 +44,16 @@ const axiosInstance: AxiosInstance = axios.create({
   baseURL: PATH_URL
 })
 
+const retryMap: Map<string, InternalAxiosRequestConfig> = new Map()
+
 axiosInstance.interceptors.request.use((res: InternalAxiosRequestConfig) => {
   const controller = new AbortController()
-  // const url = res.url || ''
   res.signal = controller.signal
-  // abortControllerMap.set(
-  //   import.meta.env.VITE_USE_MOCK === 'true' ? url.replace('/mock', '') : url,
-  //   controller
-  // )
+  const url = res?.url
+  if (url) {
+    retryMap.set(url, res)
+    abortControllerMap.set(url, controller)
+  }
   return res
 })
 
@@ -42,7 +65,7 @@ axiosInstance.interceptors.response.use(
     // 这里不能做任何处理，否则后面的 interceptors 拿不到完整的上下文了
     return res
   },
-  (error: AxiosError) => {
+  async (error: AxiosError) => {
     console.log('err： ' + error) // for debug
     // console.log('xzz2021: error', error)
     let msg = (error.response?.data as any)?.message
@@ -70,11 +93,12 @@ axiosInstance.interceptors.response.use(
     errMsg(msg)
 
     if (error?.status == 401) {
-      // 取消后面的所有请求
-      service?.cancelAllRequest()
-      console.log('取消后面的所有请求')
-      const userStore = useUserStoreWithOut()
-      userStore.logout()
+      // 先停止所有后续请求
+      // service.cancelAllRequest()
+      // 再尝试刷新token
+      await tryNewToken()
+    } else {
+      abortControllerMap.delete(error?.config?.url || '')
     }
     return Promise.reject(error)
   }
@@ -113,6 +137,15 @@ const service = {
       controller.abort()
     }
     abortControllerMap.clear()
+  },
+  async retryAllRequest() {
+    for (const [_, config] of retryMap) {
+      retryMap.delete(config?.url || '')
+      const userStore = useUserStoreWithOut()
+      const newToken = userStore.getToken ? 'bearer ' + userStore.getToken : ''
+      config.headers['Authorization'] = newToken
+      newToken && (await service.request(config))
+    }
   }
 }
 

@@ -8,23 +8,23 @@ interface UploadFileParams {
 }
 export const uploadFileApi = (data: UploadFileParams) => {
   return request.post({
-    url: '/api/staticfile/upload',
+    url: 'staticfile/upload',
     data,
     headers: { 'Content-Type': 'multipart/form-data' }
   })
 }
 
 export const getFileListApi = (params: any) => {
-  return request.get({ url: '/api/staticfile/list', params })
+  return request.get({ url: 'staticfile/list', params })
 }
 
 // export const delRoleApi = (id) => {
-//   return request.delete({ url: '/api/role/' + id })
+//   return request.delete({ url: 'role/' + id })
 // }
 
 // export const delFileApi = (sha256: string) => {
-//   return request.delete({ url: '/api/staticfile/' + sha256 })
+//   return request.delete({ url: 'staticfile/' + sha256 })
 // }
 export const deleteFileApi = (ids: number[]) => {
-  return request.delete({ url: '/api/staticfile/delete', data: { ids } })
+  return request.delete({ url: 'staticfile/delete', data: { ids } })
 }
