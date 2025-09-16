@@ -1,12 +1,9 @@
 import axios, { AxiosError } from 'axios'
 import { defaultRequestInterceptors, defaultResponseInterceptors } from './config'
-
 import { AxiosInstance, InternalAxiosRequestConfig, RequestConfig, AxiosResponse } from './types'
 import { ElMessage } from 'element-plus'
 import { REQUEST_TIMEOUT } from '@/constants'
-
-import { useUserStoreWithOut } from '@/store/modules/user'
-import { refresher } from './refresh'
+import { slientTokenRefresh } from './refresh'
 
 const errMsg = (msg: string) => {
   ElMessage({
@@ -16,25 +13,6 @@ const errMsg = (msg: string) => {
   })
 }
 
-const tryNewToken = async () => {
-  const userStore = useUserStoreWithOut()
-  service.cancelAllRequest()
-  try {
-    const token = await refresher.tryRefresh()
-    console.log('xzz2021: tryNewToken -> token', token)
-    userStore.setToken(token)
-    // 刷新token成功后，继续执行上一次的axios请求  继续发起也没有用  因为没法返回数据给原始调用处
-    // await service.retryAllRequest()
-    return true
-  } catch (error: any) {
-    console.log('xzz2021: tryNewToken -> error', error)
-    if (error?.status === 401) {
-      // service.cancelAllRequest()
-      // userStore.logout()
-    }
-    return false
-  }
-}
 export const PATH_URL = import.meta.env.VITE_API_BASE_PATH
 
 const abortControllerMap: Map<string, AbortController> = new Map()
@@ -44,14 +22,11 @@ const axiosInstance: AxiosInstance = axios.create({
   baseURL: PATH_URL
 })
 
-const retryMap: Map<string, InternalAxiosRequestConfig> = new Map()
-
 axiosInstance.interceptors.request.use((res: InternalAxiosRequestConfig) => {
   const controller = new AbortController()
   res.signal = controller.signal
   const url = res?.url
   if (url) {
-    retryMap.set(url, res)
     abortControllerMap.set(url, controller)
   }
   return res
@@ -60,15 +35,20 @@ axiosInstance.interceptors.request.use((res: InternalAxiosRequestConfig) => {
 //  响应拦截器 一号    1. 优先过滤掉服务端 异常状态码
 axiosInstance.interceptors.response.use(
   (res: AxiosResponse) => {
-    const url = res.config.url || ''
-    abortControllerMap.delete(url)
+    // const url = res.config.url || ''
+    // abortControllerMap.delete(url)
     // 这里不能做任何处理，否则后面的 interceptors 拿不到完整的上下文了
     return res
   },
   async (error: AxiosError) => {
-    console.log('err： ' + error) // for debug
-    // console.log('xzz2021: error', error)
+    console.log('err：-------------- ' + error) // for debug
     let msg = (error.response?.data as any)?.message
+
+    const original = await slientTokenRefresh(error?.status || 0, error?.config)
+    if (original) {
+      const res = await axiosInstance(original)
+      return { data: res } //  为什么要包裹?  因为后续还有拦截器在 进行逻辑判断
+    }
 
     switch (error?.status) {
       case 500:
@@ -92,14 +72,11 @@ axiosInstance.interceptors.response.use(
     }
     errMsg(msg)
 
-    if (error?.status == 401) {
-      // 先停止所有后续请求
-      // service.cancelAllRequest()
-      // 再尝试刷新token
-      await tryNewToken()
-    } else {
-      abortControllerMap.delete(error?.config?.url || '')
-    }
+    // if (error?.status == 401) {
+    //   // 先停止所有后续请求
+    //   // service.cancelAllRequest()
+    //   // 再尝试刷新token
+    // }
     return Promise.reject(error)
   }
 )
@@ -114,7 +91,6 @@ const service = {
       if (config.interceptors?.requestInterceptors) {
         config = config.interceptors.requestInterceptors(config as any)
       }
-
       axiosInstance
         .request(config)
         .then((res) => {
@@ -137,15 +113,6 @@ const service = {
       controller.abort()
     }
     abortControllerMap.clear()
-  },
-  async retryAllRequest() {
-    for (const [_, config] of retryMap) {
-      retryMap.delete(config?.url || '')
-      const userStore = useUserStoreWithOut()
-      const newToken = userStore.getToken ? 'bearer ' + userStore.getToken : ''
-      config.headers['Authorization'] = newToken
-      newToken && (await service.request(config))
-    }
   }
 }
 

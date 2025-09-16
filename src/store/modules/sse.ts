@@ -58,9 +58,7 @@ export const useSSEStore = defineStore('sse', () => {
     }
     const uid = userStore.userInfo?.id
     if (!uid) return
-    const sseUrl = uniqueSlash(
-      `${import.meta.env.VITE_API_BASE_PATH}/sse/${uid}?token=${encodeURIComponent(userStore.token)}`
-    )
+    const sseUrl = uniqueSlash(`${import.meta.env.VITE_API_BASE_PATH}/sse/${uid}`)
 
     // console.log('sseUrl=-====', sseUrl)
 
