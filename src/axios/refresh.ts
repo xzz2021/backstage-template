@@ -56,8 +56,14 @@ export const refreshFn = async (): Promise<string> => {
   return access_token as string
 }
 
+// singleton.ts   //  包裹 class 实现  单例模式
+export function singleton<T>(key: string, create: () => T): T {
+  const g = globalThis as any
+  return (g[key] ??= create())
+}
+
 //  开发阶段 有bug 热更新 可能会导致2次new  从而多次请求
-const refresher = new TokenRefresher(refreshFn as RefreshFn, 3000)
+const refresher = singleton('refresher', () => new TokenRefresher(refreshFn as RefreshFn, 3000))
 
 export const slientTokenRefresh = async (
   status: number,
