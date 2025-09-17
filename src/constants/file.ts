@@ -34,6 +34,10 @@ export const FileIcon: FileExtendNameIconMap = {
   html: 'file-html',
   css: 'file-css',
   js: 'file-js',
+  jpg: 'file-image-color',
+  png: 'file-image-color',
+  gif: 'file-image-color',
+  jpeg: 'file-image-color',
   other: 'file-other'
 }
 
@@ -52,3 +56,5 @@ export const VideoTypes = ['mp4', 'avi']
 export const DocTypes = ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'txt', 'md']
 
 export const AudioTypes = ['mp3', 'wav', 'wma', 'ogg', 'flac', 'aac', 'm4a', 'm3u8']
+
+export const ZipTypes = ['zip', 'rar', '7z', 'tar', 'gz', 'gzip']

@@ -1,6 +1,6 @@
 import { ElMessage } from 'element-plus'
 import * as XLSX from 'xlsx'
-import { AudioTypes, DocTypes, FileIcon, ImageTypes, VideoTypes } from '@/constants/file'
+import { AudioTypes, DocTypes, FileIcon, ImageTypes, VideoTypes, ZipTypes } from '@/constants/file'
 
 export const formatFileSize = (size: number) => {
   let formatSize = ''
@@ -33,7 +33,7 @@ export const isImage = (extension: string) => {
   return ImageTypes.includes(extension)
 }
 
-type FileType = 'image' | 'video' | 'doc' | 'other' | 'audio'
+type FileType = 'image' | 'video' | 'doc' | 'other' | 'audio' | 'zip'
 export const getFileType = (extension: string): FileType => {
   if (ImageTypes.includes(extension)) {
     return 'image'
@@ -43,8 +43,29 @@ export const getFileType = (extension: string): FileType => {
     return 'doc'
   } else if (AudioTypes.includes(extension)) {
     return 'audio'
+  } else if (ZipTypes.includes(extension)) {
+    return 'zip'
   } else {
     return 'other'
+  }
+}
+
+export const getFileIcon2 = (extension: string) => {
+  const type = getFileType(extension)
+  // console.log('xzz2021: type', type)
+  switch (type) {
+    case 'image':
+      return 'material-icon-theme:folder-aws-open'
+    case 'video':
+      return 'material-icon-theme:video'
+    case 'doc':
+      return 'material-icon-theme:document'
+    case 'audio':
+      return 'material-icon-theme:audio'
+    case 'zip':
+      return 'material-icon-theme:zip'
+    default:
+      return 'material-icon-theme:bun-light'
   }
 }
 
