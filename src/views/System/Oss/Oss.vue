@@ -25,6 +25,7 @@ import {
 import { Dialog } from '@/components/Dialog'
 import { createFolderApi, deleteObjectApi, downloadObjectApi, searchOssApi } from '@/api/oss'
 import UploadBtn from './components/UploadBtn.vue'
+import S3UploadBtn from './components/S3UploadBtn.vue'
 
 const { getOssList } = useOssStore()
 const { tableRegister, tableState, tableMethods } = useTable({
@@ -114,6 +115,7 @@ const downloadFile = async (rawName: string) => {
 }
 
 const popoverDom = (rawName: string) => {
+  const newName = rawName.replace(currentPrefix.value, '')
   return (
     <ElPopover
       ref="popover"
@@ -142,7 +144,7 @@ const popoverDom = (rawName: string) => {
             </ElButton>
           </>
         ),
-        reference: () => <div class="">{rawName.replace(currentPrefix.value, '')}</div>
+        reference: () => <div class="">{newName}</div>
       }}
     />
   )
@@ -282,7 +284,8 @@ const handleConfirm = () => {
       </div>
       <div class="flex items-center gap-10px">
         <UploadBtn @success="getList" :folderPath="currentPrefix" />
-        <BaseButton type="" @click="AddFolder">创建文件夹</BaseButton>
+        <S3UploadBtn @success="getList" :folderPath="currentPrefix" />
+        <BaseButton plain @click="AddFolder">创建文件夹</BaseButton>
       </div>
     </div>
 
@@ -299,15 +302,21 @@ const handleConfirm = () => {
       @register="tableRegister"
     />
 
-    <Dialog title="创建文件夹" v-model="dialogVisible" @confirm="handleConfirm">
+    <Dialog
+      title="创建文件夹"
+      v-model="dialogVisible"
+      @confirm="handleConfirm"
+      width="600px"
+      maxHeight="200px"
+    >
       <el-form :model="formData" :rules="rules" ref="formRef">
         <el-form-item label="文件夹名称" prop="folderName">
           <el-input v-model="formData.folderName" />
         </el-form-item>
       </el-form>
       <template #footer>
-        <BaseButton type="primary" @click="handleConfirm">确定</BaseButton>
         <BaseButton type="primary" @click="dialogVisible = false">取消</BaseButton>
+        <BaseButton type="primary" @click="handleConfirm">确定</BaseButton>
       </template>
     </Dialog>
   </ContentWrap>

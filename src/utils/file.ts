@@ -197,3 +197,100 @@ export const exportExcelData = (
   XLSX.utils.book_append_sheet(workbook, worksheet, fileName)
   XLSX.writeFile(workbook, `${fileName}.xlsx`)
 }
+
+// 前端分片上传工具类
+export class ChunkUploader {
+  private chunkSize = 2 * 1024 * 1024 // 2MB 每片
+  private file: File
+  private totalChunks: number
+  private uploadedChunks: Set<number> = new Set()
+  private uploadId: string = ''
+
+  constructor(file: File, chunkSize = 2 * 1024 * 1024) {
+    this.file = file
+    this.chunkSize = chunkSize
+    this.totalChunks = Math.ceil(file.size / chunkSize)
+  }
+
+  // 初始化分片上传
+  async initUpload(): Promise<string> {
+    const response = await fetch('/minio/init-multipart-upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fileName: this.file.name,
+        fileSize: this.file.size,
+        mimeType: this.file.type,
+        totalChunks: this.totalChunks
+      })
+    })
+
+    const result = await response.json()
+    this.uploadId = result.uploadId
+    return this.uploadId
+  }
+
+  // 上传单个分片
+  async uploadChunk(chunkIndex: number): Promise<boolean> {
+    const start = chunkIndex * this.chunkSize
+    const end = Math.min(start + this.chunkSize, this.file.size)
+    const chunk = this.file.slice(start, end)
+
+    const formData = new FormData()
+    formData.append('file', chunk)
+    formData.append('uploadId', this.uploadId)
+    formData.append('chunkIndex', chunkIndex.toString())
+    formData.append('fileName', this.file.name)
+
+    try {
+      const response = await fetch('/minio/upload-chunk', {
+        method: 'POST',
+        body: formData
+      })
+
+      if (response.ok) {
+        this.uploadedChunks.add(chunkIndex)
+        return true
+      }
+      return false
+    } catch (error) {
+      console.error(`分片 ${chunkIndex} 上传失败:`, error)
+      return false
+    }
+  }
+
+  // 完成分片上传
+  async completeUpload(): Promise<any> {
+    const response = await fetch('/minio/complete-multipart-upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        uploadId: this.uploadId,
+        fileName: this.file.name,
+        uploadedChunks: Array.from(this.uploadedChunks)
+      })
+    })
+
+    return response.json()
+  }
+
+  // 获取上传进度
+  getProgress(): number {
+    return (this.uploadedChunks.size / this.totalChunks) * 100
+  }
+
+  // 恢复上传（断点续传）
+  async resumeUpload(): Promise<void> {
+    const response = await fetch(`/minio/get-upload-progress?uploadId=${this.uploadId}`)
+    const progress = await response.json()
+
+    this.uploadedChunks = new Set(progress.uploadedChunks)
+
+    // 继续上传未完成的分片
+    for (let i = 0; i < this.totalChunks; i++) {
+      if (!this.uploadedChunks.has(i)) {
+        await this.uploadChunk(i)
+      }
+    }
+  }
+}
