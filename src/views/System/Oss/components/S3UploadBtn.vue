@@ -52,10 +52,10 @@ const uploadChange = async (uploadFile: UploadFile) => {
     :show-file-list="false"
     :on-change="uploadChange"
   >
-    <BaseButton type="primary">
+    <BaseButton type="success">
       <div class="flex items-center gap-4px">
-        <Icon icon="vi-tdesign:cloud-upload" />
-        <div>大文件分片上传</div>
+        <Icon icon="fluent:flash-16-regular" />
+        <div>分片上传</div>
       </div>
     </BaseButton>
   </el-upload>

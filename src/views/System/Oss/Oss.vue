@@ -11,6 +11,7 @@ import { OssListItem } from '@/api/oss/types'
 import { formatFileSize, getFileIcon2 } from '@/utils/file'
 import { formatToDateTime } from '@/utils/dateUtil'
 import { Icon } from '@/components/Icon'
+
 import {
   ElBreadcrumb,
   ElBreadcrumbItem,
@@ -23,9 +24,10 @@ import {
   ElMessageBox
 } from 'element-plus'
 import { Dialog } from '@/components/Dialog'
-import { createFolderApi, deleteObjectApi, downloadObjectApi, searchOssApi } from '@/api/oss'
+import { createFolderApi, deleteObjectApi, searchOssApi } from '@/api/oss'
 import UploadBtn from './components/UploadBtn.vue'
 import S3UploadBtn from './components/S3UploadBtn.vue'
+import { downloadFile } from './components/utils'
 
 const { getOssList } = useOssStore()
 const { tableRegister, tableState, tableMethods } = useTable({
@@ -81,41 +83,12 @@ const deleteFile = (rawName: string) => {
 const resetSearch = () => {
   isSearching.value = false
   searchParams.value = null
+  currentPrefix.value = ''
   getList()
 }
 
-const downloadFile = async (rawName: string) => {
-  try {
-    const blob = await downloadObjectApi({
-      objectName: rawName
-    })
-
-    // 创建下载链接
-    const url = window.URL.createObjectURL(blob.data)
-    const link = document.createElement('a')
-    link.href = url
-
-    // 从文件名中提取实际的文件名（去掉路径前缀）
-    const fileName = rawName.split('/').pop() || rawName
-    link.download = fileName
-
-    // 触发下载
-    document.body.appendChild(link)
-    link.click()
-
-    // 清理
-    document.body.removeChild(link)
-    window.URL.revokeObjectURL(url)
-
-    ElMessage.success('文件下载成功')
-  } catch (error) {
-    console.error('下载失败:', error)
-    ElMessage.error('文件下载失败')
-  }
-}
-
-const popoverDom = (rawName: string) => {
-  const newName = rawName.replace(currentPrefix.value, '')
+const popoverDom = (displayName: string, rawName: string) => {
+  const newName = displayName.replace(currentPrefix.value, '')
   return (
     <ElPopover
       ref="popover"
@@ -128,7 +101,7 @@ const popoverDom = (rawName: string) => {
               type="primary"
               plain
               onClick={() => {
-                downloadFile(rawName)
+                downloadFile(rawName, rawName.endsWith('/'))
               }}
             >
               下载
@@ -151,6 +124,7 @@ const popoverDom = (rawName: string) => {
 }
 
 const generateDom = (data: any) => {
+  const rawName = data?.name || data?.prefix
   const ll = data?.prefix?.split('/')
   const name = data?.name || ll?.[ll?.length - 2]
   const isFolder = data?.prefix
@@ -165,12 +139,13 @@ const generateDom = (data: any) => {
           }}
         >
           <Icon icon={icon}></Icon>
-          <div class="truncate">{name}</div>
+          {/* <div class="truncate">{name}</div> */}
+          {popoverDom(name, rawName)}
         </div>
       ) : (
         <div class="flex items-center gap-10px cursor-pointer">
           <Icon icon={icon}></Icon>
-          {popoverDom(name)}
+          {popoverDom(name, rawName)}
         </div>
       )}
     </>
@@ -255,6 +230,7 @@ const handleConfirm = () => {
     if (res.code === 200) {
       ElMessage.success('创建文件夹成功')
       dialogVisible.value = false
+      formData.value.folderName = ''
       getList()
     }
   })
@@ -278,7 +254,9 @@ const handleConfirm = () => {
             class="cursor-pointer"
             @click="setSearchParams({ prefix: currentPrefix.split(item).shift() + item + '/' })"
           >
-            <div class="hover:bg-gray-100 rounded-md px-5px py-4px">{{ item }}</div>
+            <div class="hover:bg-gray-100 rounded-md px-5px py-4px max-w-80px truncate">
+              {{ item }}
+            </div>
           </el-breadcrumb-item>
         </el-breadcrumb>
       </div>

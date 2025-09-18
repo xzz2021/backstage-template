@@ -1,12 +1,5 @@
 import request from '@/axios'
-import type {
-  UserLoginType,
-  SmsLoginType,
-  UserRegisterType,
-  SmsLoginRes,
-  UserType,
-  RefreshTokenRes
-} from './types'
+import type { UserLoginType, SmsLoginType, UserRegisterType, SmsLoginRes, UserType } from './types'
 
 export const loginApi = (data: UserLoginType): Promise<IResponse<SmsLoginRes>> => {
   return request.post({ url: 'auth/rt/login', data })
@@ -46,8 +39,4 @@ export const loginOutApi = (): Promise<IResponse> => {
 
 export const getCaptchaApi = (): Promise<IResponse<{ svg: string; id: string }>> => {
   return request.get({ url: 'captcha/common' })
-}
-
-export const refreshTokenApi = (): Promise<IResponse<RefreshTokenRes>> => {
-  return request.post({ url: 'auth/refreshToken' })
 }
