@@ -61,3 +61,10 @@ export const downloadFolderApi = (params: { folderPath: string }): Promise<Axios
 export const searchOssApi = (params: { searchTerm: string }): Promise<IResponse<any>> => {
   return request.get({ url: 'minio/search', params })
 }
+
+// 获取文件URL
+export const getFileUrlApi = (params: {
+  objectName: string
+}): Promise<IResponse<{ url: string; objectName: string; operation: string; expiry: number }>> => {
+  return request.get({ url: 'minio/presigned', params })
+}

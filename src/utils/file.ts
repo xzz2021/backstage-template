@@ -16,6 +16,18 @@ export const formatFileSize = (size: number) => {
   return formatSize
 }
 
+export function formatBytes(n: number) {
+  if (n < 1024) return `${n} B`
+  const k = 1024
+  const units = ['KB', 'MB', 'GB']
+  let i = -1
+  do {
+    n /= k
+    i++
+  } while (n >= k && i < units.length - 1)
+  return `${n.toFixed(2)} ${units[i]}`
+}
+
 // 计算文件的sha256
 export const getFileSha256 = async (file: File) => {
   const buffer = await file.arrayBuffer() // 将文件转换为 ArrayBuffer
@@ -55,17 +67,17 @@ export const getFileIcon2 = (extension: string) => {
   // console.log('xzz2021: type', type)
   switch (type) {
     case 'image':
-      return 'material-icon-theme:folder-aws-open'
+      return { icon: 'material-icon-theme:folder-aws-open', type: 'image' }
     case 'video':
-      return 'material-icon-theme:video'
+      return { icon: 'material-icon-theme:video', type: 'video' }
     case 'doc':
-      return 'material-icon-theme:document'
+      return { icon: 'material-icon-theme:document', type: 'doc' }
     case 'audio':
-      return 'material-icon-theme:audio'
+      return { icon: 'material-icon-theme:audio', type: 'audio' }
     case 'zip':
-      return 'material-icon-theme:zip'
+      return { icon: 'material-icon-theme:zip', type: 'zip' }
     default:
-      return 'material-icon-theme:bun-light'
+      return { icon: 'material-icon-theme:bun-light', type: 'other' }
   }
 }
 

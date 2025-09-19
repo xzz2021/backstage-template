@@ -1,33 +1,28 @@
 <script setup lang="tsx">
-import { ContentWrap } from '@/components/ContentWrap'
-import { Search } from '@/components/Search'
-import { useTable } from '@/hooks/web/useTable'
-import { ref, unref, reactive } from 'vue'
+import { createFolderApi, deleteObjectApi, searchOssApi } from '@/api/oss'
 import { BaseButton } from '@/components/Button'
+import { ContentWrap } from '@/components/ContentWrap'
 import { FormSchema } from '@/components/Form'
-import { Table, TableColumn } from '@/components/Table'
-import { useOssStore } from '@/store/modules/oss'
-import { OssListItem } from '@/api/oss/types'
-import { formatFileSize, getFileIcon2 } from '@/utils/file'
-import { formatToDateTime } from '@/utils/dateUtil'
 import { Icon } from '@/components/Icon'
-
+import { Search } from '@/components/Search'
+import { Table, TableColumn } from '@/components/Table'
+import { useTable } from '@/hooks/web/useTable'
+import { useOssStore } from '@/store/modules/oss'
+import { formatToDateTime } from '@/utils/dateUtil'
+import { formatFileSize, getFileIcon2 } from '@/utils/file'
+import { safeName } from '@/utils/safeName'
 import {
   ElBreadcrumb,
   ElBreadcrumbItem,
-  ElForm,
-  ElFormItem,
-  ElInput,
-  ElMessage,
-  ElPopover,
   ElButton,
-  ElMessageBox
+  ElMessage,
+  ElMessageBox,
+  ElPopover
 } from 'element-plus'
-import { Dialog } from '@/components/Dialog'
-import { createFolderApi, deleteObjectApi, searchOssApi } from '@/api/oss'
-import UploadBtn from './components/UploadBtn.vue'
+import { reactive, ref, unref } from 'vue'
 import S3UploadBtn from './components/S3UploadBtn.vue'
-import { downloadFile } from './components/utils'
+import UploadBtn from './components/UploadBtn.vue'
+import { downloadFile, previewFile } from './components/utils'
 
 const { getOssList } = useOssStore()
 const { tableRegister, tableState, tableMethods } = useTable({
@@ -60,11 +55,6 @@ const searchFile = async (params: { name: string }) => {
   dataList.value = list
   total.value = list.length
 }
-
-const dialogVisible = ref(false)
-
-const currentRow = ref<OssListItem | null>(null)
-const actionType = ref('')
 
 const deleteFile = (rawName: string) => {
   ElMessageBox.confirm('确定删除该文件吗？', '提示', {
@@ -128,7 +118,8 @@ const generateDom = (data: any) => {
   const ll = data?.prefix?.split('/')
   const name = data?.name || ll?.[ll?.length - 2]
   const isFolder = data?.prefix
-  const icon = isFolder ? 'flat-color-icons:folder' : getFileIcon2(name.split('.').pop())
+  const { type: fileType, icon: fileIcon } = getFileIcon2(name.split('.').pop() || '')
+  const icon = isFolder ? 'flat-color-icons:folder' : fileIcon
   return (
     <>
       {isFolder ? (
@@ -143,7 +134,12 @@ const generateDom = (data: any) => {
           {popoverDom(name, rawName)}
         </div>
       ) : (
-        <div class="flex items-center gap-10px cursor-pointer">
+        <div
+          class="flex items-center gap-10px cursor-pointer"
+          onClick={() => {
+            previewFile(rawName, fileType)
+          }}
+        >
           <Icon icon={icon}></Icon>
           {popoverDom(name, rawName)}
         </div>
@@ -194,53 +190,40 @@ const searchSchema = reactive<FormSchema[]>([
     label: '名称',
     component: 'Input'
   }
-  // {
-  //   field: 'status',
-  //   label: '状态',
-  //   component: 'Select',
-  //   componentProps: {
-  //     options: [
-  //       { label: '启用', value: true },
-  //       { label: '禁用', value: false }
-  //     ]
-  //   }
-  // }
 ])
 
-const AddFolder = () => {
-  currentRow.value = null
-  dialogVisible.value = true
-  actionType.value = 'createFolder'
-}
-
-const formData = ref({
-  folderName: ''
-})
-
-const rules = ref({
-  folderName: [{ required: true, message: '请输入文件夹名称', trigger: 'blur' }]
-})
-
-const handleConfirm = () => {
+const handleConfirm = (folderName: string) => {
   const newData = {
-    folderName: formData.value.folderName,
+    folderName: folderName,
     parentPath: currentPrefix.value.replace(/\/$/, '')
   }
   createFolderApi(newData).then((res) => {
     if (res.code === 200) {
       ElMessage.success('创建文件夹成功')
-      dialogVisible.value = false
-      formData.value.folderName = ''
       getList()
     }
   })
+}
+
+const open = () => {
+  ElMessageBox.prompt('请输入文件夹名称', '创建文件夹', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    inputPattern: /^[^\/]+$/,
+    inputErrorMessage: '请输入正确的文件夹名称'
+  })
+    .then(({ value }) => {
+      handleConfirm(safeName(value))
+    })
+    .catch(() => {
+      ElMessage.info('创建失败')
+    })
 }
 </script>
 
 <template>
   <ContentWrap>
     <Search :schema="searchSchema" @search="searchFile" @reset="resetSearch" />
-
     <div class="mb-10px flex items-center justify-between">
       <div class="flex items-center gap-10px">
         <div class="text-14px">当前目录: </div>
@@ -263,7 +246,7 @@ const handleConfirm = () => {
       <div class="flex items-center gap-10px">
         <UploadBtn @success="getList" :folderPath="currentPrefix" />
         <S3UploadBtn @success="getList" :folderPath="currentPrefix" />
-        <BaseButton plain @click="AddFolder">创建文件夹</BaseButton>
+        <BaseButton plain @click="open">创建文件夹</BaseButton>
       </div>
     </div>
 
@@ -279,23 +262,5 @@ const handleConfirm = () => {
       :border="false"
       @register="tableRegister"
     />
-
-    <Dialog
-      title="创建文件夹"
-      v-model="dialogVisible"
-      @confirm="handleConfirm"
-      width="600px"
-      maxHeight="200px"
-    >
-      <el-form :model="formData" :rules="rules" ref="formRef">
-        <el-form-item label="文件夹名称" prop="folderName">
-          <el-input v-model="formData.folderName" />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <BaseButton type="primary" @click="dialogVisible = false">取消</BaseButton>
-        <BaseButton type="primary" @click="handleConfirm">确定</BaseButton>
-      </template>
-    </Dialog>
   </ContentWrap>
 </template>
