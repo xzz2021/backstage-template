@@ -135,7 +135,7 @@ export class ChunkUploader {
   async initOrResume(): Promise<{ uploadId: string; key: string }> {
     await this.prepareKeyAndParts()
     if (!this.uploadId) {
-      const res = await fetch(`${this.opts.apiBase}/minio/s3/init`, {
+      const res = await fetch(`${this.opts.apiBase}minio/s3/init`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(this.opts.headers || {}) },
         body: JSON.stringify({
@@ -155,7 +155,7 @@ export class ChunkUploader {
 
   /** 从服务端拉取已上传分片，返回现有 partNumber→etag */
   async listServerParts(): Promise<Record<number, string>> {
-    const url = new URL(`${this.opts.apiBase}/minio/s3/list-parts`, location.origin)
+    const url = new URL(`${this.opts.apiBase}minio/s3/list-parts`, location.origin)
     url.search = new URLSearchParams({
       bucket: this.opts.bucket,
       key: this.key,
@@ -205,7 +205,7 @@ export class ChunkUploader {
       completeParts.push({ partNumber, etag })
     }
     // 请求合并
-    const completeRes = await fetch(`${this.opts.apiBase}/minio/s3/complete`, {
+    const completeRes = await fetch(`${this.opts.apiBase}minio/s3/complete`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...(this.opts.headers || {}) },
       body: JSON.stringify({
@@ -275,7 +275,7 @@ export class ChunkUploader {
     const bytes = end - start
 
     // 取预签名
-    const url = new URL(`${this.opts.apiBase}/minio/s3/presign-part`, location.origin)
+    const url = new URL(`${this.opts.apiBase}minio/s3/presign-part`, location.origin)
     url.search = new URLSearchParams({
       bucket: this.opts.bucket,
       key: this.key,

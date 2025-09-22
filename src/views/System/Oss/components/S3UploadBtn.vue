@@ -1,8 +1,8 @@
 <script setup lang="tsx">
-import { ElUpload, UploadFile, ElMessage } from 'element-plus'
 import { Icon } from '@/components/Icon'
 import { ChunkUploader } from '@/utils/chunk'
-
+import { ElMessage, ElUpload, UploadFile } from 'element-plus'
+const baseApi = import.meta.env.VITE_API_BASE_PATH
 const props = defineProps<{
   folderPath?: string
 }>()
@@ -20,7 +20,7 @@ const uploadChange = async (uploadFile: UploadFile) => {
   const chunkUploader = new ChunkUploader(uploadFile.raw, {
     bucket: 'public', // 选择 存储桶
     key: fileInfo.folderPath, // 慎重传递  目录
-    apiBase: '/api',
+    apiBase: baseApi,
     partSize: 1024 * 1024 * 6,
     onProgress: ({ uploadedBytes, totalBytes, rateBps, uploadedParts, totalParts }) => {
       const textContent =

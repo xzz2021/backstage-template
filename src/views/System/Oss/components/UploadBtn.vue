@@ -1,7 +1,7 @@
 <script setup lang="tsx">
-import { ElUpload, UploadFile, ElMessage } from 'element-plus'
-import { Icon } from '@/components/Icon'
 import { uploadFileOssApi } from '@/api/oss'
+import { Icon } from '@/components/Icon'
+import { ElLoading, ElMessage, ElUpload, UploadFile } from 'element-plus'
 
 const props = defineProps<{
   folderPath?: string
@@ -17,7 +17,16 @@ const uploadChange = async (uploadFile: UploadFile) => {
   }
 
   // 1. 上传文件
-  await uploadFileOssApi(fileInfo)
+  // 开启全局loading
+  ElLoading.service({
+    target: document.body,
+    text: '上传中...',
+    background: 'rgba(0, 0, 0, 0.7)'
+  })
+  await uploadFileOssApi(fileInfo).finally(() => {
+    ElLoading.service().close()
+  })
+
   ElMessage.success('上传成功')
   emit('success')
 }
