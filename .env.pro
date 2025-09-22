@@ -2,7 +2,7 @@
 VITE_NODE_ENV=production
 
 # 接口前缀
-VITE_API_BASE_PATH=api/
+# VITE_API_BASE_PATH=api/
 
 # 打包路径
 VITE_BASE_PATH=/
@@ -20,15 +20,13 @@ VITE_SOURCEMAP=false
 VITE_OUT_DIR=dist-pro
 
 # 标题
-VITE_APP_TITLE=ElementAdmin
+VITE_APP_TITLE=xzz2021
 
 # 是否包分析
-VITE_USE_BUNDLE_ANALYZER=true
+VITE_USE_BUNDLE_ANALYZER=false
 
 # 是否全量引入element-plus样式
 VITE_USE_ALL_ELEMENT_PLUS_STYLE=false
-
-
 
 # 是否切割css
 VITE_USE_CSS_SPLIT=true
@@ -41,6 +39,6 @@ VITE_HIDE_GLOBAL_SETTING=false
 
 
 # 接口前缀
-VITE_API_BASE_PATH=api/ "https://xzz.xzz.com/"
+VITE_API_BASE_PATH="https://api.xzz2021.top/"
 
-VITE_WECHAT_REDIRECT_URL='https://xzz.xzz.com/#/login'
+# VITE_WECHAT_REDIRECT_URL='https://xzz.xzz.com/#/login'

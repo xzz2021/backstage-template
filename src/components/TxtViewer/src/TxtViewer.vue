@@ -150,7 +150,7 @@ onBeforeUnmount(() => abort())
     ui-sans-serif,
     -apple-system,
     BlinkMacSystemFont,
-    "Segoe UI",
+    'Segoe UI',
     Roboto,
     Helvetica,
     Arial;

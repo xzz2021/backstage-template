@@ -27,5 +27,5 @@ export const delDepartmentApi = (id: number) => {
 }
 
 export const generateDepartmentSeedApi = (data: any) => {
-  return request.post({ url: 'department/generateDepartmentSeed', data })
+  return request.post({ url: 'department/generateDepartmentSeed', data: { data } })
 }

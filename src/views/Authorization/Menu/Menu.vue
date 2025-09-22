@@ -1,25 +1,24 @@
 <script setup lang="tsx">
-import { reactive, ref, unref } from 'vue'
-import { useTable } from '@/hooks/web/useTable'
-import { useI18n } from '@/hooks/web/useI18n'
-import { Table, TableColumn } from '@/components/Table'
-import { ElTag } from 'element-plus'
-import { Icon } from '@/components/Icon'
-import { ContentWrap } from '@/components/ContentWrap'
-import Write from './components/Write.vue'
-import Detail from './components/Detail.vue'
-import { Dialog } from '@/components/Dialog'
+import { addMenuApi, delMenuApi, editMenuApi, generateMenuSeedApi, sortMenuApi } from '@/api/menu'
 import { BaseButton } from '@/components/Button'
-import { useRoleMenu } from '@/hooks/fn/useRoleMenu'
-import { useMenuStore } from '@/store/modules/menu'
-import { editMenuApi, addMenuApi, delMenuApi, sortMenuApi, generateMenuSeedApi } from '@/api/menu'
+import { ContentWrap } from '@/components/ContentWrap'
+import { Dialog } from '@/components/Dialog'
+import { Icon } from '@/components/Icon'
 import { hasPermi } from '@/components/Permission'
-import SortMenu from './components/SortMenu.vue'
 import HasPermission from '@/components/Permission/src/Permission.vue'
-import { ElMessage } from 'element-plus'
 import Seed from '@/components/Seed.vue'
+import { Table, TableColumn } from '@/components/Table'
+import { useRoleMenu } from '@/hooks/fn/useRoleMenu'
+import { useI18n } from '@/hooks/web/useI18n'
+import { useTable } from '@/hooks/web/useTable'
+import { useMenuStore } from '@/store/modules/menu'
+import { findNode, treeMapEach } from '@/utils/tree'
+import { ElMessage, ElTag } from 'element-plus'
 import { storeToRefs } from 'pinia'
-import { findNode } from '@/utils/tree'
+import { reactive, ref, unref } from 'vue'
+import Detail from './components/Detail.vue'
+import SortMenu from './components/SortMenu.vue'
+import Write from './components/Write.vue'
 
 const { t } = useI18n()
 
@@ -252,6 +251,83 @@ const updateListAndCurrentMenu = async () => {
   const findNodeData = findNode(dataList.value, (item) => item.id === id)
   setCurrentMenu(findNodeData || {})
 }
+
+/*
+   name: 'Dashboard',
+    path: 'dashboard',
+    redirect: '/dashboard/workplace',
+    type: 0,
+    component: '#',
+    sort: 0,
+    status: true,
+
+
+    //  meta
+
+    title: 'router.analysis',
+          icon: null,
+          affix: false,
+          activeMenu: false,
+          alwaysShow: false,
+          breadcrumb: true,
+          canTo: false,
+          hidden: false,
+          noCache: false,
+          noTagsView: false,
+*/
+const generateMenuSeedData = (data: any[]) => {
+  // 后端也有做dto排除字段, 这里可以省略
+  return data.map((item) => {
+    return treeMapEach(item, {
+      conversion: (item) => {
+        const { meta, name, path, redirect, type, component, sort, status, permissionList } = item
+        const newPermissionList = permissionList.map((item: any) => {
+          return {
+            name: item.name,
+            code: item.code,
+            value: item.value,
+            resource: item.resource
+          }
+        })
+        const {
+          title,
+          icon,
+          hidden,
+          affix,
+          activeMenu,
+          alwaysShow,
+          breadcrumb,
+          canTo,
+          noCache,
+          noTagsView
+        } = meta
+
+        return {
+          name,
+          path,
+          redirect,
+          type,
+          component,
+          sort,
+          status,
+          permissionList: newPermissionList,
+          meta: {
+            title,
+            icon,
+            hidden,
+            affix,
+            activeMenu,
+            alwaysShow,
+            breadcrumb,
+            canTo,
+            noCache,
+            noTagsView
+          }
+        }
+      }
+    })
+  })
+}
 </script>
 
 <template>
@@ -263,7 +339,7 @@ const updateListAndCurrentMenu = async () => {
         <BaseButton type="success" @click="getRole">更新菜单</BaseButton>
         <Seed
           @getList="getList"
-          :keyData="{ treeList: dataList, filename: '菜单' }"
+          :keyData="{ treeList: generateMenuSeedData(dataList), filename: '菜单' }"
           @generateSeed="generateMenuSeedApi"
         />
       </HasPermission>

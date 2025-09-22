@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ImageCropping } from '@/components/ImageCropping'
-import { ref, unref } from 'vue'
-import { ElMessage } from 'element-plus'
 import { uploadAvatarApi } from '@/api/user'
+import { ImageCropping } from '@/components/ImageCropping'
+import { ElMessage } from 'element-plus'
+import { ref, unref } from 'vue'
 
 const props = defineProps({
   url: {
@@ -48,7 +48,7 @@ const getAvatarUrl = async () => {
 
     // 上传成功 更新用户头像
     ElMessage.success('头像更换成功')
-    return res?.data?.filePath
+    return res?.data?.url
   } catch (error) {
     console.log(error)
   }

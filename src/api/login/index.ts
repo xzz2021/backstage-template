@@ -1,8 +1,8 @@
 import request from '@/axios'
-import type { UserLoginType, SmsLoginType, UserRegisterType, SmsLoginRes, UserType } from './types'
+import type { SmsLoginRes, SmsLoginType, UserLoginType, UserRegisterType, UserType } from './types'
 
 export const loginApi = (data: UserLoginType): Promise<IResponse<SmsLoginRes>> => {
-  return request.post({ url: 'auth/rt/login', data })
+  return request.post({ url: 'auth/rt/login', data, withCredentials: true })
 }
 
 export const smsLoginApi = (data: SmsLoginType): Promise<IResponse<SmsLoginRes>> => {
@@ -10,7 +10,7 @@ export const smsLoginApi = (data: SmsLoginType): Promise<IResponse<SmsLoginRes>>
 }
 
 export const registerApi = (data: UserRegisterType): Promise<IResponse<UserType>> => {
-  return request.post({ url: 'api/auth/register', data })
+  return request.post({ url: 'auth/register', data })
 }
 
 export const getRoleMenuApi = (): Promise<IResponse<{ list: AppCustomRouteRecordRaw[] }>> => {

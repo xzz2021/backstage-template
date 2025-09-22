@@ -1,6 +1,6 @@
 // refresh-api.ts
-import axios, { AxiosRequestConfig } from 'axios'
 import { useUserStoreWithOut } from '@/store/modules/user'
+import axios, { AxiosRequestConfig } from 'axios'
 export const PATH_URL = import.meta.env.VITE_API_BASE_PATH
 
 export const refreshApi = axios.create({
@@ -81,7 +81,7 @@ export const slientTokenRefresh = async (
   //   return original
   // }
 
-  const isATExpired = status === 401 || status === 419
+  const isATExpired = status === 401 || status === 406 //  未授权 或 不接受
   if (isATExpired && original && !original._retry) {
     original._retry = true // 防死循环
 

@@ -1,22 +1,22 @@
 <script setup lang="tsx">
+import { BaseButton } from '@/components/Button'
 import { ContentWrap } from '@/components/ContentWrap'
-import { Search } from '@/components/Search'
 import { Dialog } from '@/components/Dialog'
+import { Search } from '@/components/Search'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useTable } from '@/hooks/web/useTable'
-import { ref, unref, reactive } from 'vue'
-import Write from './components/Write.vue'
+import { reactive, ref, unref } from 'vue'
 import Detail from './components/Detail.vue'
-import { BaseButton } from '@/components/Button'
+import Write from './components/Write.vue'
 
-import { FormSchema } from '@/components/Form'
-import { ElMessage, ElTag } from 'element-plus'
-import { Table, TableColumn } from '@/components/Table'
-import { editDepartmentApi, addDepartmentApi, generateDepartmentSeedApi } from '@/api/department'
+import { addDepartmentApi, editDepartmentApi, generateDepartmentSeedApi } from '@/api/department'
 import type { DepartmentItem } from '@/api/department/types'
+import { FormSchema } from '@/components/Form'
 import Seed from '@/components/Seed.vue'
+import { Table, TableColumn } from '@/components/Table'
 import { useDepartmentStore } from '@/store/modules/department'
 import { treeMapEach } from '@/utils/tree'
+import { ElMessage, ElTag } from 'element-plus'
 
 const { getDepartmentList, delDepartment } = useDepartmentStore()
 const { tableRegister, tableState, tableMethods } = useTable({
@@ -56,9 +56,10 @@ const delLoading = ref(false)
 
 const delOne = async (id: number) => {
   delLoading.value = true
-  await delDepartment(id)
+  await delDepartment(id).finally(() => {
+    loading.value = false
+  })
   ElMessage.success('删除成功')
-  delLoading.value = false
   getList()
 }
 // const delData = async (row: DepartmentItem | null) => {
@@ -218,7 +219,10 @@ const generateDepartmentSeedData = (data: DepartmentItem[]) => {
     return treeMapEach(item, {
       conversion: (item) => {
         const { name, status, remark, children } = item
-        return { name, status, remark, children }
+        if (children && children.length > 0) {
+          return { name, status, remark, children: children.length > 0 ? children : undefined }
+        }
+        return { name, status, remark }
       }
     })
   })

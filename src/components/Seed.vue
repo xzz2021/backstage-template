@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { PropType, ref } from 'vue'
 import { BaseButton } from '@/components/Button'
 import { Dialog } from '@/components/Dialog'
-import { ElInput, ElMessage } from 'element-plus'
 import { exportSeedData } from '@/utils/file'
+import { ElInput, ElMessage } from 'element-plus'
+import { PropType, ref } from 'vue'
 const seedData = ref('')
 const emit = defineEmits(['getList', 'generateSeed'])
 defineProps({
@@ -25,6 +25,7 @@ const generateSeed = async () => {
     return
   }
   await emit('generateSeed', JSON.parse(seedData.value))
+  await new Promise((resolve) => setTimeout(resolve, 2000))
   // ElMessage.success('生成成功')
   // 更新列表
   seedDialog.value = false

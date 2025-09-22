@@ -1,9 +1,9 @@
-import axios, { AxiosError } from 'axios'
-import { defaultRequestInterceptors, defaultResponseInterceptors } from './config'
-import { AxiosInstance, InternalAxiosRequestConfig, RequestConfig, AxiosResponse } from './types'
-import { ElMessage } from 'element-plus'
 import { REQUEST_TIMEOUT } from '@/constants'
+import axios, { AxiosError } from 'axios'
+import { ElMessage } from 'element-plus'
+import { defaultRequestInterceptors, defaultResponseInterceptors } from './config'
 import { slientTokenRefresh } from './refresh'
+import { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig, RequestConfig } from './types'
 
 const errMsg = (msg: string) => {
   ElMessage({
@@ -41,7 +41,7 @@ axiosInstance.interceptors.response.use(
     return res
   },
   async (error: AxiosError) => {
-    console.log('err：-------------- ' + error) // for debug
+    console.log('err-------------------------- ', error) // for debug
     let msg = (error.response?.data as any)?.message
 
     const original = await slientTokenRefresh(error?.status || 0, error?.config)
@@ -70,6 +70,11 @@ axiosInstance.interceptors.response.use(
         msg = msg || '网络异常,或后端服务进程出错!'
         break
     }
+
+    // CORS 是 浏览器层的同源策略。只要目标站没按规则回 CORS 头，浏览器就把响应“吃掉”，不给你的 JS 代码（包括 Axios）看，所以你获取不到 status、headers、data。
+    const isCorsBlocked = error.code === 'ERR_NETWORK' && !error.response
+    // 在某些环境下可能是 "Network Error" / "TypeError: Failed to fetch"
+    isCorsBlocked && (msg = '可能是 CORS 被浏览器拦截了')
     errMsg(msg)
 
     // if (error?.status == 401) {

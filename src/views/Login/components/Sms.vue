@@ -1,14 +1,14 @@
 <script setup lang="tsx">
-import { reactive, ref, onMounted, unref } from 'vue'
-import { Form, FormSchema } from '@/components/Form'
-import { useI18n } from '@/hooks/web/useI18n'
-import { ElInput, ElMessage } from 'element-plus'
-import { useForm } from '@/hooks/web/useForm'
 import { getSmsCode, smsLoginApi } from '@/api/login'
-import { useValidator } from '@/hooks/web/useValidator'
-import { Icon } from '@/components/Icon'
-import { useUserStore } from '@/store/modules/user'
 import { BaseButton } from '@/components/Button'
+import { Form, FormSchema } from '@/components/Form'
+import { Icon } from '@/components/Icon'
+import { useForm } from '@/hooks/web/useForm'
+import { useI18n } from '@/hooks/web/useI18n'
+import { useValidator } from '@/hooks/web/useValidator'
+import { useUserStore } from '@/store/modules/user'
+import { ElInput, ElMessage } from 'element-plus'
+import { onMounted, reactive, ref, unref } from 'vue'
 import { useLogin } from './hooks'
 const { required, phone } = useValidator()
 
@@ -228,14 +228,13 @@ const signIn = async () => {
     if (isValid) {
       loading.value = true
       const formData = await getFormData<{ phone: string; code: string }>()
-      try {
-        const res = await smsLoginApi(formData)
-        const { access_token = '', userinfo = {} } = res.data
-        if (access_token) {
-          successLogin(userinfo, access_token as string)
-        }
-      } finally {
+
+      const res = await smsLoginApi(formData).finally(() => {
         loading.value = false
+      })
+      const { access_token = '', userinfo = {} } = res.data
+      if (access_token) {
+        successLogin(userinfo, access_token as string)
       }
     }
   })

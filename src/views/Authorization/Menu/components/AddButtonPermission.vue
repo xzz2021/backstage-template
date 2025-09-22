@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { FormSchema, Form } from '@/components/Form'
-import { ElDrawer, ElMessage } from 'element-plus'
-import { reactive, watch } from 'vue'
+import { addPermission, updatePermission } from '@/api/menu'
+import { Form, FormSchema } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
 import { useValidator } from '@/hooks/web/useValidator'
 import { useMenuStore } from '@/store/modules/menu'
-import { addPermission, updatePermission } from '@/api/menu'
+import { ElDrawer, ElMessage } from 'element-plus'
+import { reactive, watch } from 'vue'
 
 const menuStore = useMenuStore()
 const modelValue = defineModel<boolean>()
@@ -57,13 +57,16 @@ const confirm = async () => {
   if (valid) {
     const formData = await getFormData()
     const isEdit = !!formData.id
-    isEdit ? await updatePermission(formData) : await addPermission(formData)
+    isEdit
+      ? await updatePermission(formData).finally(() => {
+          modelValue.value = false
+        })
+      : await addPermission(formData).finally(() => {
+          modelValue.value = false
+        })
 
     ElMessage.success(isEdit ? '更新权限成功' : '添加权限成功')
     emit('refresh')
-    // 清空表单
-    // elFormExpose?.resetFields()
-    modelValue.value = false
   }
 }
 

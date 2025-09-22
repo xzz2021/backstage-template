@@ -6,7 +6,7 @@ export const getMenuListApi = async (): Promise<
     total: number
   }>
 > => {
-  return await request.get({ url: 'menu/getMenuList' })
+  return request.get({ url: 'menu/getMenuList' })
 }
 
 export const addMenuApi = (data) => {

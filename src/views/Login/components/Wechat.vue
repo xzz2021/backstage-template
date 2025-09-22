@@ -1,9 +1,9 @@
 <script setup lang="tsx">
-import { onMounted, onUnmounted, ref } from 'vue'
+import { wechatLogin } from '@/api/login'
 import { useAppStore } from '@/store/modules/app'
 import { ElLink, ElMessage } from 'element-plus'
+import { onMounted, onUnmounted, ref } from 'vue'
 import { onBeforeRouteUpdate } from 'vue-router'
-import { wechatLogin } from '@/api/login'
 import BindForm from './BindForm.vue'
 import { useLogin } from './hooks'
 const WECHAT_REDIRECT_URL = import.meta.env.VITE_WECHAT_REDIRECT_URL
@@ -37,8 +37,6 @@ onMounted(() => {
       style: isDark ? 'white' : 'black' // 提供"black"、"white"可选。二维码的样式
       // href: 'data:text/css;base64,LmltcG93ZXJCb3ggLnFyY29kZSB7bWFyZ2luLXRvcDowO30KLmltcG93ZXJCb3ggLnRpdGxlIHtkaXNwbGF5OiBub25lO30=' // 外部css文件url，需要https
     })
-    console.log('xzz2021: wxElement.onload -> obj', obj)
-    // obj.show()
   }
   onUnmounted(() => {
     toBindPage.value = false
@@ -51,11 +49,8 @@ const wechatInfo = ref<any>(null)
 const toBindPage = ref(false)
 //  监听路由跳转  并拦截停留在当前页
 onBeforeRouteUpdate(async (to) => {
-  // console.log('xzz2021: onBeforeRouteUpdate -> to', to)
   if (to.query?.code) {
     const { code, state } = to.query
-    // console.log('✨ 🍰 ✨ xzz2021: code', code)
-    // return
     if (state === weixinState.value) {
       // 向后端发起登录请求
       try {

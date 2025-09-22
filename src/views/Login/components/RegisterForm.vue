@@ -1,13 +1,12 @@
 <script setup lang="tsx">
-import { Form, FormSchema } from '@/components/Form'
-import { reactive, ref, unref } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useForm } from '@/hooks/web/useForm'
-import { ElInput, FormRules } from 'element-plus'
-import { useValidator } from '@/hooks/web/useValidator'
-import { BaseButton } from '@/components/Button'
 import { getSmsCode, registerApi } from '@/api/login'
-import { ElMessage } from 'element-plus'
+import { BaseButton } from '@/components/Button'
+import { Form, FormSchema } from '@/components/Form'
+import { useForm } from '@/hooks/web/useForm'
+import { useI18n } from '@/hooks/web/useI18n'
+import { useValidator } from '@/hooks/web/useValidator'
+import { ElInput, ElMessage, FormRules } from 'element-plus'
+import { reactive, ref, unref } from 'vue'
 
 const emit = defineEmits(['to-login'])
 
@@ -236,9 +235,10 @@ const loginRegister = async () => {
       const formData = await getFormData()
       loading.value = true
       const { password, phone, username, code } = formData
-      await registerApi({ password, phone, username, code })
+      await registerApi({ password, phone, username, code }).finally(() => {
+        loading.value = false
+      })
       ElMessage.success('注册成功, 欢迎登陆!')
-      loading.value = false
       toLogin()
     }
   })

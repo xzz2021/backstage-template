@@ -1,6 +1,6 @@
-import service from './service'
 import { CONTENT_TYPE } from '@/constants'
 import { useUserStoreWithOut } from '@/store/modules/user'
+import service from './service'
 import { throttleWrap } from './throttle'
 
 const request = (option: AxiosConfig) => {
@@ -20,9 +20,8 @@ const request = (option: AxiosConfig) => {
         : '',
       ...headers
     },
-    credentials: withCredentials ? 'include' : 'omit'
+    withCredentials
   }
-
   // return service.request(config) //  返回原始请求   用于测试 后端限流
   return throttleWrap(service.request)(config) //  前端节流请求
 }

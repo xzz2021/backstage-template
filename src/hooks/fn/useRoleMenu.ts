@@ -1,10 +1,10 @@
 import { getRoleMenuApi } from '@/api/login'
-import { formatToTree } from '@/utils/tree'
-import { useUserStore } from '@/store/modules/user'
 import { usePermissionStore } from '@/store/modules/permission'
-import { useRouter } from 'vue-router'
-import type { RouteLocationNormalizedLoaded, RouteRecordRaw } from 'vue-router'
+import { useUserStore } from '@/store/modules/user'
+import { formatToTree } from '@/utils/tree'
 import { ref, watch } from 'vue'
+import type { RouteLocationNormalizedLoaded, RouteRecordRaw } from 'vue-router'
+import { useRouter } from 'vue-router'
 
 const userStore = useUserStore()
 const permissionStore = usePermissionStore()
@@ -17,7 +17,7 @@ export const useRoleMenu = () => {
   const getRole = async () => {
     const res = await getRoleMenuApi()
     const { list } = res?.data || {}
-    if (list) {
+    if (list && list.length > 0) {
       const routers = list ? formatToTree(list) : []
       userStore.setRoleRouters(routers)
       await permissionStore.generateRoutes('server', routers).catch(() => {})
@@ -29,6 +29,8 @@ export const useRoleMenu = () => {
       // 2. 所以开发阶段, 要么设定好常量路由第0项的redirect, 要么直接跳转已有路由的第0项 避免出错
       // 3. 最佳方案, 必须存在一个所有用户都拥有的路由欢迎页, 从而避免跳转404
       push({ path: redirect.value || permissionStore.routers[0].path })
+    } else {
+      throw new Error('角色路由为空,请检查重试!')
     }
   }
 
