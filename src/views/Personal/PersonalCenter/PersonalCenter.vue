@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import { ContentWrap } from '@/components/ContentWrap'
-import { ref, unref } from 'vue'
-import { ElDivider, ElImage, ElTag, ElTabPane, ElTabs, ElButton, ElMessage } from 'element-plus'
+import { getPersonByIdApi } from '@/api/user'
 import defaultAvatar from '@/assets/imgs/avatar.jpg'
-import UploadAvatar from './components/UploadAvatar.vue'
+import { ContentWrap } from '@/components/ContentWrap'
 import { Dialog } from '@/components/Dialog'
+import { useI18n } from '@/hooks/web/useI18n'
+import { useUserStore } from '@/store/modules/user'
+import { ElButton, ElDivider, ElImage, ElMessage, ElTabPane, ElTabs, ElTag } from 'element-plus'
+import { storeToRefs } from 'pinia'
+import { ref, unref } from 'vue'
 import EditInfo from './components/EditInfo.vue'
 import EditPassword from './components/EditPassword.vue'
-import { getPersonByIdApi } from '@/api/user'
-import { useUserStore } from '@/store/modules/user'
-import { storeToRefs } from 'pinia'
+import UploadAvatar from './components/UploadAvatar.vue'
 
+const { t } = useI18n()
 const userStore = useUserStore()
 const { userInfo } = storeToRefs(userStore)
 const activeName = ref('first')
@@ -51,7 +53,7 @@ const saveAvatar = async () => {
 
 <template>
   <div class="flex w-100% h-100%">
-    <ContentWrap title="个人信息" class="w-400px">
+    <ContentWrap :title="t('userDemo.personalInfo')" class="w-400px">
       <div class="flex justify-center items-center">
         <div
           class="avatar w-[150px] h-[150px] relative cursor-pointer"
@@ -66,22 +68,22 @@ const saveAvatar = async () => {
       </div>
       <ElDivider />
       <div class="flex justify-between items-center">
-        <div>昵称：</div>
+        <div>{{ t('login.username') }}:</div>
         <div>{{ userInfo?.username }}</div>
       </div>
       <ElDivider />
       <div class="flex justify-between items-center">
-        <div>手机号码：</div>
+        <div>{{ t('login.phone') }}:</div>
         <div>{{ userInfo?.phone ?? '-' }}</div>
       </div>
       <ElDivider />
       <div class="flex justify-between items-center">
-        <div>用户邮箱：</div>
+        <div>{{ t('userDemo.email') }}:</div>
         <div>{{ userInfo?.email ?? '-' }}</div>
       </div>
       <ElDivider />
       <div class="flex justify-between items-center">
-        <div>所属角色：</div>
+        <div>{{ t('role.role') }}:</div>
         <div>
           <template v-if="userInfo?.roles?.length">
             <ElTag v-for="item in userInfo?.roles || []" :key="item.id" class="ml-2 mb-w"
@@ -93,7 +95,7 @@ const saveAvatar = async () => {
       </div>
       <ElDivider />
       <div class="flex justify-between items-center">
-        <div>所属部门：</div>
+        <div>{{ t('userDemo.department') }}:</div>
         <div
           ><ElTag>
             {{ userInfo?.departments?.map((item) => item.name).join(',') ?? '-' }}
@@ -102,15 +104,15 @@ const saveAvatar = async () => {
       </div>
       <ElDivider />
       <div class="flex items-center justify-center">
-        <div class="text-12px">注册于：{{ userInfo?.createdAt || '-' }}</div>
+        <div class="text-12px">{{ t('tableDemo.createdAt') }}:{{ userInfo?.createdAt || '-' }}</div>
       </div>
     </ContentWrap>
-    <ContentWrap title="基本资料" class="flex-[3] ml-20px">
+    <ContentWrap :title="t('userDemo.basicInfo')" class="flex-[3] ml-20px">
       <ElTabs v-model="activeName">
-        <ElTabPane label="基本信息" name="first">
+        <ElTabPane :label="t('userDemo.personalInfo')" name="first">
           <EditInfo :user-info="userInfo" @refresh="fetchDetailUserApi" />
         </ElTabPane>
-        <ElTabPane label="修改密码" name="second">
+        <ElTabPane :label="t('userDemo.password')" name="second">
           <EditPassword :userid="userInfo?.id || 0" />
         </ElTabPane>
       </ElTabs>

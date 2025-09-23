@@ -1,12 +1,12 @@
 <script setup lang="ts">
+import { DepartmentItem } from '@/api/department/types'
 import { Form, FormSchema } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
-import { PropType, reactive, watch } from 'vue'
+import { useI18n } from '@/hooks/web/useI18n'
 import { useValidator } from '@/hooks/web/useValidator'
-import { DepartmentItem } from '@/api/department/types'
 import { useDepartmentStore } from '@/store/modules/department'
 import { storeToRefs } from 'pinia'
-import { useI18n } from 'vue-i18n'
+import { PropType, reactive, watch } from 'vue'
 
 const { required } = useValidator()
 

@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { ElDropdown, ElDropdownMenu, ElDropdownItem } from 'element-plus'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useDesign } from '@/hooks/web/useDesign'
-import LockDialog from './components/LockDialog.vue'
-import { ref, computed, onMounted } from 'vue'
-import LockPage from './components/LockPage.vue'
-import { useLockStore } from '@/store/modules/lock'
-import { useUserStore } from '@/store/modules/user'
-import { useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
 import defaultAvatar from '@/assets/imgs/avatar.jpg'
+import { useDesign } from '@/hooks/web/useDesign'
+import { useI18n } from '@/hooks/web/useI18n'
+import { useLockStore } from '@/store/modules/lock'
 import { useSSEStore } from '@/store/modules/sse'
+import { useUserStore } from '@/store/modules/user'
+import { ElDropdown, ElDropdownItem, ElDropdownMenu } from 'element-plus'
+import { storeToRefs } from 'pinia'
+import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import LockDialog from './components/LockDialog.vue'
+import LockPage from './components/LockPage.vue'
 
 const sseStore = useSSEStore()
 
@@ -64,7 +64,7 @@ onMounted(() => {
     </div>
     <template #dropdown>
       <ElDropdownMenu>
-        <ElDropdownItem @click="toPage('/personal/personal-center')">
+        <ElDropdownItem @click="toPage('/personal/information')">
           <div>
             {{ t('router.personalCenter') }}
           </div>

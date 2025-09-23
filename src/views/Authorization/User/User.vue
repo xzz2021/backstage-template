@@ -1,25 +1,23 @@
 <script setup lang="tsx">
-import { ContentWrap } from '@/components/ContentWrap'
-import { useI18n } from '@/hooks/web/useI18n'
-import { Table } from '@/components/Table'
-import { computed, onMounted, ref, unref, watch } from 'vue'
-import { ElTree, ElInput, ElDivider, ElLink } from 'element-plus'
-import { useTable } from '@/hooks/web/useTable'
-import { Search } from '@/components/Search'
-import Write from './components/Write.vue'
-import Detail from './components/Detail.vue'
-import { Dialog } from '@/components/Dialog'
-import { BaseButton } from '@/components/Button'
-import { addUserApi, getUserByDepartmentIdApi, updateUserApi } from '@/api/user'
-import type { FormSchema } from '@/components/Form'
-import { ElMessage } from 'element-plus'
 import { deleteUserByIdsApi } from '@/api/department'
-import { TableColumn } from '@/components/Table'
-import { storeToRefs } from 'pinia'
-import { useDepartmentStore } from '@/store/modules/department'
 import { DepartmentItem, DepartmentUserItem } from '@/api/department/types'
+import { addUserApi, getUserByDepartmentIdApi, updateUserApi } from '@/api/user'
+import { BaseButton } from '@/components/Button'
+import { ContentWrap } from '@/components/ContentWrap'
+import { Dialog } from '@/components/Dialog'
+import type { FormSchema } from '@/components/Form'
+import { Search } from '@/components/Search'
+import { Table, TableColumn } from '@/components/Table'
+import { useI18n } from '@/hooks/web/useI18n'
+import { useTable } from '@/hooks/web/useTable'
+import { useDepartmentStore } from '@/store/modules/department'
 import { useRoleStore } from '@/store/modules/role'
 import { eachTree } from '@/utils/tree'
+import { ElDivider, ElInput, ElLink, ElMessage, ElTree } from 'element-plus'
+import { storeToRefs } from 'pinia'
+import { computed, onMounted, ref, unref, watch } from 'vue'
+import Detail from './components/Detail.vue'
+import Write from './components/Write.vue'
 const { t } = useI18n()
 const { getDepartmentList } = useDepartmentStore()
 const departmentStore = useDepartmentStore()
@@ -64,15 +62,15 @@ const tree2FlatList = computed(() => {
 })
 const tableColumns = ref<TableColumn[]>([
   {
-    label: '用户名',
+    label: t('userDemo.username'),
     field: 'username'
   },
   {
-    label: '手机号',
+    label: t('login.phone'),
     field: 'phone'
   },
   {
-    label: '部门',
+    label: t('userDemo.department'),
     field: 'departments',
     slots: {
       default: (data: any) => {
@@ -91,7 +89,7 @@ const tableColumns = ref<TableColumn[]>([
     }
   },
   {
-    label: '创建时间',
+    label: t('tableDemo.createdAt'),
     field: 'createdAt',
     slots: {
       default: (data: any) => {
@@ -101,7 +99,7 @@ const tableColumns = ref<TableColumn[]>([
   },
   {
     field: 'roles',
-    label: '角色',
+    label: t('role.name'),
     slots: {
       default: (data: any) => {
         const roles = data?.row?.roles
@@ -119,9 +117,10 @@ const tableColumns = ref<TableColumn[]>([
     }
   },
   {
-    label: '操作',
+    label: t('tableDemo.action'),
     field: 'action',
-    width: 240,
+    width: '260px',
+    fixed: 'right',
     slots: {
       default: (data: any) => {
         const row = data.row
@@ -215,7 +214,7 @@ const searchSchema = ref<FormSchema[]>([
   },
   {
     field: 'phone',
-    label: '手机号',
+    label: t('login.phone'),
     component: 'Input'
   }
 ])

@@ -49,7 +49,7 @@ const tableColumns = reactive<TableColumn[]>([
   {
     field: 'meta.title',
     label: t('menu.menuName'),
-    width: 200,
+    minWidth: 200,
     slots: {
       default: (data: any) => {
         const title = data.row.meta.title
@@ -65,25 +65,26 @@ const tableColumns = reactive<TableColumn[]>([
     slots: {
       default: (data: any) => {
         const icon = data.row.meta.icon
-        if (icon) {
-          return (
-            <>
-              <Icon icon={icon} />
-            </>
-          )
-        } else {
-          return null
-        }
+        return icon ? <Icon icon={icon} /> : null
       }
     }
   },
   {
     field: 'component',
     label: t('menu.component'),
+    minWidth: 360,
     slots: {
       default: (data: any) => {
         const component = data.row.component
-        return <>{component === '#' ? '顶级目录' : component === '##' ? '子目录' : component}</>
+        return (
+          <>
+            {component === '#'
+              ? t('menu.topDirectory')
+              : component === '##'
+                ? t('menu.subDirectory')
+                : component}
+          </>
+        )
       }
     }
   },
@@ -94,7 +95,7 @@ const tableColumns = reactive<TableColumn[]>([
   {
     field: 'status',
     label: t('menu.status'),
-    width: 80,
+    minWidth: 90,
     align: 'center',
     slots: {
       default: (data: any) => {
@@ -111,7 +112,8 @@ const tableColumns = reactive<TableColumn[]>([
   {
     field: 'action',
     label: t('userDemo.action'),
-    width: 240,
+    fixed: 'right',
+    width: 260,
     slots: {
       default: (data: any) => {
         const row = data.row
@@ -123,11 +125,7 @@ const tableColumns = reactive<TableColumn[]>([
             <BaseButton type="success" onClick={() => action(row, 'detail')}>
               {t('exampleDemo.detail')}
             </BaseButton>
-            <BaseButton
-              type="danger"
-              disabled={!hasPermi('delete')}
-              onClick={() => delAction(row.id)}
-            >
+            <BaseButton type="danger" v-if={!hasPermi('delete')} onClick={() => delAction(row.id)}>
               {t('exampleDemo.del')}
             </BaseButton>
           </>
@@ -195,7 +193,7 @@ const save = async () => {
 }
 
 const sortMenuAction = () => {
-  dialogTitle.value = '菜单排序'
+  dialogTitle.value = t('exampleDemo.sort')
   dialogVisible.value = true
   actionType.value = 'sort'
 }
@@ -334,9 +332,9 @@ const generateMenuSeedData = (data: any[]) => {
   <ContentWrap>
     <div class="mb-10px">
       <BaseButton type="primary" @click="AddAction">{{ t('exampleDemo.add') }}</BaseButton>
-      <BaseButton type="primary" @click="sortMenuAction">菜单排序</BaseButton>
+      <BaseButton type="primary" @click="sortMenuAction">{{ t('exampleDemo.sort') }}</BaseButton>
       <HasPermission permission="refresh">
-        <BaseButton type="success" @click="getRole">更新菜单</BaseButton>
+        <BaseButton type="success" @click="getRole">{{ t('common.refresh') }}</BaseButton>
         <Seed
           @getList="getList"
           :keyData="{ treeList: generateMenuSeedData(dataList), filename: '菜单' }"

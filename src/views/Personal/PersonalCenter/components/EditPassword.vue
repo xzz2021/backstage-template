@@ -1,10 +1,15 @@
 <script setup lang="ts">
+import { updatePasswordApi } from '@/api/user'
+import { BaseButton } from '@/components/Button'
 import { Form, FormSchema } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
-import { reactive, ref } from 'vue'
+import { useI18n } from '@/hooks/web/useI18n'
 import { useValidator } from '@/hooks/web/useValidator'
-import { ElMessage, ElMessageBox, ElDivider } from 'element-plus'
-import { updatePasswordApi } from '@/api/user'
+import { ElDivider, ElMessage, ElMessageBox } from 'element-plus'
+import { reactive, ref } from 'vue'
+
+const { t } = useI18n()
+
 const props = defineProps<{
   userid: number
 }>()
@@ -14,7 +19,7 @@ const { required } = useValidator()
 const formSchema = reactive<FormSchema[]>([
   {
     field: 'password',
-    label: '旧密码',
+    label: t('userDemo.oldPassword'),
     component: 'InputPassword',
     colProps: {
       span: 24
@@ -22,7 +27,7 @@ const formSchema = reactive<FormSchema[]>([
   },
   {
     field: 'newPassword',
-    label: '新密码',
+    label: t('userDemo.newPassword'),
     component: 'InputPassword',
     colProps: {
       span: 24
@@ -33,7 +38,7 @@ const formSchema = reactive<FormSchema[]>([
   },
   {
     field: 'newPassword2',
-    label: '确认新密码',
+    label: t('userDemo.confirmNewPassword'),
     component: 'InputPassword',
     colProps: {
       span: 24
@@ -113,5 +118,5 @@ const save = async () => {
 <template>
   <Form :rules="rules" @register="formRegister" :schema="formSchema" />
   <ElDivider />
-  <BaseButton type="primary" @click="save">确认修改</BaseButton>
+  <BaseButton type="primary" @click="save">{{ t('exampleDemo.save') }}</BaseButton>
 </template>

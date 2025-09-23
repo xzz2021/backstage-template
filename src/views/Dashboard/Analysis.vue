@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import PanelGroup from './components/PanelGroup.vue'
-import { ElRow, ElCol, ElCard, ElSkeleton } from 'element-plus'
-import { Echart } from '@/components/Echart'
-import { pieOptions, barOptions, lineOptions } from './echarts-data'
-import { ref, reactive } from 'vue'
 import {
+  getMonthlySalesApi,
   getUserAccessSourceApi,
-  getWeeklyUserActivityApi,
-  getMonthlySalesApi
+  getWeeklyUserActivityApi
 } from '@/api/dashboard/analysis'
-import { set } from 'lodash-es'
-import { EChartsOption } from 'echarts'
+import { Echart } from '@/components/Echart'
 import { useI18n } from '@/hooks/web/useI18n'
+import { EChartsOption } from 'echarts'
+import { ElCard, ElCol, ElRow, ElSkeleton } from 'element-plus'
+import { set } from 'lodash-es'
+import { reactive, ref } from 'vue'
+import PanelGroup from './components/PanelGroup.vue'
+import { barOptions, lineOptions, pieOptions } from './echarts-data'
 // import { useAppStore } from '@/store/modules/app'
 
 const { t } = useI18n()
@@ -111,12 +111,13 @@ const getMonthlySales = async () => {
 //   options === pieOptionsData && set(options, 'series[0].emptyCircleStyle.color', inactiveColor)
 // }
 
+// @ts-ignore
 const getAllApi = async () => {
   await Promise.all([getUserAccessSource(), getWeeklyUserActivity(), getMonthlySales()])
   loading.value = false
 }
 
-console.log('xzz2021: getAllApi -> getAllApi', getAllApi)
+// console.log('xzz2021: getAllApi -> getAllApi', getAllApi)
 
 // 监听暗黑模式变化并重新更新样式
 // watch(isDark, () => {

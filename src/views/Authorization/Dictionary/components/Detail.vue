@@ -1,12 +1,12 @@
 <script setup lang="tsx">
-import { PropType } from 'vue'
 import { Descriptions, DescriptionsSchema } from '@/components/Descriptions'
+import { PropType } from 'vue'
 
-import { reactive } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { ElTag } from 'element-plus'
-import { formatToDateTime } from '@/utils/dateUtil'
 import { DictionaryEntry } from '@/api/dictionary/types'
+import { useI18n } from '@/hooks/web/useI18n'
+import { formatToDateTime } from '@/utils/dateUtil'
+import { ElTag } from 'element-plus'
+import { reactive } from 'vue'
 defineProps({
   currentRow: {
     type: Object as PropType<Nullable<DictionaryEntry>>,

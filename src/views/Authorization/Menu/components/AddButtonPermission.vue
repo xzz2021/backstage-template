@@ -2,6 +2,7 @@
 import { addPermission, updatePermission } from '@/api/menu'
 import { Form, FormSchema } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
+import { useI18n } from '@/hooks/web/useI18n'
 import { useValidator } from '@/hooks/web/useValidator'
 import { useMenuStore } from '@/store/modules/menu'
 import { ElDrawer, ElMessage } from 'element-plus'
@@ -10,11 +11,12 @@ import { reactive, watch } from 'vue'
 const menuStore = useMenuStore()
 const modelValue = defineModel<boolean>()
 const { required } = useValidator()
+const { t } = useI18n()
 
 const formSchema = reactive<FormSchema[]>([
   {
     field: 'name',
-    label: '权限名称',
+    label: t('permission.name'),
     component: 'Input',
     colProps: {
       span: 24
@@ -22,7 +24,7 @@ const formSchema = reactive<FormSchema[]>([
   },
   {
     field: 'code',
-    label: '权限标识',
+    label: t('permission.code'),
     component: 'Input',
     colProps: {
       span: 24
@@ -30,7 +32,7 @@ const formSchema = reactive<FormSchema[]>([
   },
   {
     field: 'value',
-    label: '值',
+    label: t('permission.value'),
     component: 'Input',
     colProps: {
       span: 24
@@ -89,14 +91,21 @@ watch(
 </script>
 
 <template>
-  <ElDrawer v-model="modelValue" title="自定义权限" append-to-body @close="onClose">
+  <ElDrawer
+    v-model="modelValue"
+    :title="
+      t(menuStore.drawerFormData.id ? 'permission.updatePermission' : 'permission.addPermission')
+    "
+    append-to-body
+    @close="onClose"
+  >
     <template #default>
       <Form :rules="rules" @register="formRegister" :schema="formSchema" />
     </template>
     <template #footer>
       <div>
-        <BaseButton @click="() => (modelValue = false)">取消</BaseButton>
-        <BaseButton type="primary" @click="confirm">确认</BaseButton>
+        <BaseButton @click="() => (modelValue = false)">{{ t('common.cancel') }}</BaseButton>
+        <BaseButton type="primary" @click="confirm">{{ t('common.ok') }}</BaseButton>
       </div>
     </template>
   </ElDrawer>

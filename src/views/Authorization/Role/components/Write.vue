@@ -1,14 +1,14 @@
 <script setup lang="tsx">
 import { Form, FormSchema } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
-import { PropType, reactive, watch, ref, unref, nextTick } from 'vue'
-import { useValidator } from '@/hooks/web/useValidator'
 import { useI18n } from '@/hooks/web/useI18n'
-import { ElTree, ElCheckboxGroup, ElCheckbox } from 'element-plus'
-import { eachTree } from '@/utils/tree'
-import { findIndex } from '@/utils'
+import { useValidator } from '@/hooks/web/useValidator'
 import { useMenuStore } from '@/store/modules/menu'
+import { findIndex } from '@/utils'
+import { eachTree } from '@/utils/tree'
+import { ElCheckbox, ElCheckboxGroup, ElTree } from 'element-plus'
 import { storeToRefs } from 'pinia'
+import { nextTick, PropType, reactive, ref, unref, watch } from 'vue'
 
 const { t } = useI18n()
 
@@ -27,12 +27,12 @@ const treeRef = ref<typeof ElTree>()
 const formSchema = ref<FormSchema[]>([
   {
     field: 'name',
-    label: t('role.roleName'),
+    label: t('role.name'),
     component: 'Input'
   },
   {
     field: 'code',
-    label: t('role.roleCode'),
+    label: t('role.code'),
     component: 'Input'
   },
   {
@@ -203,6 +203,21 @@ const handleCheckChange = (val: string[]) => {
     checkedCount > 0 && checkedCount < currentTreeData.value.permissionList.length
 }
 
+const countMenuAndPermission = (list: AppCustomRouteRecordRaw[]) => {
+  let menuCount = 0
+  let permissionCount = 0
+  list.forEach((item) => {
+    menuCount += 1
+    permissionCount += item.permissionList?.length || 0
+    if (item.children && item.children.length > 0) {
+      const [childMenuCount, childPermissionCount] = countMenuAndPermission(item.children)
+      menuCount += childMenuCount
+      permissionCount += childPermissionCount
+    }
+  })
+  return [menuCount, permissionCount]
+}
+
 const { allMenuList } = storeToRefs(menuStore)
 const getMenuList = async () => {
   // 请求到总菜单及权限列表
@@ -214,7 +229,6 @@ const getMenuList = async () => {
   if (list) {
     treeData.value = list
     if (!props.currentRow?.menus) return
-    // console.log('🚀 ~ getMenuList ~ props.currentRow', props.currentRow)
     await nextTick()
 
     const checked: any[] = []
@@ -237,12 +251,14 @@ const getMenuList = async () => {
     for (const item of checked) {
       unref(treeRef)?.setChecked(item.id, true, false)
     }
-    // unref(treeRef)?.setCheckedKeys(
-    //   checked.map((v) => v.id),
-    //   false
-    // )
+
     nextTick(() => {
-      checkAllTreeData.value = list.length === treeData.value.length
+      // 此处应该计算 菜单  及其children 总和 权限总和 是否全选
+      const result = countMenuAndPermission(list)
+      const checkedPermissionCount = checked.reduce((acc, item) => {
+        return acc + 1 + (item.permissions?.length || 0)
+      }, 0)
+      checkAllTreeData.value = result[0] + result[1] === checkedPermissionCount
     })
   }
 }
@@ -269,6 +285,7 @@ const submit = async () => {
     formData.menuIds = menuIds
     formData.permissionIds = permissionIds
     delete formData.menus
+    delete formData.permissionList
 
     return formData
   }

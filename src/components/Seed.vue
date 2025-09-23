@@ -3,7 +3,7 @@ import { BaseButton } from '@/components/Button'
 import { Dialog } from '@/components/Dialog'
 import { exportSeedData } from '@/utils/file'
 import { ElInput, ElMessage } from 'element-plus'
-import { PropType, ref } from 'vue'
+import { nextTick, PropType, ref } from 'vue'
 const seedData = ref('')
 const emit = defineEmits(['getList', 'generateSeed'])
 defineProps({
@@ -25,7 +25,9 @@ const generateSeed = async () => {
     return
   }
   await emit('generateSeed', JSON.parse(seedData.value))
-  await new Promise((resolve) => setTimeout(resolve, 2000))
+
+  // 等待下一个tick，确保父组件的异步操作有机会开始
+  await nextTick()
   // ElMessage.success('生成成功')
   // 更新列表
   seedDialog.value = false

@@ -1,27 +1,27 @@
 <script setup lang="tsx">
 import { ContentWrap } from '@/components/ContentWrap'
-import { useI18n } from '@/hooks/web/useI18n'
 import { Table } from '@/components/Table'
-import { ref, unref, onMounted } from 'vue'
+import { useI18n } from '@/hooks/web/useI18n'
 import { useTable } from '@/hooks/web/useTable'
+import { onMounted, ref, unref } from 'vue'
 // import { Search } from '@/components/Search'
-import Write from './components/Write.vue'
-import Detail from './components/Detail.vue'
-import { Dialog } from '@/components/Dialog'
 import { BaseButton } from '@/components/Button'
+import { Dialog } from '@/components/Dialog'
 import { ElLink } from 'element-plus'
+import Detail from './components/Detail.vue'
+import Write from './components/Write.vue'
 // import type { FormSchema } from '@/components/Form'
-import { formatToDateTime } from '@/utils/dateUtil'
-import { ElMessage } from 'element-plus'
-import TypeWrite from './components/TypeWrite.vue'
-import { TableColumn } from '@/components/Table'
-import Seed from '@/components/Seed.vue'
-import { storeToRefs } from 'pinia'
-import { useClipboard } from '@/hooks/web/useClipboard'
-import { treeMapEach } from '@/utils/tree'
-import { useDictionaryStore } from '@/store/modules/dictionary'
-import { DictionaryEntry, DictionaryItem } from '@/api/dictionary/types'
 import { generateDictionarySeedApi } from '@/api/dictionary'
+import { DictionaryEntry, DictionaryItem } from '@/api/dictionary/types'
+import Seed from '@/components/Seed.vue'
+import { TableColumn } from '@/components/Table'
+import { useClipboard } from '@/hooks/web/useClipboard'
+import { useDictionaryStore } from '@/store/modules/dictionary'
+import { formatToDateTime } from '@/utils/dateUtil'
+import { treeMapEach } from '@/utils/tree'
+import { ElMessage } from 'element-plus'
+import { storeToRefs } from 'pinia'
+import TypeWrite from './components/TypeWrite.vue'
 const { t } = useI18n()
 const dictionaryStore = useDictionaryStore()
 const { allDictionaryList } = storeToRefs(dictionaryStore)
@@ -69,23 +69,23 @@ const tableColumns = ref<TableColumn[]>([
   },
 
   {
-    label: '名称',
+    label: t('tableDemo.name'),
     field: 'name'
   },
   {
-    label: '编码',
+    label: t('tableDemo.code'),
     field: 'code'
   },
   {
-    label: '排序',
+    label: t('exampleDemo.sort'),
     field: 'sort'
   },
   {
-    label: '描述',
+    label: t('tableDemo.description'),
     field: 'description'
   },
   {
-    label: '创建时间',
+    label: t('tableDemo.createdAt'),
     field: 'createdAt',
     slots: {
       default: (data: any) => {
@@ -94,9 +94,10 @@ const tableColumns = ref<TableColumn[]>([
     }
   },
   {
-    label: '操作',
+    label: t('tableDemo.action'),
     field: 'action',
-    width: 240,
+    width: '260px',
+    fixed: 'right',
     slots: {
       default: (data: any) => {
         const row = data.row as DictionaryEntry

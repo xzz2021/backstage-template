@@ -1,11 +1,10 @@
 <script setup lang="tsx">
-import { PropType } from 'vue'
 import { DepartmentUserItem } from '@/api/department/types'
 import { Descriptions, DescriptionsSchema } from '@/components/Descriptions'
-import { useI18n } from 'vue-i18n'
-import { ElTag } from 'element-plus'
+import { useI18n } from '@/hooks/web/useI18n'
 import { formatToDateTime } from '@/utils/dateUtil'
-import { ref } from 'vue'
+import { ElTag } from 'element-plus'
+import { PropType, ref } from 'vue'
 defineProps({
   currentRow: {
     type: Object as PropType<DepartmentUserItem>,

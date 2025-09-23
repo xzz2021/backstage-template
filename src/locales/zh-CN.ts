@@ -24,6 +24,7 @@ export default {
     skipLabel: '跳过',
     doneLabel: '结束',
     menu: '菜单',
+    directory: '目录',
     menuDes: '以路由的结构渲染的菜单栏',
     collapse: '展开缩收',
     collapseDes: '展开和缩放菜单栏',
@@ -171,8 +172,20 @@ export default {
     sticky: '黏性',
     treeTable: '树形表格',
     PicturePreview: '表格图片预览',
+
     department: '部门管理',
     menuManagement: '菜单管理',
+    dictionary: '字典管理',
+    userIdentity: '用户身份',
+    userInfo: '个人信息',
+    // 系统管理 用户管理 在线用户  oss管理  文件管理  用户日志
+    systemManagement: '系统管理',
+    userManagement: '用户管理',
+    onlineUser: '在线用户',
+    ossManagement: 'oss管理',
+    fileManagement: '文件管理',
+    userLog: '用户日志',
+
     permission: '权限测试页',
     function: '功能',
     multipleTabs: '多开标签页',
@@ -191,7 +204,13 @@ export default {
     tree: 'Tree 树形控件'
   },
   permission: {
-    hasPermission: '请设置操作权限值'
+    name: '权限名称',
+    code: '权限标识',
+    value: '值',
+    hasPermission: '请设置操作权限值',
+    addPermission: '添加权限',
+    updatePermission: '修改权限',
+    addCurd: '快速生成增删改查'
   },
   analysis: {
     newUser: '新增用户',
@@ -331,6 +350,8 @@ export default {
     customContent: '自定义内容',
     lazyLoad: '懒加载',
     upload: '上传',
+    chunkUpload: '分片上传',
+    download: '下载',
     userAvatar: '用户头像',
     iconPicker: '图标选择器',
     iAgree: '我同意'
@@ -465,7 +486,12 @@ export default {
     preview: '封面',
     showOrHiddenSortable: '显示/隐藏排序',
     videoPreview: '视频预览',
-    cardTable: '卡片表格'
+    name: '名称',
+    code: '编码',
+    description: '描述',
+    cardTable: '卡片表格',
+    createdAt: '创建时间',
+    updatedAt: '更新时间'
   },
   richText: {
     richText: '富文本',
@@ -512,7 +538,8 @@ export default {
     important: '重要',
     content: '内容',
     save: '保存',
-    detail: '详情'
+    detail: '详情',
+    sort: '排序'
   },
   userDemo: {
     title: '用户管理',
@@ -540,7 +567,13 @@ export default {
     // 禁用
     disable: '禁用',
     // 上级部门
-    superiorDepartment: '上级部门'
+    superiorDepartment: '上级部门',
+    oldPassword: '旧密码',
+    newPassword: '新密码',
+    confirmNewPassword: '确认新密码',
+    //  个人信息  修改密码  基本资料
+    personalInfo: '个人信息',
+    basicInfo: '基本资料'
   },
   menu: {
     menuName: '菜单名称',
@@ -553,18 +586,23 @@ export default {
     alwaysShow: '是否一直显示',
     noCache: '是否清除缓存',
     breadcrumb: '是否显示面包屑',
-    affix: '是否固定在标签页',
+    affix: '是否固定标签页',
     noTagsView: '是否隐藏标签页',
     activeMenu: '高亮菜单',
     canTo: '是否可跳转',
     name: '组件名称',
     redirect: '重定向',
     parentMenu: '父级菜单',
-    menuType: '菜单类型'
+    menuType: '菜单类型',
+    copyForm: '一键复制表单',
+    writeForm: '一键写入表单',
+    topDirectory: '顶级目录',
+    subDirectory: '子目录'
   },
   role: {
-    roleName: '角色名称',
+    name: '角色名称',
     role: '角色',
+    code: '编码',
     menu: '菜单分配'
   },
   inputPasswordDemo: {

@@ -1,10 +1,14 @@
 <script lang="ts" setup>
-import { FormSchema, Form } from '@/components/Form'
-import { useForm } from '@/hooks/web/useForm'
-import { useValidator } from '@/hooks/web/useValidator'
-import { reactive, ref, watch } from 'vue'
-import { ElDivider, ElMessage, ElMessageBox } from 'element-plus'
 import { updatePersonApi } from '@/api/user'
+import { BaseButton } from '@/components/Button'
+import { Form, FormSchema } from '@/components/Form'
+import { useForm } from '@/hooks/web/useForm'
+import { useI18n } from '@/hooks/web/useI18n'
+import { useValidator } from '@/hooks/web/useValidator'
+import { ElDivider, ElMessage, ElMessageBox } from 'element-plus'
+import { reactive, ref, watch } from 'vue'
+
+const { t } = useI18n()
 
 const props = defineProps({
   userInfo: {
@@ -18,7 +22,7 @@ const { required, phone, maxlength } = useValidator()
 const formSchema = reactive<FormSchema[]>([
   {
     field: 'username',
-    label: '昵称',
+    label: t('userDemo.username'),
     component: 'Input',
     colProps: {
       span: 24
@@ -26,15 +30,18 @@ const formSchema = reactive<FormSchema[]>([
   },
   {
     field: 'phone',
-    label: '手机号码',
+    label: t('login.phone'),
     component: 'Input',
+    componentProps: {
+      disabled: true
+    },
     colProps: {
       span: 24
     }
   },
   {
     field: 'email',
-    label: '邮箱',
+    label: t('userDemo.email'),
     component: 'Input',
     colProps: {
       span: 24
@@ -102,5 +109,5 @@ const save = async () => {
 <template>
   <Form :rules="rules" @register="formRegister" :schema="formSchema" />
   <ElDivider />
-  <BaseButton type="primary" @click="save">保存</BaseButton>
+  <BaseButton type="primary" @click="save">{{ t('exampleDemo.save') }}</BaseButton>
 </template>

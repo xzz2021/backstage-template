@@ -1,21 +1,20 @@
 <script setup lang="tsx">
-import { reactive, ref, unref } from 'vue'
-import { useTable } from '@/hooks/web/useTable'
-import { useI18n } from '@/hooks/web/useI18n'
-import { Table, TableColumn } from '@/components/Table'
-import { ElTag } from 'element-plus'
-import { Search } from '@/components/Search'
-import { FormSchema } from '@/components/Form'
-import { ContentWrap } from '@/components/ContentWrap'
-import Write from './components/Write.vue'
-import Detail from './components/Detail.vue'
-import { Dialog } from '@/components/Dialog'
-import { BaseButton } from '@/components/Button'
-import { ElMessage } from 'element-plus'
-import Seed from '@/components/Seed.vue'
 import { addRoleApi, delRoleApi, editRoleApi, generateRoleSeedApi } from '@/api/role'
+import { BaseButton } from '@/components/Button'
+import { ContentWrap } from '@/components/ContentWrap'
+import { Dialog } from '@/components/Dialog'
+import { FormSchema } from '@/components/Form'
+import { Search } from '@/components/Search'
+import Seed from '@/components/Seed.vue'
+import { Table, TableColumn } from '@/components/Table'
+import { useI18n } from '@/hooks/web/useI18n'
+import { useTable } from '@/hooks/web/useTable'
 import { useRoleStore } from '@/store/modules/role'
 import { exportExcelData } from '@/utils/file'
+import { ElMessage, ElTag } from 'element-plus'
+import { reactive, ref, unref } from 'vue'
+import Detail from './components/Detail.vue'
+import Write from './components/Write.vue'
 
 const { t } = useI18n()
 const ids = ref<string[]>([])
@@ -51,7 +50,7 @@ const tableColumns = reactive<TableColumn[]>([
   },
   {
     field: 'name',
-    label: t('role.roleName')
+    label: t('role.name')
   },
   {
     field: 'status',
@@ -80,7 +79,7 @@ const tableColumns = reactive<TableColumn[]>([
   {
     field: 'action',
     label: t('userDemo.action'),
-    width: 240,
+    width: 260,
     fixed: 'right',
     slots: {
       default: (data: any) => {
@@ -142,6 +141,7 @@ const action = (row: any, type: string) => {
   dialogTitle.value = t(type === 'edit' ? 'exampleDemo.edit' : 'exampleDemo.detail')
   actionType.value = type
   currentRow.value = row
+  // console.log('🚀 ~ action ~ currentRow', row)
   dialogVisible.value = true
 }
 

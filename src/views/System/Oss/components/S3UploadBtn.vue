@@ -1,7 +1,11 @@
 <script setup lang="tsx">
 import { Icon } from '@/components/Icon'
+import { useI18n } from '@/hooks/web/useI18n'
 import { ChunkUploader } from '@/utils/chunk'
 import { ElMessage, ElUpload, UploadFile } from 'element-plus'
+
+const { t } = useI18n()
+
 const baseApi = import.meta.env.VITE_API_BASE_PATH
 const props = defineProps<{
   folderPath?: string
@@ -19,7 +23,7 @@ const uploadChange = async (uploadFile: UploadFile) => {
   // 1. 上传文件
   const chunkUploader = new ChunkUploader(uploadFile.raw, {
     bucket: 'public', // 选择 存储桶
-    key: fileInfo.folderPath, // 慎重传递  目录
+    key: fileInfo?.folderPath, // 慎重传递  目录
     apiBase: baseApi,
     partSize: 1024 * 1024 * 6,
     onProgress: ({ uploadedBytes, totalBytes, rateBps, uploadedParts, totalParts }) => {
@@ -55,7 +59,7 @@ const uploadChange = async (uploadFile: UploadFile) => {
     <BaseButton type="success">
       <div class="flex items-center gap-4px">
         <Icon icon="fluent:flash-16-regular" />
-        <div>分片上传</div>
+        <div>{{ t('formDemo.chunkUpload') }}</div>
       </div>
     </BaseButton>
   </el-upload>

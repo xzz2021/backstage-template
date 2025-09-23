@@ -1,16 +1,16 @@
 <script setup lang="tsx">
-import { Form, FormSchema } from '@/components/Form'
-import { useForm } from '@/hooks/web/useForm'
-import { PropType, reactive, watch, ref, unref } from 'vue'
-import { useValidator } from '@/hooks/web/useValidator'
-import { useI18n } from '@/hooks/web/useI18n'
-import { ElButton, ElMessage, ElPopconfirm, ElTable, ElTableColumn } from 'element-plus'
-import AddButtonPermission from './AddButtonPermission.vue'
-import { BaseButton } from '@/components/Button'
-import { cloneDeep } from 'lodash-es'
-import { useMenuStore } from '@/store/modules/menu'
 import { batchCreatePermissionApi, delPermission } from '@/api/menu'
+import { BaseButton } from '@/components/Button'
+import { Form, FormSchema } from '@/components/Form'
 import { useClipboard } from '@/hooks/web/useClipboard'
+import { useForm } from '@/hooks/web/useForm'
+import { useI18n } from '@/hooks/web/useI18n'
+import { useValidator } from '@/hooks/web/useValidator'
+import { useMenuStore } from '@/store/modules/menu'
+import { ElButton, ElMessage, ElPopconfirm, ElTable, ElTableColumn } from 'element-plus'
+import { cloneDeep } from 'lodash-es'
+import { PropType, reactive, ref, unref, watch } from 'vue'
+import AddButtonPermission from './AddButtonPermission.vue'
 
 const { t } = useI18n()
 
@@ -51,11 +51,11 @@ const formSchema = reactive<FormSchema[]>([
     componentProps: {
       options: [
         {
-          label: '目录',
+          label: t('common.directory'),
           value: 0
         },
         {
-          label: '菜单',
+          label: t('common.menu'),
           value: 1
         }
       ],
@@ -156,7 +156,7 @@ const formSchema = reactive<FormSchema[]>([
   },
   {
     field: 'component',
-    label: '组件',
+    label: t('menu.component'),
     component: 'Input',
     value: '#',
     componentProps: {
@@ -165,7 +165,12 @@ const formSchema = reactive<FormSchema[]>([
       on: {
         change: (val: string) => {
           cacheComponent.value = val
-          setValues({ ...props.currentRow, component: val, name: val.split('/').pop() })
+          setValues({
+            ...props.currentRow,
+            component: val,
+            name: val.split('/').pop(),
+            path: val.split('/').pop()?.toLowerCase()
+          })
         }
       }
     }
@@ -202,6 +207,7 @@ const formSchema = reactive<FormSchema[]>([
     field: 'status',
     label: t('menu.status'),
     component: 'Switch',
+    colProps: { span: 6 },
     componentProps: {
       activeText: t('userDemo.enable'),
       inactiveText: t('userDemo.disable'),
@@ -225,23 +231,23 @@ const formSchema = reactive<FormSchema[]>([
                   onClick={() => handleAdd({ menuId: data.id, resource: data.path })}
                   disabled={!data?.id}
                 >
-                  添加权限
+                  {t('permission.addPermission')}
                 </BaseButton>
                 <BaseButton type="danger" size="small" onClick={batchCreatePermission}>
-                  快速生成增删改查
+                  {t('permission.addCurd')}
                 </BaseButton>
                 <BaseButton type="success" size="small" onClick={copyFormdata}>
-                  一键复制表单
+                  {t('menu.copyForm')}
                 </BaseButton>
                 <BaseButton type="success" size="small" onClick={writeFormdata}>
-                  一键写入表单
+                  {t('menu.writeForm')}
                 </BaseButton>
               </div>
               <ElTable data={data?.permissionList}>
                 <ElTableColumn type="index" prop="id" />
                 <ElTableColumn
                   prop="name"
-                  label="权限名称"
+                  label={t('tableDemo.name')}
                   v-slots={{
                     default: ({ row }: any) => (
                       <div class="mr-1" key={row.value}>
@@ -252,26 +258,26 @@ const formSchema = reactive<FormSchema[]>([
                 />
                 <ElTableColumn
                   prop="code"
-                  label="权限标识"
+                  label={t('tableDemo.code')}
                   v-slots={{
                     default: ({ row }: any) => <span>{row.code}</span>
                   }}
                 />
 
                 <ElTableColumn
-                  label="操作"
-                  width="160"
+                  label={t('formDemo.operate')}
+                  width="180"
                   v-slots={{
                     default: ({ row }: any) => (
                       <>
                         <ElButton size="small" type="primary" onClick={() => handleEdit(row)}>
-                          编辑
+                          {t('formDemo.change')}
                         </ElButton>
                         <ElPopconfirm title="确定删除?" onConfirm={() => handleDelete(row)}>
                           {{
                             reference: () => (
                               <ElButton size="small" type="danger">
-                                删除
+                                {t('formDemo.delete')}
                               </ElButton>
                             )
                           }}

@@ -1,17 +1,16 @@
 <script setup lang="tsx">
+import { DepartmentUserItem } from '@/api/department/types'
+import { resetPasswordApi } from '@/api/user'
+import { BaseButton } from '@/components/Button'
 import { Form, FormSchema } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
-import { PropType, reactive, watch } from 'vue'
-import { DepartmentUserItem } from '@/api/department/types'
+import { useI18n } from '@/hooks/web/useI18n'
 import { useValidator } from '@/hooks/web/useValidator'
-import { useI18n } from 'vue-i18n'
-import { ElInput, ElMessage } from 'element-plus'
-import { BaseButton } from '@/components/Button'
-import { resetPasswordApi } from '@/api/user'
-import { ref, unref } from 'vue'
 import { useDepartmentStore } from '@/store/modules/department'
 import { useRoleStore } from '@/store/modules/role'
+import { ElInput, ElMessage } from 'element-plus'
 import { storeToRefs } from 'pinia'
+import { PropType, reactive, ref, unref, watch } from 'vue'
 
 const roleStore = useRoleStore()
 const { roleList } = storeToRefs(roleStore) // 使用storeToRefs获取store中的数据
@@ -111,7 +110,7 @@ const formSchema = ref<FormSchema[]>([
   },
   {
     field: 'phone',
-    label: '手机号',
+    label: t('login.phone'),
     component: 'Input'
   },
   {

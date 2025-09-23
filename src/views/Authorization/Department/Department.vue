@@ -87,10 +87,10 @@ const writeRef = ref<ComponentRef<typeof Write>>()
 const saveLoading = ref(false)
 
 const tableColumns = reactive<TableColumn[]>([
-  {
-    field: 'selection',
-    type: 'selection'
-  },
+  // {
+  //   field: 'selection',
+  //   type: 'selection'
+  // },
   {
     field: 'index',
     label: t('tableDemo.index'),
@@ -108,7 +108,7 @@ const tableColumns = reactive<TableColumn[]>([
   },
   {
     field: 'path',
-    label: '路径',
+    label: t('menu.path'),
     width: '165px'
   },
   {
@@ -127,24 +127,24 @@ const tableColumns = reactive<TableColumn[]>([
       }
     }
   },
-  {
-    field: 'createdAt',
-    label: t('tableDemo.displayTime'),
-    width: '165px'
-    // slots: {
-    //   default: (data: any) => {
-    //     return <>{formatToDateTime(data.row.createdAt)}</>
-    //   }
-    // }
-  },
+  // {
+  //   field: 'createdAt',
+  //   label: t('tableDemo.displayTime'),
+  //   width: '165px'
+  //   // slots: {
+  //   //   default: (data: any) => {
+  //   //     return <>{formatToDateTime(data.row.createdAt)}</>
+  //   //   }
+  //   // }
+  // },
   {
     field: 'updatedAt',
-    label: '更新时间',
+    label: t('tableDemo.updatedAt'),
     width: '165px'
   },
   {
     field: 'remark',
-    label: t('userDemo.remark')
+    label: t('tableDemo.description')
   },
   {
     field: 'action',

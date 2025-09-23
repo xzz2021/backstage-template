@@ -1,8 +1,10 @@
 <script setup lang="tsx">
-import { PropType, ref } from 'vue'
 import { Descriptions, DescriptionsSchema } from '@/components/Descriptions'
 import { Icon } from '@/components/Icon'
+import { useI18n } from '@/hooks/web/useI18n'
+import { useMenuStore } from '@/store/modules/menu'
 import { ElTag } from 'element-plus'
+import { PropType, ref } from 'vue'
 
 defineProps({
   currentRow: {
@@ -11,105 +13,128 @@ defineProps({
   }
 })
 
+const { t } = useI18n()
+
 const renderTag = (enable?: boolean) => {
-  return <ElTag type={!enable ? 'danger' : 'success'}>{enable ? '启用' : '禁用'}</ElTag>
+  return (
+    <ElTag type={enable ? 'success' : 'danger'}>
+      {enable ? t('userDemo.enable') : t('userDemo.disable')}
+    </ElTag>
+  )
 }
 
 const detailSchema = ref<DescriptionsSchema[]>([
   {
     field: 'type',
-    label: '菜单类型',
-    span: 24,
+    label: t('menu.menuType'),
     slots: {
       default: (data) => {
         const type = data.type
-        return <>{type === 1 ? '菜单' : '目录'}</>
+        return <>{type === 1 ? t('common.menu') : t('common.directory')}</>
       }
     }
   },
   {
-    field: 'parentName',
-    label: '父级菜单'
+    field: 'parentId',
+    label: t('menu.parentMenu'),
+    slots: {
+      default: (data) => {
+        const parentId = data.parentId
+        const parentName = useMenuStore().getAllMenuList.find((item) => item.id === parentId)?.meta
+          ?.title
+        return <>{parentName ? t(parentName) : '-'}</>
+      }
+    }
   },
   {
     field: 'meta.title',
-    label: '菜单名称'
+    label: t('menu.menuName'),
+    slots: {
+      default: (data) => {
+        const title = data.meta.title
+        return <>{title ? t(title) : '-'}</>
+      }
+    }
+  },
+  {
+    field: 'meta.icon',
+    label: t('menu.icon'),
+    slots: {
+      default: (data) => {
+        const icon = data.meta.icon
+        return icon ? <Icon icon={icon} /> : null
+      }
+    }
   },
   {
     field: 'component',
-    label: '组件',
+    label: t('menu.component'),
+    span: 24,
     slots: {
       default: (data) => {
         const component = data.component
-        return <>{component === '#' ? '顶级目录' : component === '##' ? '子目录' : component}</>
+        return (
+          <div class="  truncate ">
+            {component === '#'
+              ? t('menu.topDirectory')
+              : component === '##'
+                ? t('menu.subDirectory')
+                : component}
+          </div>
+        )
       }
     }
   },
   {
     field: 'name',
-    label: '组件名称'
-  },
-  {
-    field: 'meta.icon',
-    label: '图标',
-    slots: {
-      default: (data) => {
-        const icon = data.icon
-        if (icon) {
-          return (
-            <>
-              <Icon icon={icon} />
-            </>
-          )
-        } else {
-          return null
-        }
-      }
-    }
+    label: t('menu.menuName')
   },
   {
     field: 'path',
-    label: '路径'
+    label: t('menu.path')
   },
   {
     field: 'meta.activeMenu',
-    label: '高亮菜单'
+    label: t('menu.activeMenu'),
+    slots: {
+      default: (data) => renderTag(data.activeMenu)
+    }
     // slots: {
     //   default: (data) => {
     //     return renderTag(data.activeMenu)
     //   }
     // }
   },
-  {
-    field: 'permissionList',
-    label: '按钮权限',
-    span: 24,
-    slots: {
-      default: (data: any) => (
-        <>
-          {data?.permissionList?.map((v) => {
-            return (
-              <ElTag class="mr-1" key={v.value}>
-                {v.label}
-              </ElTag>
-            )
-          })}
-        </>
-      )
-    }
-  },
-  {
-    field: 'menuState',
-    label: '菜单状态',
-    slots: {
-      default: (data) => {
-        return renderTag(data.menuState)
-      }
-    }
-  },
+  // {
+  //   field: 'permissionList',
+  //   label: t('menu.buttonPermission'),
+  //   span: 24,
+  //   slots: {
+  //     default: (data: any) => (
+  //       <>
+  //         {data?.permissionList?.map((v) => {
+  //           return (
+  //             <ElTag class="mr-1" key={v.value}>
+  //               {v.label}
+  //             </ElTag>
+  //           )
+  //         })}
+  //       </>
+  //     )
+  //   }
+  // },
+  // {
+  //   field: 'menuState',
+  //   label: t('menu.menuState'),
+  //   slots: {
+  //     default: (data) => {
+  //       return renderTag(data.menuState)
+  //     }
+  //   }
+  // },
   {
     field: 'meta.hidden',
-    label: '是否隐藏',
+    label: t('menu.hidden'),
     slots: {
       default: (data) => {
         return renderTag(data.enableHidden)
@@ -118,7 +143,7 @@ const detailSchema = ref<DescriptionsSchema[]>([
   },
   {
     field: 'meta.alwaysShow',
-    label: '是否一直显示',
+    label: t('menu.alwaysShow'),
     slots: {
       default: (data) => {
         return renderTag(data.enableDisplay)
@@ -127,7 +152,7 @@ const detailSchema = ref<DescriptionsSchema[]>([
   },
   {
     field: 'meta.noCache',
-    label: '是否清除缓存',
+    label: t('menu.noCache'),
     slots: {
       default: (data) => {
         return renderTag(data.enableCleanCache)
@@ -136,7 +161,7 @@ const detailSchema = ref<DescriptionsSchema[]>([
   },
   {
     field: 'meta.breadcrumb',
-    label: '是否显示面包屑',
+    label: t('menu.breadcrumb'),
     slots: {
       default: (data) => {
         return renderTag(data.enableShowCrumb)
@@ -145,7 +170,7 @@ const detailSchema = ref<DescriptionsSchema[]>([
   },
   {
     field: 'meta.affix',
-    label: '是否固定标签页',
+    label: t('menu.affix'),
     slots: {
       default: (data) => {
         return renderTag(data.enablePinnedTab)
@@ -154,7 +179,7 @@ const detailSchema = ref<DescriptionsSchema[]>([
   },
   {
     field: 'meta.noTagsView',
-    label: '是否隐藏标签页',
+    label: t('menu.noTagsView'),
     slots: {
       default: (data) => {
         return renderTag(data.enableHiddenTab)
@@ -163,7 +188,7 @@ const detailSchema = ref<DescriptionsSchema[]>([
   },
   {
     field: 'meta.canTo',
-    label: '是否可跳转',
+    label: t('menu.canTo'),
     slots: {
       default: (data) => {
         return renderTag(data.enableSkip)

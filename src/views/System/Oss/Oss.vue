@@ -1,11 +1,12 @@
 <script setup lang="tsx">
-import { createFolderApi, deleteObjectApi, searchOssApi } from '@/api/oss'
+import { createFolderApi, deleteObjectApi, searchOssApi, uploadFileOssApi } from '@/api/oss'
 import { BaseButton } from '@/components/Button'
 import { ContentWrap } from '@/components/ContentWrap'
 import { FormSchema } from '@/components/Form'
 import { Icon } from '@/components/Icon'
 import { Search } from '@/components/Search'
 import { Table, TableColumn } from '@/components/Table'
+import { UploadBtn } from '@/components/UploadBtn'
 import { useTable } from '@/hooks/web/useTable'
 import { useOssStore } from '@/store/modules/oss'
 import { formatToDateTime } from '@/utils/dateUtil'
@@ -21,7 +22,6 @@ import {
 } from 'element-plus'
 import { reactive, ref, unref } from 'vue'
 import S3UploadBtn from './components/S3UploadBtn.vue'
-import UploadBtn from './components/UploadBtn.vue'
 import { downloadFile, previewFile } from './components/utils'
 
 const { getOssList } = useOssStore()
@@ -219,6 +219,17 @@ const open = () => {
       ElMessage.info('创建失败')
     })
 }
+
+const startUpload = async (file: File) => {
+  const fileInfo = {
+    // sha256,
+    file
+  }
+  // 1. 上传文件
+  await uploadFileOssApi(fileInfo)
+  await getList()
+  ElMessage.success('上传成功')
+}
 </script>
 
 <template>
@@ -244,7 +255,7 @@ const open = () => {
         </el-breadcrumb>
       </div>
       <div class="flex items-center gap-10px">
-        <UploadBtn @success="getList" :folderPath="currentPrefix" />
+        <UploadBtn :uploadApi="startUpload" />
         <S3UploadBtn @success="getList" :folderPath="currentPrefix" />
         <BaseButton plain @click="open">创建文件夹</BaseButton>
       </div>

@@ -1,17 +1,15 @@
 <script setup lang="tsx">
+import { DictionaryItem } from '@/api/dictionary/types'
+import { ContentWrap } from '@/components/ContentWrap'
+import { Dialog } from '@/components/Dialog'
 import { Form, FormSchema } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
-import { PropType, reactive, ref, unref, watch } from 'vue'
+import { useI18n } from '@/hooks/web/useI18n'
 import { useValidator } from '@/hooks/web/useValidator'
-import { DictionaryItem } from '@/api/dictionary/types'
-import { useI18n } from 'vue-i18n'
-import { ElMessage, ElMessageBox, ElTree } from 'element-plus'
 import { useDictionaryStore } from '@/store/modules/dictionary'
-import { ContentWrap } from '@/components/ContentWrap'
-import { ElInput } from 'element-plus'
-import { Dialog } from '@/components/Dialog'
-import { ElPopover, ElButton } from 'element-plus'
+import { ElButton, ElInput, ElMessage, ElMessageBox, ElPopover, ElTree } from 'element-plus'
 import { storeToRefs } from 'pinia'
+import { PropType, reactive, ref, unref, watch } from 'vue'
 const { required } = useValidator()
 
 const dictionaryStore = useDictionaryStore()
@@ -74,17 +72,17 @@ const { t } = useI18n()
 const formSchema = reactive<FormSchema[]>([
   {
     field: 'name',
-    label: '字典名称',
+    label: t('tableDemo.name'),
     component: 'Input'
   },
   {
     field: 'code',
-    label: '字典编码',
+    label: t('tableDemo.code'),
     component: 'Input'
   },
   {
     field: 'sort',
-    label: '排序',
+    label: t('exampleDemo.sort'),
     component: 'InputNumber',
     componentProps: {
       min: 0,
@@ -95,7 +93,7 @@ const formSchema = reactive<FormSchema[]>([
 
   {
     field: 'description',
-    label: t('userDemo.remark'),
+    label: t('tableDemo.description'),
     component: 'Input',
     componentProps: {
       type: 'textarea',

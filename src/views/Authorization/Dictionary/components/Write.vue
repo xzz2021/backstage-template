@@ -1,10 +1,10 @@
 <script setup lang="tsx">
+import { DictionaryEntry } from '@/api/dictionary/types'
 import { Form, FormSchema } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
-import { PropType, reactive, watch } from 'vue'
+import { useI18n } from '@/hooks/web/useI18n'
 import { useValidator } from '@/hooks/web/useValidator'
-import { useI18n } from 'vue-i18n'
-import { DictionaryEntry } from '@/api/dictionary/types'
+import { PropType, reactive, watch } from 'vue'
 
 const { required } = useValidator()
 
@@ -72,17 +72,17 @@ const formSchema = reactive<FormSchema[]>([
   // },
   {
     field: 'name',
-    label: '字典名称',
+    label: t('tableDemo.name'),
     component: 'Input'
   },
   {
     field: 'code',
-    label: '字典编码',
+    label: t('tableDemo.code'),
     component: 'Input'
   },
   {
     field: 'sort',
-    label: '排序',
+    label: t('exampleDemo.sort'),
     component: 'InputNumber',
     componentProps: {
       min: 0,
@@ -126,7 +126,7 @@ const formSchema = reactive<FormSchema[]>([
   // },
   {
     field: 'description',
-    label: t('userDemo.remark'),
+    label: t('tableDemo.description'),
     component: 'Input',
     componentProps: {
       type: 'textarea',

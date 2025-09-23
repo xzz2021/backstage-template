@@ -24,6 +24,7 @@ export default {
     skipLabel: 'Jump',
     doneLabel: 'End',
     menu: 'Menu',
+    directory: 'Directory',
     menuDes: 'Menu bar rendered in routed structure',
     collapse: 'Collapse',
     collapseDes: 'Expand and zoom the menu bar',
@@ -165,16 +166,26 @@ export default {
     exampleEdit: 'Example page - edit',
     exampleDetail: 'Example page - detail',
     errorPage: 'Error page',
-    authorization: 'Authorization',
-    user: 'User management',
-    role: 'Role management',
     document: 'Document',
     inputPassword: 'InputPassword',
     sticky: 'Sticky',
     treeTable: 'Tree table',
     PicturePreview: 'Table Image Preview',
-    department: 'Department management',
-    menuManagement: 'Menu management',
+
+    user: 'User',
+    role: 'Role',
+    authorization: 'Authorization',
+    department: 'Department',
+    menuManagement: 'Menu',
+    dictionary: 'Dictionary',
+    userIdentity: 'User identity',
+    userInfo: 'Information',
+    systemManagement: 'System',
+    userManagement: 'User',
+    onlineUser: 'Online user',
+    ossManagement: 'Oss',
+    fileManagement: 'File',
+    userLog: 'User log',
     // 权限测试页面
     permission: 'Permission test page',
     function: 'Function',
@@ -195,7 +206,13 @@ export default {
     tree: 'Tree'
   },
   permission: {
-    hasPermission: 'Please set the operation permission value'
+    name: 'Name',
+    code: 'Code',
+    value: 'Value',
+    hasPermission: 'Please set the operation permission value',
+    addPermission: 'Add permission',
+    updatePermission: 'Update permission',
+    addCurd: 'Quickly generate CRUD'
   },
   analysis: {
     newUser: 'New user',
@@ -337,6 +354,8 @@ export default {
     // 懒加载
     lazyLoad: 'Lazy load',
     upload: 'Upload',
+    chunkUpload: 'Chunk upload',
+    download: 'Download',
     // 用户头像
     userAvatar: 'User avatar',
     iconPicker: 'Icon picker',
@@ -475,7 +494,12 @@ export default {
     preview: 'Preview',
     showOrHiddenSortable: 'Show or hidden sortable',
     videoPreview: 'Video preview',
-    cardTable: 'Card table'
+    name: 'Name',
+    code: 'Code',
+    description: 'Description',
+    cardTable: 'Card table',
+    createdAt: 'Created at',
+    updatedAt: 'Updated at'
   },
   richText: {
     richText: 'Rich text',
@@ -522,7 +546,8 @@ export default {
     important: 'Important',
     content: 'Content',
     save: 'Save',
-    detail: 'Detail'
+    detail: 'Detail',
+    sort: 'Sort'
   },
   userDemo: {
     title: 'User management',
@@ -537,7 +562,7 @@ export default {
     remarkMessage1: 'Back end control routing permission',
     remarkMessage2: 'Front end control routing permission',
     // 部门列表
-    departmentList: 'Department list',
+    departmentList: 'Departments',
     // 搜索部门
     searchDepartment: 'Search department',
     account: 'Account',
@@ -549,7 +574,12 @@ export default {
     status: 'Status',
     enable: 'Enable',
     disable: 'Disable',
-    superiorDepartment: 'Superior department'
+    superiorDepartment: 'Superior department',
+    oldPassword: 'Old password',
+    newPassword: 'New password',
+    confirmNewPassword: 'Confirm password',
+    personalInfo: 'Personal information',
+    basicInfo: 'Basic information'
   },
   menu: {
     menuName: 'Menu name',
@@ -570,11 +600,16 @@ export default {
     name: 'Name',
     redirect: 'Redirect',
     parentMenu: 'Parent menu',
-    menuType: 'Menu type'
+    menuType: 'Menu type',
+    copyForm: 'Copy form',
+    writeForm: 'Write form',
+    topDirectory: 'Top directory',
+    subDirectory: 'Sub directory'
   },
   role: {
-    roleName: 'Role name',
+    name: 'Name',
     role: 'Role',
+    code: 'Code',
     // 菜单分配
     menu: 'Menu allocation'
   },

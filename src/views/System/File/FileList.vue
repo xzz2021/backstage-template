@@ -1,17 +1,17 @@
 <script setup lang="tsx">
-import { ContentWrap } from '@/components/ContentWrap'
-import { useI18n } from '@/hooks/web/useI18n'
-import { Table, TableColumn } from '@/components/Table'
+import { deleteFileApi, getFileListApi, uploadFileApi } from '@/api/file'
 import type { FileItem } from '@/api/file/types'
-import { useTable } from '@/hooks/web/useTable'
-import { ref, unref, reactive } from 'vue'
 import { BaseButton } from '@/components/Button'
-import { getFileListApi, deleteFileApi } from '@/api/file'
-import { formatFileSize, downloadFile } from '@/utils/file'
-import RenderFile from './components/RenderFile.vue'
-import { ElMessage } from 'element-plus'
-import UploadBtn from './components/UploadBtn.vue'
+import { ContentWrap } from '@/components/ContentWrap'
+import { Table, TableColumn } from '@/components/Table'
+import { UploadBtn } from '@/components/UploadBtn'
+import { useI18n } from '@/hooks/web/useI18n'
+import { useTable } from '@/hooks/web/useTable'
+import { downloadFile, formatFileSize } from '@/utils/file'
 import { useClipboard } from '@vueuse/core'
+import { ElMessage } from 'element-plus'
+import { reactive, ref, unref } from 'vue'
+import RenderFile from './components/RenderFile.vue'
 
 const { copy } = useClipboard()
 
@@ -89,20 +89,21 @@ const tableColumns = reactive<TableColumn[]>([
   {
     field: 'action',
     label: t('userDemo.action'),
-    width: 240,
+    width: 300,
+    fixed: 'right',
     slots: {
       default: (data: any) => {
         const row = data.row
         return (
           <>
             <BaseButton type="success" onClick={() => copyUrl(row.url)}>
-              复制
+              {t('setting.copy')}
             </BaseButton>
             <BaseButton
               type="primary"
               onClick={() => downloadFile({ url: row.url, fileName: row.name })}
             >
-              下载
+              {t('formDemo.download')}
             </BaseButton>
             <BaseButton type="danger" onClick={() => delData(row.id)}>
               {t('exampleDemo.del')}
@@ -151,6 +152,17 @@ const copyUrl = (url: string) => {
   copy(url)
   ElMessage.success('文件链接复制成功')
 }
+
+const startUpload = async (file: File) => {
+  const fileInfo = {
+    // sha256,
+    file
+  }
+  // 1. 上传文件
+  await uploadFileApi(fileInfo)
+  await getList()
+  ElMessage.success('上传成功')
+}
 </script>
 
 <template>
@@ -158,7 +170,7 @@ const copyUrl = (url: string) => {
     <!-- <Search :schema="searchSchema" @search="setSearchParams" @reset="setSearchParams" /> -->
 
     <div class="mb-10px flex items-center gap-10px">
-      <UploadBtn @success="getList" />
+      <UploadBtn :uploadApi="startUpload" />
       <BaseButton :loading="delLoading" type="danger" @click="delData">
         {{ t('exampleDemo.batchDel') }}
       </BaseButton>
