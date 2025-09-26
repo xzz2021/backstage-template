@@ -125,7 +125,11 @@ const tableColumns = reactive<TableColumn[]>([
             <BaseButton type="success" onClick={() => action(row, 'detail')}>
               {t('exampleDemo.detail')}
             </BaseButton>
-            <BaseButton type="danger" v-if={!hasPermi('delete')} onClick={() => delAction(row.id)}>
+            <BaseButton
+              type="danger"
+              disabled={!hasPermi('delete')}
+              onClick={() => delAction(row.id)}
+            >
               {t('exampleDemo.del')}
             </BaseButton>
           </>

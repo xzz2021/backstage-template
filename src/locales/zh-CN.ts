@@ -491,7 +491,8 @@ export default {
     description: '描述',
     cardTable: '卡片表格',
     createdAt: '创建时间',
-    updatedAt: '更新时间'
+    updatedAt: '更新时间',
+    operator: '操作人'
   },
   richText: {
     richText: '富文本',

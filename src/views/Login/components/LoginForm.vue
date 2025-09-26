@@ -1,17 +1,17 @@
 <script setup lang="tsx">
-import { reactive, ref, onMounted, unref } from 'vue'
-import { Form, FormSchema } from '@/components/Form'
-import { useI18n } from '@/hooks/web/useI18n'
-import { ElCheckbox, ElLink } from 'element-plus'
-import { useForm } from '@/hooks/web/useForm'
-import { useValidator } from '@/hooks/web/useValidator'
-import { Icon } from '@/components/Icon'
-import { useUserStore } from '@/store/modules/user'
-import { BaseButton } from '@/components/Button'
+import { getCaptchaApi, loginApi } from '@/api/login'
 import { UserLoginType } from '@/api/login/types'
-import { loginApi, getCaptchaApi } from '@/api/login'
-import { useLogin } from './hooks'
+import { BaseButton } from '@/components/Button'
+import { Form, FormSchema } from '@/components/Form'
+import { Icon } from '@/components/Icon'
+import { useForm } from '@/hooks/web/useForm'
+import { useI18n } from '@/hooks/web/useI18n'
+import { useValidator } from '@/hooks/web/useValidator'
+import { useUserStore } from '@/store/modules/user'
 import { AxiosError } from 'axios'
+import { ElCheckbox, ElLink, ElMessage } from 'element-plus'
+import { onMounted, reactive, ref, unref } from 'vue'
+import { useLogin } from './hooks'
 
 const { required } = useValidator()
 const { successLogin } = useLogin()
@@ -77,7 +77,7 @@ const schema = reactive<FormSchema[]>([
   },
   {
     field: 'captchaText',
-    label: '验证码',
+    label: t('login.code'),
     component: 'Input',
     colProps: {
       span: 24
@@ -246,6 +246,7 @@ const toWechat = () => {
 }
 
 const toSms = () => {
+  return ElMessage.warning('体验模式,暂不开放!')
   emit('to-sms')
 }
 
@@ -275,7 +276,7 @@ const signIn = async () => {
         await successLogin(userinfo, access_token)
       } catch (error) {
         console.log('xzz2021: signIn -> error', error)
-        if (error instanceof AxiosError && error.response?.status === 401) {
+        if (error instanceof AxiosError && error.response?.status === 400) {
           // 只有当后面的登录失败时，才更新验证码
           updateCaptcha()
         }

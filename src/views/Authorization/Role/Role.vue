@@ -105,7 +105,7 @@ const tableColumns = reactive<TableColumn[]>([
 const searchSchema = reactive<FormSchema[]>([
   {
     field: 'name',
-    label: t('role.roleName'),
+    label: t('role.name'),
     component: 'Input'
   },
   {
@@ -212,6 +212,7 @@ const exportExcel = () => {
     <Search :schema="searchSchema" @reset="setSearchParams" @search="setSearchParams" />
     <div class="mb-10px">
       <BaseButton type="primary" @click="AddAction">{{ t('exampleDemo.add') }}</BaseButton>
+      <BaseButton type="success" @click="exportExcel">导出excel</BaseButton>
 
       <Seed
         @getList="getList"
@@ -225,7 +226,6 @@ const exportExcel = () => {
         @generateSeed="generateRoleSeedApi"
       />
     </div>
-    <BaseButton type="success" @click="exportExcel">导出excel</BaseButton>
     <Table
       v-model:pageSize="pageSize"
       v-model:currentPage="currentPage"
@@ -234,9 +234,7 @@ const exportExcel = () => {
       node-key="id"
       :data="dataList"
       :loading="loading"
-      :pagination="{
-        total
-      }"
+      :pagination="{ total }"
       @register="tableRegister"
     />
   </ContentWrap>

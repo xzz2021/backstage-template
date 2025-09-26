@@ -32,7 +32,7 @@ const schema = reactive<FormSchema[]>([
     formItemProps: {
       slots: {
         default: () => {
-          return <h2 class="text-2xl font-bold text-center w-[100%]">验证码登录</h2>
+          return <h2 class="text-2xl font-bold text-center w-[100%]">{t('login.login')}</h2>
         }
       }
     }

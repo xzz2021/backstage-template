@@ -2,7 +2,7 @@
 import { Icon } from '@/components/Icon'
 import { useI18n } from '@/hooks/web/useI18n'
 import { ChunkUploader } from '@/utils/chunk'
-import { ElMessage, ElUpload, UploadFile } from 'element-plus'
+import { ElLoading, ElMessage, ElUpload, UploadFile } from 'element-plus'
 
 const { t } = useI18n()
 
@@ -38,7 +38,15 @@ const uploadChange = async (uploadFile: UploadFile) => {
     }
   })
   try {
-    await chunkUploader.uploadAll() // 自动初始化/续传/合并
+    ElLoading.service({
+      target: document.body,
+      text: '上传中...',
+      background: 'rgba(0, 0, 0, 0.7)'
+    })
+    await chunkUploader.uploadAll().finally(() => {
+      ElLoading.service().close()
+    })
+    // await chunkUploader.uploadAll() // 自动初始化/续传/合并
     // alert(`上传完成：${result.data.key} ${result.data.size} bytes`)
     ElMessage.success('上传成功')
     emit('success')

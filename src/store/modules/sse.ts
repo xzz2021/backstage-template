@@ -1,7 +1,7 @@
-import { ref, watch } from 'vue'
-import { defineStore } from 'pinia'
 import { useIdle } from '@vueuse/core'
 import mitt from 'mitt'
+import { defineStore } from 'pinia'
+import { ref, watch } from 'vue'
 import { useUserStore } from './user'
 
 /**
@@ -78,7 +78,7 @@ export const useSSEStore = defineStore('sse', () => {
         // userStore.fetchPermsAndMenus()
       }
       // 在线用户数量变更时
-      else if (type === 'updateOnlineUserCount') {
+      else if (type === 'updateOnlineUserCount' && location.hash == '#/system/onlineUser') {
         onlineUserCount.value = ~~data // 双按位取反  效果等价于把一个数 向零取整  把原数的小数部分截掉，只保留整数部分
         emitter.emit('onlineUser', onlineUserCount.value)
       } else if (type === 'focusLogOut') {

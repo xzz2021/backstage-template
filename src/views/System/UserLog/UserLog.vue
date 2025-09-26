@@ -1,17 +1,17 @@
 <script setup lang="tsx">
-import { ContentWrap } from '@/components/ContentWrap'
-import { Search } from '@/components/Search'
-import { Dialog } from '@/components/Dialog'
-import { useI18n } from '@/hooks/web/useI18n'
-import { Table, TableColumn } from '@/components/Table'
-import { useTable } from '@/hooks/web/useTable'
-import { ref, unref, reactive } from 'vue'
-import Detail from './components/Detail.vue'
-import { BaseButton } from '@/components/Button'
-import { FormSchema } from '@/components/Form'
+import { delLogApi, getLogListApi } from '@/api/log/index'
 import { LogItem } from '@/api/log/type'
-import { getLogListApi, delLogApi } from '@/api/log/index'
+import { BaseButton } from '@/components/Button'
+import { ContentWrap } from '@/components/ContentWrap'
+import { Dialog } from '@/components/Dialog'
+import { FormSchema } from '@/components/Form'
+import { Search } from '@/components/Search'
+import { Table, TableColumn } from '@/components/Table'
+import { useI18n } from '@/hooks/web/useI18n'
+import { useTable } from '@/hooks/web/useTable'
 import { ElTag } from 'element-plus'
+import { reactive, ref, unref } from 'vue'
+import Detail from './components/Detail.vue'
 
 const ids = ref<string[]>([])
 
@@ -122,7 +122,7 @@ const tableColumns = reactive<TableColumn[]>([
   {
     field: 'ip',
     label: 'IP地址',
-    width: '90px'
+    width: '130px'
   },
   {
     field: 'createdAt',
