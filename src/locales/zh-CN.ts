@@ -183,6 +183,7 @@ export default {
     userManagement: '用户管理',
     onlineUser: '在线用户',
     ossManagement: 'oss管理',
+    server: '服务监控',
     fileManagement: '文件管理',
     userLog: '用户日志',
 

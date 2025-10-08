@@ -184,6 +184,7 @@ export default {
     userManagement: 'User',
     onlineUser: 'Online user',
     ossManagement: 'Oss',
+    server: 'Server Monitoring',
     fileManagement: 'File',
     userLog: 'User log',
     // 权限测试页面

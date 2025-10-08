@@ -16,7 +16,7 @@ import Seed from '@/components/Seed.vue'
 import { Table, TableColumn } from '@/components/Table'
 import { useDepartmentStore } from '@/store/modules/department'
 import { treeMapEach } from '@/utils/tree'
-import { ElMessage, ElTag } from 'element-plus'
+import { ElMessage, ElSwitch } from 'element-plus'
 
 const { getDepartmentList, delDepartment } = useDepartmentStore()
 const { tableRegister, tableState, tableMethods } = useTable({
@@ -119,9 +119,10 @@ const tableColumns = reactive<TableColumn[]>([
         const status = data.row.status
         return (
           <>
-            <ElTag type={status ? 'success' : 'danger'}>
+            {/* <ElTag type={status ? 'success' : 'danger'}>
               {status ? t('userDemo.enable') : t('userDemo.disable')}
-            </ElTag>
+            </ElTag> */}
+            <ElSwitch v-model={status} before-change={() => handleStatusChange(data.row)} />
           </>
         )
       }
@@ -169,6 +170,15 @@ const tableColumns = reactive<TableColumn[]>([
     }
   }
 ])
+
+const handleStatusChange = async (row: DepartmentItem) => {
+  console.log('🚀 ~ xzz: handleStatusChange -> row', row)
+  const res = await editDepartmentApi({ ...row, status: !row.status })
+  if (res?.data?.id) {
+    ElMessage.success('更新成功!')
+    getList()
+  }
+}
 
 const save = async () => {
   const write = unref(writeRef)

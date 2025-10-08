@@ -44,3 +44,40 @@ export interface UserListResponse {
   list: UserListItem[]
   total: number
 }
+export interface ServerInfoResponse {
+  cpu: {
+    cpuNum: number
+    used: number
+    sys: number
+    free: number
+  }
+  mem: {
+    total: number
+    used: number
+    free: number
+    usage: number
+  }
+  sys: {
+    computerName: string
+    osName: string
+    computerIp: string
+    osArch: string
+  }
+  node: {
+    title: string
+    version: string
+    execPath: string
+    argv: string
+    cwd: string
+    uptime: string
+  }
+  sysFiles: {
+    dirName: string
+    sysTypeName: string
+    typeName: string
+    total: number
+    free: number
+    used: number
+    usage: number
+  }[]
+}
