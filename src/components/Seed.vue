@@ -2,7 +2,7 @@
 import { BaseButton } from '@/components/Button'
 import { Dialog } from '@/components/Dialog'
 import { exportSeedData } from '@/utils/file'
-import { ElInput, ElMessage } from 'element-plus'
+import { ElButtonGroup, ElInput, ElMessage } from 'element-plus'
 import { nextTick, PropType, ref } from 'vue'
 const seedData = ref('')
 const emit = defineEmits(['getList', 'generateSeed'])
@@ -37,16 +37,18 @@ const generateSeed = async () => {
 </script>
 <template>
   <Permission permission="seed">
-    <BaseButton type="primary" @click="() => exportSeedData(keyData.treeList, keyData.filename)">
-      一键复制seed
-    </BaseButton>
-    <BaseButton
-      type="success"
-      @click="() => exportSeedData(keyData.treeList, keyData.filename, true)"
-    >
-      下载seed文件
-    </BaseButton>
-    <BaseButton type="danger" @click="seedDialog = true">增量更新seed</BaseButton>
+    <ElButtonGroup class="ml-10px">
+      <BaseButton type="primary" @click="() => exportSeedData(keyData.treeList, keyData.filename)">
+        复制seed
+      </BaseButton>
+      <BaseButton
+        type="success"
+        @click="() => exportSeedData(keyData.treeList, keyData.filename, true)"
+      >
+        下载seed
+      </BaseButton>
+      <BaseButton type="danger" @click="seedDialog = true">更新seed</BaseButton>
+    </ElButtonGroup>
   </Permission>
   <Dialog v-model="seedDialog" title="生成新数据">
     <div class="text-[red] m-[10px]">请将seed数据粘贴到下方(必须是数组): </div>

@@ -339,12 +339,12 @@ const generateMenuSeedData = (data: any[]) => {
       <BaseButton type="primary" @click="sortMenuAction">{{ t('exampleDemo.sort') }}</BaseButton>
       <HasPermission permission="refresh">
         <BaseButton type="success" @click="getRole">{{ t('common.refresh') }}</BaseButton>
-        <Seed
-          @getList="getList"
-          :keyData="{ treeList: generateMenuSeedData(dataList), filename: '菜单' }"
-          @generateSeed="generateMenuSeedApi"
-        />
       </HasPermission>
+      <Seed
+        @getList="getList"
+        :keyData="{ treeList: generateMenuSeedData(dataList), filename: '菜单' }"
+        @generateSeed="generateMenuSeedApi"
+      />
     </div>
     <Table
       :columns="tableColumns"

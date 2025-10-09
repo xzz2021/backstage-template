@@ -11,7 +11,7 @@ import { useI18n } from '@/hooks/web/useI18n'
 import { useTable } from '@/hooks/web/useTable'
 import { useRoleStore } from '@/store/modules/role'
 import { exportExcelData } from '@/utils/file'
-import { ElMessage, ElTag } from 'element-plus'
+import { ElButtonGroup, ElMessage, ElTag } from 'element-plus'
 import { reactive, ref, unref } from 'vue'
 import Detail from './components/Detail.vue'
 import Write from './components/Write.vue'
@@ -210,9 +210,12 @@ const exportExcel = () => {
 <template>
   <ContentWrap>
     <Search :schema="searchSchema" @reset="setSearchParams" @search="setSearchParams" />
-    <div class="mb-10px">
+    <div class="mb-10px flex items-center gap-10px">
       <BaseButton type="primary" @click="AddAction">{{ t('exampleDemo.add') }}</BaseButton>
-      <BaseButton type="success" @click="exportExcel">导出excel</BaseButton>
+      <ElButtonGroup>
+        <BaseButton type="success" @click="exportExcel"> <Icon icon="ep:upload" />导出</BaseButton>
+        <BaseButton type="success"> <Icon icon="ep:download" />导入</BaseButton>
+      </ElButtonGroup>
 
       <Seed
         @getList="getList"

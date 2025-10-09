@@ -1,9 +1,9 @@
 import router from '@/router'
-import type { RouteLocationNormalizedLoaded } from 'vue-router'
+import { findIndex } from '@/utils'
 import { getRawRoute } from '@/utils/routerHelper'
 import { defineStore } from 'pinia'
+import type { RouteLocationNormalizedLoaded } from 'vue-router'
 import { store } from '../index'
-import { findIndex } from '@/utils'
 import { useUserStoreWithOut } from './user'
 
 export interface TagsViewState {

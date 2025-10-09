@@ -41,8 +41,8 @@ axiosInstance.interceptors.response.use(
     return res
   },
   async (error: AxiosError) => {
-    console.log('err-------------------------- ', error) // for debug
-    let msg = (error.response?.data as any)?.message
+    // console.log('err-------------------------- ', error) // for debug
+    let msg = (error.response?.data as any)?.message || error.message || error.toString()
 
     const original = await slientTokenRefresh(error?.status || 0, error?.config)
     if (original) {

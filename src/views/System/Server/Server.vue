@@ -12,7 +12,6 @@ const serverInfo = ref<ServerInfoResponse>()
 
 const getServerInfo = async () => {
   const res = await getServerInfoApi()
-  console.log(res)
   serverInfo.value = res.data
 }
 const uptime = ref<number>(0)
@@ -21,15 +20,11 @@ onMounted(async () => {
   await getServerInfo()
   uptime.value = Number(serverInfo.value!.node.uptime)
   serverInfo.value!.node.uptime = formatTimeBySeconds(uptime.value)
-
   loadDone()
   setInterval(() => {
     uptime.value++
     serverInfo.value!.node.uptime = formatTimeBySeconds(uptime.value)
   }, 1000)
-  // setInterval(() => {
-  //   getServerInfo()
-  // }, 5000)
 })
 
 const cpuTableData = computed(() => {
@@ -47,10 +42,6 @@ const cpuTableData = computed(() => {
 })
 
 const memTableData = computed(() => {
-  // total 总内存
-  // used 已使用内存
-  // free 剩余内存
-  // usage 使用率
   return Object.keys(serverInfo.value?.mem || {}).map((key) => ({
     value: serverInfo.value?.mem?.[key],
     key:
@@ -78,7 +69,7 @@ const serverInfoTableData = computed(() => {
         : key === 'osName'
           ? '操作系统'
           : key === 'computerIp'
-            ? '计算机IP'
+            ? '内网IP'
             : '操作系统架构'
   }))
 })
@@ -114,9 +105,8 @@ const diskTableColumn = [
 <template>
   <div class="flex flex-col gap-10px w-full">
     <div class="flex gap-20px w-full">
-      <!--     flex: 1; -->
       <ContentWrap title="CPU" style="flex: 1">
-        <el-table :data="cpuTableData" style="width: 100%">
+        <el-table :data="cpuTableData">
           <el-table-column
             v-for="item in simpleTableData"
             :key="item.prop"
@@ -126,7 +116,7 @@ const diskTableColumn = [
         </el-table>
       </ContentWrap>
       <ContentWrap title="内存" style="flex: 1">
-        <el-table :data="memTableData" style="width: 100%">
+        <el-table :data="memTableData">
           <el-table-column
             v-for="item in simpleTableData"
             :key="item.prop"
@@ -156,7 +146,7 @@ const diskTableColumn = [
     </ContentWrap>
 
     <ContentWrap title="磁盘状态">
-      <el-table :data="serverInfo?.sysFiles" style="width: 100%">
+      <el-table :data="serverInfo?.sysFiles">
         <el-table-column
           v-for="item in diskTableColumn"
           :key="item.prop"

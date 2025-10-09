@@ -243,7 +243,7 @@ const generateDepartmentSeedData = (data: DepartmentItem[]) => {
   <ContentWrap>
     <Search :schema="searchSchema" @search="setSearchParams" @reset="setSearchParams" />
 
-    <div class="mb-10px">
+    <div>
       <BaseButton type="primary" @click="AddAction">{{ t('exampleDemo.add') }}</BaseButton>
       <!-- <BaseButton :loading="delLoading" type="danger" @click="delData(null)">
         {{ t('exampleDemo.del') }}

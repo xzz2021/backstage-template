@@ -245,18 +245,10 @@ const generateDictionarySeedData = (data: DictionaryItem[]) => {
     <TypeWrite @currentChange="currentChange" />
     <ContentWrap class="flex-[3] ml-20px">
       <!-- <Search @reset="getList" @search="setSearchParams" :schema="searchSchema" /> -->
-
-      <Seed
-        @getList="updateDictionaryList"
-        :keyData="{
-          treeList: generateDictionarySeedData(allDictionaryList),
-          filename: '部门'
-        }"
-        @generateSeed="generateDictionarySeedApi"
-      />
-      <ElLink class="mx-10px" @click="copy(currentDicKey)" type="primary">
+      <ElLink class="mr-10px" @click="copy(currentDicKey)" type="primary">
         {{ currentDicKey && `当前字典: ${currentDicKey}` }}</ElLink
       >
+
       <div class="my-10px">
         <BaseButton type="primary" @click="AddAction" :disabled="!currentNodeKey">{{
           t('exampleDemo.add')
@@ -269,6 +261,14 @@ const generateDictionarySeedData = (data: DictionaryItem[]) => {
         >
           {{ t('exampleDemo.batchDel') }}
         </BaseButton>
+        <Seed
+          @getList="updateDictionaryList"
+          :keyData="{
+            treeList: generateDictionarySeedData(allDictionaryList),
+            filename: '部门'
+          }"
+          @generateSeed="generateDictionarySeedApi"
+        />
       </div>
       <Table
         v-model:current-page="currentPage"

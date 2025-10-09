@@ -37,7 +37,7 @@ export const useSSEStore = defineStore('sse', () => {
   })
 
   watch(idle, (idleValue) => {
-    console.log('idleValue', idleValue)
+    // console.log('idleValue', idleValue)
     if (idleValue) {
       closeEventSource()
     } else if (userStore.token) {
