@@ -19,7 +19,8 @@ const getFilenameFromHeader = (headers: RawAxiosResponseHeaders | AxiosResponseH
   return filename
 }
 
-export const downloadFile = async (rawName: string, isFolder: boolean = false) => {
+export const downloadFile = async (rawName: string) => {
+  const isFolder = rawName.endsWith('/')
   try {
     const blob: AxiosResponse<Blob> = isFolder
       ? await downloadFolderApi({

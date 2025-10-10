@@ -1,5 +1,11 @@
 <script setup lang="tsx">
-import { createFolderApi, deleteObjectApi, searchOssApi, uploadFileOssApi } from '@/api/oss'
+import {
+  createFolderApi,
+  deleteObjectApi,
+  getPublicFileUrlApi,
+  searchOssApi,
+  uploadFileOssApi
+} from '@/api/oss'
 import { BaseButton } from '@/components/Button'
 import { ContentWrap } from '@/components/ContentWrap'
 import { FormSchema } from '@/components/Form'
@@ -12,6 +18,7 @@ import { useOssStore } from '@/store/modules/oss'
 import { formatToDateTime } from '@/utils/dateUtil'
 import { formatFileSize, getFileIcon2 } from '@/utils/file'
 import { safeName } from '@/utils/safeName'
+import { useClipboard } from '@vueuse/core'
 import {
   ElBreadcrumb,
   ElBreadcrumbItem,
@@ -20,7 +27,7 @@ import {
   ElMessageBox,
   ElPopover
 } from 'element-plus'
-import { reactive, ref, unref } from 'vue'
+import { onUnmounted, reactive, ref, unref } from 'vue'
 import S3UploadBtn from './components/S3UploadBtn.vue'
 import { downloadFile, previewFile } from './components/utils'
 
@@ -39,6 +46,7 @@ const { getList } = tableMethods
 const isSearching = ref(false)
 const currentPrefix = ref('')
 const searchParams = ref<any>(null)
+
 const setSearchParams = (params: any) => {
   // console.log('xzz2021: setSearchParams -> params', params)
   // 如果params为空
@@ -77,37 +85,59 @@ const resetSearch = () => {
   getList()
 }
 
+// Popover管理状态
+const activePopoverId = ref<string | null>(null)
+const popoverRefs = ref<Record<string, any>>({})
 const popoverDom = (displayName: string, rawName: string) => {
   const newName = displayName.replace(currentPrefix.value, '')
+  const popoverId = `popover-${rawName.replace(/[^a-zA-Z0-9]/g, '-')}`
+
   return (
     <ElPopover
-      ref="popover"
+      ref={(el: any) => {
+        if (el) {
+          popoverRefs.value[popoverId] = el
+        }
+      }}
       trigger="contextmenu"
       width="auto"
       v-slots={{
         default: () => (
           <>
-            <ElButton
-              type="primary"
-              plain
-              onClick={() => {
-                downloadFile(rawName, rawName.endsWith('/'))
-              }}
-            >
+            <ElButton type="primary" plain onClick={() => downloadFile(rawName)}>
               下载
             </ElButton>
             <ElButton
-              type="danger"
+              type="primary"
+              v-show={!rawName.endsWith('/')}
               plain
-              onClick={() => {
-                deleteFile(rawName)
-              }}
+              onClick={() => copyUrl(rawName)}
             >
+              复制url
+            </ElButton>
+            <ElButton type="danger" plain onClick={() => deleteFile(rawName)}>
               删除
             </ElButton>
           </>
         ),
-        reference: () => <div class="">{newName}</div>
+        reference: () => (
+          <div
+            class=""
+            onContextmenu={() => {
+              // 关闭其他打开的Popover
+              if (activePopoverId.value && activePopoverId.value !== popoverId) {
+                const activePopover = popoverRefs.value[activePopoverId.value]
+                if (activePopover && activePopover.hide) {
+                  activePopover.hide()
+                }
+              }
+              // 设置当前激活的Popover
+              activePopoverId.value = popoverId
+            }}
+          >
+            {newName}
+          </div>
+        )
       }}
     />
   )
@@ -130,7 +160,6 @@ const generateDom = (data: any) => {
           }}
         >
           <Icon icon={icon}></Icon>
-          {/* <div class="truncate">{name}</div> */}
           {popoverDom(name, rawName)}
         </div>
       ) : (
@@ -230,6 +259,20 @@ const startUpload = async (file: File) => {
   await getList()
   ElMessage.success('上传成功')
 }
+const { copy } = useClipboard()
+const copyUrl = (rawName: string) => {
+  getPublicFileUrlApi({ objectName: rawName }).then((res) => {
+    const url = res.data.url
+    copy(url)
+    ElMessage.success('复制url成功')
+  })
+}
+
+// 组件卸载时清理
+onUnmounted(() => {
+  activePopoverId.value = null
+  popoverRefs.value = {}
+})
 </script>
 
 <template>

@@ -1,10 +1,16 @@
 import request from '@/axios'
-import { OssListResponse } from './types'
 import { AxiosResponse } from 'axios'
+import { OssListResponse } from './types'
 
 //  此处后端合并了处理分页查询和 带id过滤的分页查询
 export const getOssListApi = (params: any): Promise<IResponse<OssListResponse>> => {
   return request.get({ url: 'minio/publicBucket', params })
+}
+
+export const getPublicFileUrlApi = (params: {
+  objectName: string
+}): Promise<IResponse<{ url: string }>> => {
+  return request.get({ url: 'minio/publicFileUrl', params })
 }
 
 // 创建文件夹
