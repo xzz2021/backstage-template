@@ -1,12 +1,12 @@
 <script setup lang="tsx">
-import { ContentWrap } from '@/components/ContentWrap'
-import { useI18n } from '@/hooks/web/useI18n'
-import { Table, TableColumn } from '@/components/Table'
-import { useTable } from '@/hooks/web/useTable'
-import { reactive } from 'vue'
 import { BaseButton } from '@/components/Button'
+import { ContentWrap } from '@/components/ContentWrap'
+import { Table, TableColumn } from '@/components/Table'
+import { useI18n } from '@/hooks/web/useI18n'
+import { useTable } from '@/hooks/web/useTable'
 import { useSystemStore } from '@/store/modules/system'
 import { ElMessage } from 'element-plus'
+import { reactive } from 'vue'
 
 const systemStore = useSystemStore()
 const { getUserList, unlock } = systemStore
@@ -80,10 +80,6 @@ const unlockFn = async (id: number) => {
 
 <template>
   <ContentWrap>
-    <!-- <div class="mb-10px">
-      <BaseButton :loading="delLoading" type="danger" @click="getList"> 刷新 </BaseButton>
-    </div> -->
-
     <Table
       v-model:pageSize="pageSize"
       v-model:currentPage="currentPage"

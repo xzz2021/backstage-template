@@ -37,6 +37,7 @@ const { tableRegister, tableState, tableMethods } = useTable({
     const params = {
       ...unref(searchParams)
     }
+    // 后端返回的array数据  必须有唯一字段? 比如id 不然table组件勾选会变成全选
     return await getOssList(params)
   }
 })
@@ -186,9 +187,7 @@ const tableColumns = reactive<TableColumn[]>([
     field: 'name',
     label: '名称',
     slots: {
-      default: (data: any) => {
-        return generateDom(data.row)
-      }
+      default: (data: any) => generateDom(data.row)
     }
   },
   {

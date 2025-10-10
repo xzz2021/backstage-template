@@ -2,11 +2,13 @@
 import { getServerInfoApi } from '@/api/system'
 import { ServerInfoResponse } from '@/api/system/types'
 import { ContentWrap } from '@/components/ContentWrap'
+import { Echart } from '@/components/Echart'
 import { usePageLoading } from '@/hooks/web/usePageLoading'
 import { formatTimeBySeconds } from '@/utils/dateUtil'
+import { EChartsOption } from 'echarts'
 import { ElDescriptions, ElDescriptionsItem, ElTable, ElTableColumn } from 'element-plus'
-import { computed, onMounted, ref } from 'vue'
-
+import { computed, onMounted, ref, watch } from 'vue'
+import { generateGaugeOptions } from './echarts-data'
 const { loadStart, loadDone } = usePageLoading()
 const serverInfo = ref<ServerInfoResponse>()
 
@@ -101,6 +103,34 @@ const diskTableColumn = [
   { label: '已使用大小', prop: 'used' },
   { label: '使用率', prop: 'usage' }
 ]
+
+const memGaugeOptionsData = ref<EChartsOption>({})
+
+const cpuGaugeOptionsData = ref<EChartsOption>({})
+
+watch(
+  () => serverInfo.value,
+  (newVal) => {
+    const percentage = Number(newVal?.mem?.usage || 0).toFixed(2)
+    memGaugeOptionsData.value = JSON.parse(
+      JSON.stringify(
+        generateGaugeOptions({
+          percentage,
+          name: '内存使用率'
+        })
+      )
+    )
+    const percentageCpu = Number(newVal?.cpu?.used || 0) + Number(newVal?.cpu?.sys || 0)
+    cpuGaugeOptionsData.value = JSON.parse(
+      JSON.stringify(
+        generateGaugeOptions({
+          percentage: percentageCpu.toFixed(2),
+          name: 'CPU使用率'
+        })
+      )
+    )
+  }
+)
 </script>
 <template>
   <div class="flex flex-col gap-10px w-full">
@@ -114,6 +144,7 @@ const diskTableColumn = [
             :label="item.label"
           />
         </el-table>
+        <Echart :options="cpuGaugeOptionsData as EChartsOption" :height="300" />
       </ContentWrap>
       <ContentWrap title="内存" style="flex: 1">
         <el-table :data="memTableData">
@@ -124,6 +155,7 @@ const diskTableColumn = [
             :label="item.label"
           />
         </el-table>
+        <Echart :options="memGaugeOptionsData as EChartsOption" :height="300" />
       </ContentWrap>
     </div>
     <ContentWrap title="服务器信息">
